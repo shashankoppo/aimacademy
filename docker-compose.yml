@@ -1,0 +1,13 @@
+services:
+  aim-academy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aim-academy-web
+    ports:
+      - "80:80"
+    restart: always
+
+# Optional: Add networks if needed for database/backend communication
+# networks:
+#   - aim-network

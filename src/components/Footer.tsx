@@ -77,12 +77,16 @@ const Footer = () => {
           {/* Brand col (wider) */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-4 mb-6 group">
-              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-slate-200 group-hover:border-gold/40 transition-all duration-500 shadow-xl relative overflow-hidden p-1.5">
-                <img src="/images/logo_main.png" alt="AIM Academy Logo" className="w-full h-full object-contain" />
+              <div className="w-32 flex items-center justify-center group-hover:scale-105 transition-all duration-300 relative overflow-hidden">
+                <img src="/images/logo_main.png" alt="AIM Academy Logo" className="w-full max-h-24 object-contain" />
               </div>
-              <div>
-                <div className="font-display font-extrabold text-navy text-2xl group-hover:text-gold-dark transition-colors duration-300">AIM Academy</div>
-                <div className="text-[10px] text-navy/30 tracking-[0.3em] uppercase font-body mt-1">Jabalpur's #1 Civil Services</div>
+              <div className="flex flex-col gap-0.5">
+                <div className="font-black text-[1.45rem] tracking-tight leading-none whitespace-nowrap text-slate-900 group-hover:text-primary transition-colors duration-200">
+                  AIM <span className="text-primary">Academy</span>
+                </div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.22em] leading-none text-primary/70">
+                  — Synonym of Success —
+                </div>
               </div>
             </Link>
             <p className="text-slate-500 text-sm font-body leading-relaxed mb-5">

@@ -106,7 +106,8 @@
   }
 
   /* ─── Animations ─── */
-  .gsap-reveal { opacity: 0; transform: translateY(20px); }
+  /* Remove default opacity: 0 so if JS breaks, site is still visible! GSAP will handle initial hidden state via .from() */
+  .gsap-reveal { visibility: visible; }
 
   /* ─── Special Sections ─── */
   .bg-academic {

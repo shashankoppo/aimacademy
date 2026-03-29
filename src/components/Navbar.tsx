@@ -22,6 +22,7 @@ const Navbar = () => {
     { name: "About", path: "/about" },
     { name: "Courses", path: "/courses", hasDropdown: true },
     { name: "Results", path: "/results" },
+    { name: "Portals", path: "/login", hasDropdown: true },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -47,18 +48,23 @@ const Navbar = () => {
       )}>
         <div className="container mx-auto px-6 h-full flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-             {/* Official Logo Integration */}
-             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 shadow-sm border border-slate-100 overflow-hidden group-hover:scale-110 transition-transform">
-                <img src="/images/logo_main.png" alt="AIM Academy Logo" className="w-full h-full object-contain" />
+             {/* Logo Image – boundary removed & enlarged */}
+             <div className="w-28 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
+                <img src="/images/logo_main.png" alt="AIM Academy Logo" className="w-full max-h-20 object-contain" />
              </div>
-             <div className="flex flex-col">
-                <span className="font-display font-black text-2xl tracking-tighter text-slate-900 group-hover:text-primary transition-colors leading-none">AIM</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">Academy Group</span>
+             {/* Brand Text */}
+             <div className="flex flex-col gap-0.5">
+                <span className="font-black text-[1.45rem] tracking-tight leading-none whitespace-nowrap text-slate-900 group-hover:text-primary transition-colors duration-200">
+                   AIM <span className="text-primary">Academy</span>
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.22em] leading-none text-primary/70">
+                   — Synonym of Success —
+                </span>
              </div>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -76,8 +82,11 @@ const Navbar = () => {
             
             <div className="h-6 w-px bg-slate-200 mx-2" />
             
-            <Link to="/contact" className="btn-coursera">
-              Begin Free
+            <Link to="/login" className="btn-coursera bg-slate-900 px-6">
+              Sign In
+            </Link>
+            <Link to="/contact" className="btn-coursera px-6">
+              Join Free
             </Link>
           </div>
 

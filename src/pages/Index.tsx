@@ -298,23 +298,6 @@ const Index = () => {
          </div>
       </section>
 
-      {/* ══ FOOTER MINIMAL ════════════════════════════════════ */}
-      <footer className="py-16 bg-white border-t border-slate-100">
-         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1 border border-slate-100 overflow-hidden">
-                <img src="/images/logo_main.png" alt="AIM Academy Logo" className="w-full h-full object-contain" />
-             </div>
-             <span className="font-display font-black text-xl text-slate-900 tracking-tighter">AIM ACADEMY</span>
-          </div>
-            <p className="text-slate-400 text-sm">© 2024 AIM Academy Jabalpur. All Rights Reserved.</p>
-            <div className="flex gap-8">
-               {["Terms", "Privacy", "Help"].map(text => (
-                 <a key={text} href="#" className="text-slate-400 hover:text-primary text-xs font-bold uppercase tracking-widest">{text}</a>
-               ))}
-            </div>
-         </div>
-      </footer>
 
     </div>
   );
