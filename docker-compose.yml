@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: aim-academy-frontend
     ports:
-      - "80:80"
+      - "9010:80"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
