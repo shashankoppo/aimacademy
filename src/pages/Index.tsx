@@ -1,303 +1,413 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowRight, CheckCircle2, Trophy, Users, Star, Quote, 
-  Play, TrendingUp, Cpu, GraduationCap, BookOpen, Shield, Target, Flame,
-  ChevronRight, BarChart3, PieChart, Zap, Clock, Globe, Award
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { MapPin, Clock, Youtube, ShieldCheck, GraduationCap, Video, ArrowRight, ChevronRight, ChevronLeft, PhoneCall, Handshake, Users, Award, X, Play, Download, CheckCircle2 } from "lucide-react";
 
-// ─── Shared Components ───────────────────────────────────────
-const SectionHeading = ({ label, title, description, center = true }: any) => (
-  <div className={center ? "text-center mb-16 gsap-reveal" : "text-left mb-16 gsap-reveal"}>
-    <div className="flex flex-col gap-3">
-      <span className="badge-academic self-start mx-auto inline-block">{label}</span>
-      <h2 className="heading-display text-3xl md:text-5xl lg:text-5xl text-slate-900 leading-tight">
-        {title}
-      </h2>
-      {description && (center ? 
-        <p className="max-w-2xl mx-auto text-lg text-slate-500 font-body leading-relaxed mt-4">
-          {description}
-        </p> : 
-        <p className="max-w-xl text-lg text-slate-500 font-body leading-relaxed mt-4">
-          {description}
-        </p>
-      )}
-    </div>
-  </div>
-);
-
-const StatCard = ({ stat, index }: any) => (
-  <div className="flex flex-col items-center text-center p-6 border-r border-slate-100 last:border-0 gsap-reveal" style={{ transitionDelay: `${index * 0.1}s` }}>
-     <div className="font-display font-black text-4xl md:text-5xl text-primary tracking-tighter flex items-baseline gap-1">
-        <span>{stat.value}</span>
-        <span className="text-primary text-xl font-bold">{stat.suffix}</span>
-      </div>
-    <div className="text-slate-900 font-bold text-sm uppercase tracking-wide mt-2">{stat.label}</div>
-    <div className="text-slate-400 text-[11px] font-medium uppercase tracking-widest leading-none mt-1">{stat.sub}</div>
-  </div>
-);
-
-// ─── Data ───────────────────────────────────────────────────
-const courses = [
-  { icon: GraduationCap, title: "UPSC Civil Services", badge: "Flagship", desc: "Top-tier UPSC CSE mentorship by ex-faculty and rank holders.", students: "4,500+", duration: "12-18 Months", level: "Officer" },
-  { icon: Target,        title: "State PSC (MP/UP/Bihar)", badge: "Hot", desc: "Region-specific strategy for MPPSC, UPPSC, BPSC, and RPSC exams.", students: "3,200+", duration: "6-12 Months", level: "Group A/B" },
-  { icon: Shield,        title: "SSC CGL & CHSL", badge: "Popular", desc: "Intensive drills for reasoning and quant with speed-math techniques.", students: "6,800+", duration: "6 Months", level: "Central Gov" },
-  { icon: BookOpen,      title: "Banking & IBPS", badge: "Trending", desc: "Focused preparation for SBI PO, IBPS, and RBI Grade-B recruitment.", students: "2,900+", duration: "6 Months", level: "Financial" },
-];
-
-const stats = [
-  { value: '500',  suffix: '+',  label: "Selections", sub: "Since 2012" },
-  { value: '30',   suffix: '%',  label: "Selection Rate", sub: "UPSC CSE Interview" },
-  { value: '12',   suffix: 'k+', label: "Global Students", sub: "Across all streams" },
-  { value: '4.9',  suffix: '/5', label: "Student Rating", sub: "Google & Maps" },
-];
-
-const partners = [
-  { name: "ELSxGlobal", role: "Tech Partner" },
-  { name: "Oxford Education", role: "Library Access" },
-  { name: "Pearson", role: "Publishing Partner" },
-  { name: "AWS EdStart", role: "Infrastructure" },
-];
-
-const testimonials = [
-  { name: "Aarav Mehta", rank: "AIR 12 — UPSC CSE 2024", quote: "The mentorship at AIM Academy was the turning point in my preparation. The evaluation of my mains answers was far more rigorous than any other institute.", initial: "AM" },
-  { name: "Deepa Nair",  rank: "AIR 23 — UPSC CSE 2023", quote: "AIM's focus on conceptual clarity helped me tackle the most difficult Prelims paper in recent years with confidence.", initial: "DN" },
-  { name: "Priya Sharma",rank: "AIR 45 — UPSC CSE 2024", quote: "Highly intensive, highly professional, and emotionally supportive throughout the journey.", initial: "PS" },
-];
-
-// ─── Main Page ─────────────────────────────────────────────────
 const Index = () => {
-  return (
-    <div className="bg-white min-h-screen">
-      
-      {/* ══ HERO SECTION ══════════════════════════════════════ */}
-      <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-32 bg-academic overflow-hidden border-b border-slate-100">
-        <div className="absolute inset-0 bg-dot-white" />
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-16 items-center">
-            <div className="lg:col-span-12 xl:col-span-6 flex flex-col gap-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1 bg-surface-accent rounded text-primary text-xs font-bold uppercase tracking-widest border border-blue-100 gsap-reveal">
-                <Globe className="w-4 h-4" /> Global Recognition — Jabalpur #1 Ranked
-              </div>
-              <h1 className="heading-display text-[3.5rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[4.8rem] text-slate-900 leading-[1] gsap-reveal">
-                Empowering the Next Generation of <span className="text-primary italic">Leaders.</span>
-              </h1>
-              <p className="text-slate-500 text-xl font-body max-w-2xl leading-relaxed gsap-reveal [transition-delay:0.2s]">
-                Acquire the skills and mentorship to crack India's toughest exams. Join a community 
-                of <span className="text-primary font-bold">12,000+ Aspirants</span> and start your career in public service.
-              </p>
-              <div className="flex flex-wrap gap-4 items-center gsap-reveal [transition-delay:0.4s]">
-                 <Link to="/courses" className="btn-coursera text-lg px-10 py-5">
-                   Explore Programs
-                 </Link>
-                 <Link to="/contact" className="btn-outline-coursera text-lg px-10 py-5">
-                   Get Counseling
-                 </Link>
-              </div>
-              <div className="flex items-center gap-6 gsap-reveal [transition-delay:0.6s]">
-                 <div className="flex -space-x-3">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center overflow-hidden">
-                        <Users className="w-5 h-5 text-slate-300" />
-                      </div>
-                    ))}
-                 </div>
-                 <div className="text-sm font-body text-slate-400">
-                   <span className="text-slate-900 font-bold">4.9/5 Rating</span> by over 500+ successful officers
-                 </div>
-              </div>
-            </div>
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [heroSlides, setHeroSlides] = useState([
+    "/images/HEROMAIN 007.jpeg",     
+    "/images/STUDENT BANNER 01.jpeg",      
+    "/images/STUDENT_BANNER.jpeg"
+  ]);
 
-            <div className="lg:col-span-12 xl:col-span-6 relative gsap-reveal [transition-delay:0.8s]">
-              <div className="relative rounded-xl overflow-hidden shadow-2xl border-4 border-white lg:rotate-1">
-                <img 
-                  src="/images/hero_banner_wide.jpg" 
-                  alt="AIM Academy Group Success" 
-                  className="w-full h-auto object-cover hover:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/60 to-transparent p-6">
-                   <div className="flex items-center gap-4 text-white">
-                      <div className="p-3 bg-white/20 backdrop-blur rounded-full">
-                         <Play className="w-5 h-5 fill-current" />
-                      </div>
-                      <span className="font-bold text-sm">Our 12th Year of Academic Excellence</span>
+  useEffect(() => {
+    // Lead Magnet Popup after 5 seconds
+    const popupTimer = setTimeout(() => setShowPopup(true), 5000);
+
+    // Check if admin has set custom slider images
+    const saved = localStorage.getItem("aim_hero_slides");
+    if (saved) {
+      try {
+        const parsedSlides = JSON.parse(saved);
+        if (parsedSlides && parsedSlides.length > 0) {
+          setHeroSlides(parsedSlides);
+        }
+      } catch(e) {}
+    }
+
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 4000); // Slides every 4 seconds
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+
+  return (
+    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-800">
+      
+      {/* ── KGS-STYLE HERO (FULL WIDTH SLIDER) ── */}
+      <section className="w-full relative group bg-slate-100 border-b border-slate-200">
+        
+        {/* Main Slider Area */}
+        <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] bg-slate-100 overflow-hidden relative cursor-pointer block">
+           
+           {heroSlides.map((slide, index) => (
+             <div 
+                key={index}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-1000 flex items-center justify-center ${index === currentSlide ? "opacity-100 z-0" : "opacity-0 -z-10"}`}
+             >
+                <img src={slide} alt={`AIM Academy Latest Banner ${index + 1}`} className="w-full h-full object-cover object-center group-hover:scale-[1.01] transition-transform duration-700 hover:duration-[5000ms]" />
+             </div>
+           ))}
+           
+           {/* Soft overlay gradient as done in KGS */}
+           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none z-10"></div>
+
+           {/* Floating "Admissions Open" or "Free Consultation" overlay on banner to avoid pricing */}
+           <div className="absolute bottom-8 left-8 hidden md:block z-20">
+              <Link to="/contact" className="inline-flex items-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-black text-sm px-6 py-3 rounded-md uppercase tracking-wider shadow-lg hover:brightness-105 transition-all">
+                 <Handshake className="w-4 h-4" /> Book Free Counseling To Secure Seat
+              </Link>
+           </div>
+        </div>
+
+        {/* KGS Style Heavy Navigation Arrows */}
+        <button onClick={prevSlide} aria-label="Previous Slide" className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 w-12 h-12 lg:w-16 lg:h-16 bg-white/95 text-slate-800 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgb(0,0,0,0.15)] hover:bg-white hover:scale-105 transition-all opacity-0 md:group-hover:opacity-100 z-20">
+           <ChevronLeft className="w-6 h-6 lg:w-8 lg:h-8" />
+        </button>
+        <button onClick={nextSlide} aria-label="Next Slide" className="absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 w-12 h-12 lg:w-16 lg:h-16 bg-white/95 text-slate-800 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgb(0,0,0,0.15)] hover:bg-white hover:scale-105 transition-all opacity-0 md:group-hover:opacity-100 z-20">
+           <ChevronRight className="w-6 h-6 lg:w-8 lg:h-8" />
+        </button>
+
+        {/* Pagination Dots exactly identical to KGS */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
+           {heroSlides.map((_, index) => (
+             <div 
+               key={index} 
+               onClick={() => setCurrentSlide(index)}
+               className={`h-2 rounded-full cursor-pointer transition-all ${index === currentSlide ? "w-6 bg-blue-600" : "w-2 bg-white/70 hover:bg-white shadow-sm"}`}
+             ></div>
+           ))}
+        </div>
+      </section>
+
+      {/* ── STATS & CONSULTATION STRIP (BELOW HERO) ── */}
+      <section className="bg-white border-b border-slate-200 shadow-sm relative z-20">
+         <div className="container mx-auto px-4 lg:px-8">
+            <div className="py-6 lg:py-8 flex flex-wrap justify-between items-center gap-6">
+                
+                <div className="flex-1 min-w-[200px] flex items-center gap-4 sm:border-r border-slate-100 pr-4">
+                   <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-6 h-6" />
+                   </div>
+                   <div>
+                      <p className="text-2xl font-black text-slate-900 leading-none">12,000+</p>
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Students Mentored</p>
                    </div>
                 </div>
-              </div>
-              {/* Floating Stat Case */}
-              <div className="absolute -bottom-8 -left-8 academic-card bg-white p-6 border-l-4 border-l-primary animate-float-slow">
-                 <div className="flex flex-col gap-1">
-                    <span className="text-primary font-black text-2xl tracking-tighter">95% Success</span>
-                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">In Interview Rounds</span>
-                 </div>
-              </div>
+                
+                <div className="flex-1 min-w-[200px] flex items-center gap-4 lg:border-r border-slate-100 pr-4 hidden sm:flex">
+                   <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                      <Users className="w-6 h-6" />
+                   </div>
+                   <div>
+                      <p className="text-2xl font-black text-slate-900 leading-none">50+</p>
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Expert Faculty</p>
+                   </div>
+                </div>
+
+                <div className="flex-1 min-w-[200px] flex items-center gap-4 lg:border-r border-slate-100 pr-4 hidden md:flex">
+                   <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                      <Award className="w-6 h-6" />
+                   </div>
+                   <div>
+                      <p className="text-2xl font-black text-slate-900 leading-none">15+</p>
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Years Legacy</p>
+                   </div>
+                </div>
+
+                <div className="flex-none w-full lg:w-auto">
+                   <a href="tel:+917067231189" className="w-full lg:w-auto inline-flex items-center justify-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-black px-8 py-3.5 rounded-full hover:brightness-105 transition-all shadow-[0_4px_15px_rgba(251,225,34,0.3)] uppercase tracking-wide text-[13px]">
+                      <PhoneCall className="w-4 h-4" /> Book Free Counseling
+                   </a>
+                </div>
             </div>
+         </div>
+      </section>
+
+      {/* ── POPULAR EXAM CATEGORIES (KGS GRID STYLE) ── */}
+      <section className="py-12 bg-slate-50">
+        <div className="container mx-auto px-4 lg:px-8 bg-white p-6 md:p-8 rounded-[24px] border border-slate-100 shadow-[0_2px_15px_rgb(0,0,0,0.02)]">
+          <div className="flex justify-between items-center mb-8">
+             <h2 className="text-2xl font-black text-slate-900">Target Exams (Sarkari Naukri)</h2>
+             <Link to="/courses" className="text-[hsl(var(--primary-foreground))] bg-yellow-50 font-bold text-xs px-4 py-2 rounded-full hover:bg-yellow-100 flex items-center transition-colors">View All <ChevronRight className="w-3 h-3 ml-1" /></Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+            {[
+              { title: "UPSC & MPPSC", sub: "Foundation & Target", icon: "🏛️" },
+              { title: "SSC Exams", sub: "CGL, CHSL, MTS", icon: "📊" },
+              { title: "Defence Exams", sub: "NDA, CDS, AFCAT", icon: "🎖️" },
+              { title: "Banking Exams", sub: "SBI & IBPS", icon: "🏦" },
+              { title: "Railway Exams", sub: "RRB NTPC, ALP", icon: "🚂" },
+              { title: "State Police", sub: "SI & Constable", icon: "🛡️" },
+              { title: "Interview Prep", sub: "Mock Interviews", icon: "👔" },
+              { title: "Class 11 & 12", sub: "School Foundation", icon: "📚" },
+            ].map((exam, i) => (
+              <Link key={i} to="/contact" className="card-kgs bg-slate-50 p-5 sm:p-6 flex flex-col items-center text-center justify-center h-full hover:border-[hsl(var(--primary))]/50 hover:bg-white group">
+                <div className="text-3xl mb-3 opacity-90 group-hover:opacity-100 transition-opacity transform group-hover:-translate-y-1 duration-300 drop-shadow-sm">{exam.icon}</div>
+                <h3 className="font-extrabold text-slate-800 text-[14px] sm:text-[15px] mb-1 group-hover:text-amber-600 transition-colors leading-tight">{exam.title}</h3>
+                <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold uppercase tracking-wide">{exam.sub}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ══ STATS STRIP ═══════════════════════════════════════ */}
-      <div className="bg-white border-b border-slate-100">
-         <div className="container mx-auto py-12 px-6">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-               {stats.map((s, i) => <StatCard key={s.label} stat={s} index={i} />)}
-            </div>
+      {/* ── UPCOMING BATCHES (CONSULTATION FOCUS) ── */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 lg:px-8">
+           <div className="text-center md:text-left mb-10 border-l-4 border-[hsl(var(--primary))] pl-4 py-1">
+              <h2 className="text-3xl font-black text-slate-900 leading-none mb-2">Upcoming Batches (Gurukul)</h2>
+              <p className="text-slate-500 font-medium">Join India's most trusted foundation & target batches for assured selection.</p>
+           </div>
+           
+           <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { img: "/images/hero_combo_top.jpeg", title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "Admissions Open", filled: 88, seatsLeft: 12 },
+                { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", filled: 94, seatsLeft: 5 },
+                { img: "/images/hero_combo_bottom.jpeg", title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", filled: 98, seatsLeft: 2 },
+              ].map((course, i) => (
+                 <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full shadow-[0_2px_15px_rgb(0,0,0,0.03)] border-slate-200">
+                    <div className="relative aspect-video overflow-hidden bg-slate-100">
+                       <img src={course.img} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                       <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md">
+                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
+                       </div>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col items-start bg-white">
+                       <h3 className="font-extrabold text-slate-900 text-[17px] mb-3 leading-snug group-hover:text-blue-700 transition-colors">{course.title}</h3>
+                       <p className="text-[13px] text-slate-600 mb-6 leading-relaxed flex-1 font-medium">{course.desc}</p>
+                       
+                       <div className="w-full bg-slate-50 rounded-lg p-3 mb-6 border border-slate-100">
+                          <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
+                             <span>Seats Filled</span>
+                             <span className="text-red-500 animate-pulse-fast">Only {course.seatsLeft} Left!</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                             <div className="h-full bg-[hsl(var(--primary))] rounded-full" style={{ width: `${course.filled}%` }}></div>
+                          </div>
+                          <div className="text-[10px] text-right mt-1 font-bold text-slate-400">{course.filled}% Capacity</div>
+                       </div>
+
+                       <div className="mt-auto w-full">
+                          <Link to="/contact" className="w-full inline-flex items-center justify-center gap-2 text-[13px] font-black text-slate-800 bg-[hsl(var(--primary))]/20 border border-[hsl(var(--primary))]/30 px-4 py-3 rounded-xl hover:bg-[hsl(var(--primary))] hover:border-[hsl(var(--primary))] transition-all">
+                             <Handshake className="w-4 h-4" /> SECURE SEAT (FREE COUNSELING)
+                          </Link>
+                       </div>
+                    </div>
+                 </div>
+              ))}
+           </div>
+           
+           <div className="mt-16 rounded-[24px] overflow-hidden shadow-sm border border-slate-200 cursor-pointer group relative">
+              <img src="/images/results_banner.jpg" alt="Our Achievers" className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-700" />
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                 <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all shadow-[0_0_30px_rgba(220,38,38,0.6)]">
+                    <Play className="w-6 h-6 ml-1" />
+                 </div>
+              </div>
+           </div>
+
+           {/* Video Social Proof Vault */}
+           <div className="mt-10">
+              <div className="flex justify-between flex-wrap gap-4 items-end mb-6">
+                 <div>
+                    <h3 className="text-2xl font-black text-slate-900 leading-none">Toppers' Voice (Suniye Toppers ki Zubaan)</h3>
+                    <p className="text-slate-500 font-medium mt-2">Real reviews, authentic tears of joy, and unmatched 'Sarkari Naukri' selections.</p>
+                 </div>
+                 <Link to="/results" className="text-red-600 font-bold text-sm flex items-center gap-1 hover:underline">
+                    <Youtube className="w-4 h-4"/> Watch All Videos
+                 </Link>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {[1, 2, 3, 4].map((v) => (
+                    <div key={v} className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg">
+                       <img src="/images/results_banner.jpg" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt="Video Thumbnail" />
+                       <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-10 h-12 bg-red-600 text-white rounded flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                             <Play className="w-5 h-5 ml-0.5" />
+                          </div>
+                       </div>
+                    </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* ── ABOUT THE ACADEMY ADVANTAGE ── */}
+      <section className="py-20 bg-white border-y border-slate-200 relative overflow-hidden">
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-12 items-center">
+             
+             <div className="flex-1 w-full order-2 lg:order-1">
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="space-y-4 pt-8">
+                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                         <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <GraduationCap className="w-6 h-6" />
+                         </div>
+                         <h4 className="font-extrabold text-slate-900">Topper's Pedagogy</h4>
+                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Basics to Advanced</p>
+                      </div>
+                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                         <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                            <Video className="w-6 h-6" />
+                         </div>
+                         <h4 className="font-extrabold text-slate-900">1-on-1 Mentorship</h4>
+                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Direct Access</p>
+                      </div>
+                   </div>
+                   <div className="space-y-4">
+                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                         <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                            <ShieldCheck className="w-6 h-6" />
+                         </div>
+                         <h4 className="font-extrabold text-slate-900">Rigorous 'Abhyas'</h4>
+                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Mock Tests & Analysis</p>
+                      </div>
+                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                         <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <Clock className="w-6 h-6" />
+                         </div>
+                         <h4 className="font-extrabold text-slate-900">Legacy of Results</h4>
+                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Decades of Success</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             <div className="flex-1 order-1 lg:order-2">
+                <div className="inline-block px-4 py-1.5 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-black text-[10px] uppercase tracking-widest rounded-full mb-6">
+                   Why Choose AIM Academy
+                </div>
+                <h2 className="text-4xl lg:text-[46px] font-black leading-[1.1] mb-6 text-slate-900 tracking-tight">
+                   We Don't Just Teach.<br/>We <span className="text-blue-600">Engineer Success.</span>
+                </h2>
+                <p className="text-slate-600 text-[17px] leading-relaxed mb-8 font-medium">
+                   AIM Academy’s ecosystem is built entirely around student performance, continuous evaluation, and strategic mental conditioning. We prepare you to ace the exam, not just face it.
+                </p>
+                <Link to="/contact" className="inline-flex items-center gap-3 bg-slate-900 text-white font-extrabold text-[14px] px-8 py-4 rounded-xl shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all uppercase tracking-wide">
+                   Talk to a Counselor Now <ArrowRight className="w-4 h-4" />
+                </Link>
+             </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── EXPERT FACULTY ── */}
+      <section className="py-16 bg-[#f8fafc]">
+        <div className="container mx-auto px-4 lg:px-8">
+           <div className="text-center md:text-left mb-10 border-l-4 border-slate-900 pl-4 py-1">
+              <h2 className="text-3xl font-black text-slate-900 mb-2 leading-none">Guidance from Proven Educators</h2>
+              <p className="text-slate-500 font-medium">Learn directly from India's most respected faculty who have guided thousands to final selection.</p>
+           </div>
+           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              {[
+                { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
+                { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
+                { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
+                { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
+                { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
+              ].map((faculty, i) => (
+                 <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border border-slate-200 shadow-[0_2px_15px_rgb(0,0,0,0.02)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-[hsl(var(--primary))]/50 shadow-inner flex items-end justify-center">
+                       <img src={faculty.img} alt={faculty.name} className="w-[90%] h-[90%] object-contain object-bottom" />
+                    </div>
+                    <h3 className="font-extrabold text-slate-900 text-[16px]">{faculty.name}</h3>
+                    <p className="text-[10px] text-slate-500 font-bold text-center mt-1 uppercase tracking-widest leading-snug">{faculty.sub}</p>
+                 </div>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* ── OFFLINE CENTERS ── */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="container mx-auto px-4 lg:px-8">
+           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+             <div className="border-l-4 border-blue-600 pl-4 py-1">
+               <h2 className="text-3xl font-black text-slate-900 mb-2 leading-none">Visit Our Offline Centers</h2>
+               <p className="text-slate-500 font-medium">Walk in for free counseling and demo classes.</p>
+             </div>
+             <a href="tel:+917067231189" className="text-slate-900 font-black text-[13px] uppercase tracking-wide bg-[hsl(var(--primary))] px-8 py-3.5 rounded-full hover:brightness-105 flex items-center gap-2 shadow-sm transition-all">
+                <PhoneCall className="w-4 h-4" /> Helpdesk
+             </a>
+           </div>
+
+           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {[
+               { city: "Jabalpur - Ranjhi Branch", address: "Main Road Ranjhi, Adarsh Market, Beside Police Petrol Pump, Jabalpur" },
+               { city: "Jabalpur - Adhartal Branch", address: "Main Road Adhartal, Near Spring Day School, Opposite HDFC Bank" },
+               { city: "Bhopal - Corporate Office", address: "Zone-II, Maharana Pratap Nagar, Bhopal, Madhya Pradesh" },
+             ].map((center, i) => (
+               <div key={i} className="bg-slate-50 p-8 rounded-3xl flex items-start gap-5 border border-slate-200 shadow-sm hover:border-[hsl(var(--primary))]/80 hover:shadow-md transition-all group cursor-pointer">
+                 <div className="mt-1 shrink-0 bg-white shadow-sm p-3 rounded-2xl group-hover:bg-[hsl(var(--primary))] transition-colors">
+                   <MapPin className="text-[hsl(var(--primary-foreground))] w-6 h-6" />
+                 </div>
+                 <div>
+                   <h3 className="font-extrabold text-slate-900 text-[17px] mb-2">{center.city}</h3>
+                   <p className="text-[13px] text-slate-500 leading-relaxed font-semibold">{center.address}</p>
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+      </section>
+
+      {/* ── MOBILE STICKY CTA border ── */}
+      <div className="fixed bottom-0 left-0 w-full bg-[hsl(var(--primary))] border-t border-[hsl(var(--primary))/20] shadow-[0_-5px_20px_rgba(0,0,0,0.15)] z-[60] md:hidden">
+         <div className="flex text-[11px] font-black uppercase text-[hsl(var(--primary-foreground))]">
+            <a href="tel:+917067231189" className="flex-1 py-4 flex items-center justify-center gap-2 border-r border-[hsl(var(--primary-foreground))]/10 active:bg-white/20 transition-colors">
+               <PhoneCall className="w-4 h-4" /> Call Helpdesk
+            </a>
+            <a href="/contact" className="flex-1 py-4 flex items-center justify-center gap-2 active:bg-white/20 transition-colors">
+               <Handshake className="w-4 h-4" /> Secure Seat
+            </a>
          </div>
       </div>
 
-      {/* ══ LEARNING EXPERIENCE ═══════════════════════════════ */}
-      <section className="section-padding bg-slate-50/50">
-         <div className="container mx-auto px-6">
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
-               <div className="gsap-reveal">
-                  <span className="badge-academic mb-6">The AIM Method</span>
-                  <h2 className="heading-display text-4xl mb-8">Not Just Coaching. <br /><span className="text-primary italic font-medium">True Transformation.</span></h2>
-                  <p className="text-slate-500 text-lg leading-relaxed mb-10">
-                     Our pedagogy is built on the pillars of Coursera's learning style—clear, modular, and mentor-driven. We provide a structured environment where strategy meets hard work.
-                  </p>
-                  <ul className="flex flex-col gap-6">
-                     {[
-                       "Personalized 1-on-1 Mentorship Plans",
-                       "Daily Evaluation of Mains Answer Sheets",
-                       "AI-Powered Real-time Growth Analytics",
-                       "Exclusive Access to the 'Oxford Pattern' Library"
-                     ].map(text => (
-                       <li key={text} className="flex gap-4 items-center">
-                          <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
-                          <span className="text-slate-900 font-bold font-body">{text}</span>
-                       </li>
-                     ))}
-                  </ul>
-                  <Link to="/about" className="btn-coursera inline-flex gap-2 mt-12">
-                    Learn Our Origins <ChevronRight className="w-4 h-4" />
-                  </Link>
-               </div>
-               <div className="relative gsap-reveal">
-                  <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video border-[10px] border-white">
-                     <img src="/images/coursera_learning.png" alt="Learning Experience" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <button className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-                      <Play className="w-8 h-8 fill-current ml-1" />
+      {/* ── LEAD MAGNET EXIT-INTENT POPUP ── */}
+      {showPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPopup(false)}></div>
+           <div className="bg-white max-w-md w-[90%] mx-auto rounded-3xl overflow-hidden shadow-2xl relative z-10 animate-in zoom-in duration-300">
+              <button onClick={() => setShowPopup(false)} className="absolute top-4 right-4 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors z-20">
+                 <X className="w-4 h-4" />
+              </button>
+              <div className="bg-gradient-to-br from-blue-600 to-indigo-800 p-8 text-center relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full -mr-16 -mt-16"></div>
+                 <div className="w-16 h-16 bg-white shadow-lg mx-auto rounded-2xl flex items-center justify-center mb-4 transform -rotate-12">
+                    <Download className="w-8 h-8 text-blue-600 transform rotate-12" />
+                 </div>
+                 <h2 className="text-2xl font-black text-white leading-tight mb-2">Wait! Do not leave empty handed.</h2>
+                 <p className="text-blue-100 text-xs font-semibold uppercase tracking-wider">Download 5 Years Solved Papers PDF Free</p>
+              </div>
+              <div className="p-8">
+                 <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" /> High-Yield 'Sarkari' Target Material
+                 </div>
+                 <form onSubmit={(e) => { e.preventDefault(); setShowPopup(false); }} className="space-y-4">
+                    <div>
+                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">WhatsApp Number</label>
+                       <div className="flex relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-900 font-bold">+91</span>
+                          <input type="tel" required placeholder="Enter 10 digit number" className="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-900 transition-colors" />
+                       </div>
+                    </div>
+                    <button type="submit" className="w-full bg-slate-900 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.2)] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+                       <Handshake className="w-5 h-5" /> Send PDF Now
                     </button>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-
-      {/* ══ COURSES PROWESS ═══════════════════════════════════ */}
-      <section className="section-padding bg-white">
-         <div className="container mx-auto px-6">
-            <SectionHeading 
-               label="Explore Our Ecosystem" 
-               title="Specializations for the Modern Aspirant" 
-               description="Every program is designed by industrial experts to ensure you cross the merit threshold."
-            />
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-               {courses.map((c, i) => (
-                 <div key={c.title} className="academic-card gsap-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                    <div className="w-12 h-12 rounded bg-surface-accent flex items-center justify-center mb-6 text-primary transition-colors">
-                       <c.icon className="w-6 h-6" />
-                    </div>
-                    <div className="text-[10px] font-bold text-primary mb-3 uppercase tracking-widest">{c.badge}</div>
-                    <h3 className="heading-display text-xl mb-4">{c.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-8">{c.desc}</p>
-                    <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                       <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          <Clock className="w-3 h-3" /> {c.duration}
-                       </span>
-                       <Link to="/courses" className="text-primary hover:translate-x-1 transition-transform">
-                          <ArrowRight className="w-5 h-5" />
-                       </Link>
-                    </div>
-                 </div>
-               ))}
-            </div>
-            <div className="text-center mt-16">
-               <Link to="/courses" className="btn-outline-coursera inline-flex gap-2 mx-auto">
-                 View All 24+ Programs <ArrowRight className="w-4 h-4" />
-               </Link>
-            </div>
-         </div>
-      </section>
-
-      {/* ══ TRUST BANNER / PARTNERS ══════════════════════════ */}
-      <section className="py-20 border-y border-slate-50">
-         <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-               <div>
-                  <h4 className="font-bold text-slate-400 text-xs uppercase tracking-[0.3em] mb-4 text-center lg:text-left">OFFICIAL INFRASTRUCTURE PARTNERS</h4>
-                  <div className="flex flex-wrap gap-10 items-center justify-center lg:justify-start grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-                     {partners.map(p => (
-                       <div key={p.name} className="flex flex-col items-center gap-1">
-                          <Zap className="w-6 h-6 text-primary" />
-                          <span className="font-black tracking-tighter text-slate-900 border-b-2 border-primary">{p.name}</span>
-                       </div>
-                     ))}
-                  </div>
-               </div>
-               <div className="flex items-center gap-6 p-6 bg-surface-accent rounded-xl border border-blue-50 max-w-lg">
-                  <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-primary shadow-lg shrink-0">
-                     <Award className="w-8 h-8" />
-                  </div>
-                  <div>
-                     <p className="text-sm font-bold text-slate-900">Affiliated with Leading Institutions</p>
-                     <p className="text-xs text-slate-500 mt-1">Our curriculum is vetted by ISO 9001:2015 certified academic boards for quality excellence.</p>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-
-      {/* ══ TESTIMONIALS ══════════════════════════════════════ */}
-      <section className="section-padding bg-slate-50/50">
-         <div className="container mx-auto px-6">
-            <SectionHeading label="The Proof" title="Student Success Stories" />
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {testimonials.map((t, i) => (
-                 <div key={t.name} className="academic-card border-0 shadow-lg gsap-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                    <div className="flex gap-1 mb-6">
-                       {[1,2,3,4,5].map(j => (
-                         <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                       ))}
-                    </div>
-                    <p className="text-slate-600 font-body text-lg italic leading-relaxed mb-10">"{t.quote}"</p>
-                    <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 rounded-full bg-surface-accent flex items-center justify-center font-bold text-primary text-xl">
-                          {t.initial}
-                       </div>
-                       <div>
-                          <p className="font-bold text-slate-900">{t.name}</p>
-                          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{t.rank}</p>
-                       </div>
-                    </div>
-                 </div>
-               ))}
-            </div>
-         </div>
-      </section>
-
-      {/* ══ CTA SECTION ═══════════════════════════════════════ */}
-      <section className="relative py-24 bg-primary overflow-hidden">
-         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none" />
-         <div className="container mx-auto px-6 text-center relative z-10">
-            <h2 className="heading-display text-4xl md:text-5xl text-white mb-8">Ready to Elevate Your Future?</h2>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto mb-12">
-               Take the first step toward a prestigious career in Civil Services. Book your free counseling session with our senior mentors today.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-               <Link to="/contact" className="bg-white text-primary font-black py-5 px-14 rounded text-lg hover:shadow-2xl hover:-translate-y-1 transition-all">
-                  Get Started For Free
-               </Link>
-               <a href="tel:+917067231189" className="border-2 border-white/30 text-white font-black py-5 px-14 rounded text-lg hover:bg-white/10 transition-all">
-                  Speak to an Expert
-               </a>
-            </div>
-         </div>
-      </section>
-
+                 </form>
+                 <p className="text-[10px] text-center text-slate-400 font-medium mt-4">We respect your privacy. No spam, just pure value.</p>
+              </div>
+           </div>
+        </div>
+      )}
 
     </div>
   );

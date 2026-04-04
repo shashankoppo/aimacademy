@@ -19,8 +19,8 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0056D2",
-          foreground: "#FFFFFF",
+          DEFAULT: "#FACC15",
+          foreground: "#111827",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -46,10 +46,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "coursera-blue": "#0056D2",
-        "coursera-dim": "#00419E",
-        "surface-light": "#F2F4F8",
-        "surface-accent": "#EBF3FF",
+        "coursera-blue": "#FACC15",
+        "coursera-dim": "#EAB308",
+        "surface-light": "#FAFAFA",
+        "surface-accent": "#FEFCE8",
       },
       fontFamily: {
         display: ['"Inter"', 'sans-serif'],

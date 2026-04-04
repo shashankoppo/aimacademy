@@ -150,11 +150,11 @@ const About = () => {
               viewport={{ once: true }}
               className="relative flex justify-center"
             >
-              <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-gradient-to-b from-white/5 to-transparent">
+              <div className="relative w-full max-w-sm aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white/10 bg-gradient-to-b from-white/5 to-transparent">
                 <img 
                   src="/images/founder_solo.png" 
                   alt="Dr. Imran Khan - Founder & Director" 
-                  className="w-full h-full object-contain pt-10 translate-y-4"
+                  className="h-full w-full object-cover object-[center_8%] scale-[1.03]"
                 />
               </div>
               

@@ -29,6 +29,7 @@ import FeeReminders from "./pages/admin/FeeReminders";
 import StudentManagement from "./pages/admin/StudentManagement";
 import Announcements from "./pages/admin/Announcements";
 import CourseManagement from "./pages/admin/CourseManagement";
+import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
 
@@ -67,6 +68,7 @@ const AppRoutes = () => {
         <Route path="/admin/students" element={<StudentManagement />} />
         <Route path="/admin/announcements" element={<Announcements />} />
         <Route path="/admin/courses" element={<CourseManagement />} />
+        <Route path="/admin/website-settings" element={<AdminWebsiteSettings />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

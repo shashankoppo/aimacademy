@@ -23,6 +23,7 @@ const AdminDashboard = () => {
     { title: "Attendance Tracker", desc: "Student & staff attendance analytics", icon: Calendar, link: "/admin/attendance" },
     { title: "Announcements", desc: "Campus-wide broadcasts & notices", icon: Megaphone, link: "/admin/announcements" },
     { title: "System Settings", desc: "Platform configurations & access", icon: Settings, link: "#" },
+    { title: "Website Settings", desc: "Manage Hero banners & public content", icon: LayoutDashboard, link: "/admin/website-settings" },
   ];
 
   return (

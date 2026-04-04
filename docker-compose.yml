@@ -1,13 +1,13 @@
+version: '3.8'
+
 services:
-  aim-academy:
+  aim-academy-frontend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: aim-academy-web
+    container_name: aim-academy-frontend
     ports:
-      - "9010:80"
-    restart: always
-
-# Optional: Add networks if needed for database/backend communication
-# networks:
-#   - aim-network
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production

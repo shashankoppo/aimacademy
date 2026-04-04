@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,123 +6,63 @@
 
 @layer base {
   :root {
-    /* Coursera-Inspired Palette: Professional, Trustworthy, Academic */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 217 100% 41%; /* #0056D2 Coursera Blue */
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-
-    --radius: 0.5rem;
-
-    /* Extended Library Tokens */
-    --coursera-blue: #0056D2;
-    --coursera-dim:  #00419E;
-    --surface-light: #F2F4F8;
-    --surface-accent: #EBF3FF;
-    --text-heading: #1F1F1F;
-    --text-body: #4A4A4A;
-    --text-muted: #6C757D;
+    --background: 0 0% 100%; /* white */
+    --foreground: 222.2 84% 4.9%; /* slate-900 */
+    /* Light Yellow Focus - Clean, professional but vibrant like top edtechs */
+    --primary: 48 96% 58%; /* Clean lighter yellow (#FBE122 approx) */
+    --primary-foreground: 222 47% 11%;  /* Dark text on yellow for contrast */
+    --secondary: 219 73% 36%; /* Deep blue for accents */
+    --secondary-foreground: 0 0% 100%;
+    --accent: 13 94% 54%; 
+    --accent-foreground: 0 0% 100%;
   }
 }
 
 @layer base {
-  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
   }
 }
 
 @layer components {
-  /* ─── Typography Sets ─── */
-  .heading-display {
-    @apply font-black tracking-tight;
-    font-family: 'Inter', sans-serif;
-    color: var(--text-heading);
-    letter-spacing: -0.03em;
+  .card-kgs {
+    @apply bg-white border border-slate-100 rounded-2xl transition-all duration-300;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   }
-  .heading-editorial {
-    font-family: 'Playfair Display', serif;
-    @apply italic;
-  }
-
-  /* ─── Cards ─── */
-  .academic-card {
-    @apply bg-white border border-slate-200 rounded-lg p-6 transition-all duration-300;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  .academic-card:hover {
-    @apply border-primary/40 -translate-y-1;
-    box-shadow: 0 8px 24px rgba(0, 86, 210, 0.08);
-  }
-
-  /* ─── Buttons ─── */
-  .btn-coursera {
-    @apply bg-[var(--coursera-blue)] text-white font-bold py-3 px-8 rounded flex items-center justify-center transition-all;
-    font-family: 'Inter', sans-serif;
-    border-radius: 4px; /* Coursera uses sharper buttons or subtle radius */
-  }
-  .btn-coursera:hover {
-    @apply bg-[var(--coursera-dim)] shadow-lg;
-    transform: translateY(-1px);
+  .card-kgs:hover {
+    @apply shadow-lg -translate-y-1;
+    border-color: rgba(251, 225, 34, 0.6); /* Soft yellow border on hover */
   }
   
-  .btn-outline-coursera {
-    @apply bg-transparent border-2 border-[var(--coursera-blue)] text-[var(--coursera-blue)] font-bold py-3 px-8 rounded flex items-center justify-center transition-all;
-    border-radius: 4px;
+  .btn-primary {
+    @apply bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-bold py-2.5 px-6 rounded-lg hover:brightness-105 transition-all shadow-sm;
   }
-  .btn-outline-coursera:hover {
-    @apply bg-[var(--surface-accent)];
+  .btn-outline {
+    @apply border-2 border-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] bg-yellow-50/30 font-bold py-2.5 px-6 rounded-lg hover:bg-[hsl(var(--primary))] transition-all;
   }
+}
 
-  /* ─── Badges ─── */
-  .badge-academic {
-    @apply px-3 py-1 bg-[var(--surface-accent)] text-[var(--coursera-blue)] text-[11px] font-bold uppercase tracking-wider rounded border border-blue-100;
-  }
+/* Custom Animations for FOMO & Power Features */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 25s linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 
-  /* ─── Animations ─── */
-  /* Remove default opacity: 0 so if JS breaks, site is still visible! GSAP will handle initial hidden state via .from() */
-  .gsap-reveal { visibility: visible; }
-
-  /* ─── Special Sections ─── */
-  .bg-academic {
-    background: linear-gradient(135deg, #fff 0%, var(--surface-light) 100%);
-  }
-
-  /* Marquee/Ticker */
-  .ticker-bar {
-    @apply py-2 bg-[var(--coursera-blue)] text-white text-[11px] font-bold uppercase tracking-widest overflow-hidden;
-  }
-
-  /* ─── Utility ─── */
-  .bg-dot-white {
-    background-image: radial-gradient(circle, #0056D2 1.5px, transparent 1.5px);
-    background-size: 24px 24px;
-    opacity: 0.03;
-  }
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .7; transform: scale(1.05); }
+}
+.animate-pulse-fast {
+  animation: pulse-fast 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
