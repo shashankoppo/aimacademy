@@ -11,17 +11,36 @@ const Index = () => {
     "/images/STUDENT_BANNER.jpeg"
   ]);
 
+  const [faculty, setFaculty] = useState([
+    { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
+    { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
+    { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
+    { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
+    { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
+  ]);
+
   useEffect(() => {
     // Lead Magnet Popup after 5 seconds
     const popupTimer = setTimeout(() => setShowPopup(true), 5000);
 
     // Check if admin has set custom slider images
-    const saved = localStorage.getItem("aim_hero_slides");
-    if (saved) {
+    const savedSlides = localStorage.getItem("aim_hero_slides");
+    if (savedSlides) {
       try {
-        const parsedSlides = JSON.parse(saved);
+        const parsedSlides = JSON.parse(savedSlides);
         if (parsedSlides && parsedSlides.length > 0) {
           setHeroSlides(parsedSlides);
+        }
+      } catch(e) {}
+    }
+
+    // Check if admin has set custom faculty
+    const savedFaculty = localStorage.getItem("aim_faculty_data");
+    if (savedFaculty) {
+      try {
+        const parsedFaculty = JSON.parse(savedFaculty);
+        if (parsedFaculty && parsedFaculty.length > 0) {
+          setFaculty(parsedFaculty);
         }
       } catch(e) {}
     }
@@ -30,19 +49,19 @@ const Index = () => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 4000); // Slides every 4 seconds
     return () => clearInterval(timer);
-  }, []);
+  }, [heroSlides.length]);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-800">
+    <div className="min-h-screen bg-[#FFFF00] font-sans text-slate-800">
       
       {/* ── KGS-STYLE HERO (FULL WIDTH SLIDER) ── */}
-      <section className="w-full relative group bg-slate-100 border-b border-slate-200">
+      <section className="w-full relative group bg-transparent border-b border-black/5">
         
         {/* Main Slider Area */}
-        <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] bg-slate-100 overflow-hidden relative cursor-pointer block">
+        <div className="w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] bg-transparent overflow-hidden relative cursor-pointer block">
            
            {heroSlides.map((slide, index) => (
              <div 
@@ -85,7 +104,7 @@ const Index = () => {
       </section>
 
       {/* ── STATS & CONSULTATION STRIP (BELOW HERO) ── */}
-      <section className="bg-white border-b border-slate-200 shadow-sm relative z-20">
+      <section className="bg-transparent border-b border-black/5 shadow-sm relative z-20">
          <div className="container mx-auto px-4 lg:px-8">
             <div className="py-6 lg:py-8 flex flex-wrap justify-between items-center gap-6">
                 
@@ -129,8 +148,8 @@ const Index = () => {
       </section>
 
       {/* ── POPULAR EXAM CATEGORIES (KGS GRID STYLE) ── */}
-      <section className="py-12 bg-slate-50">
-        <div className="container mx-auto px-4 lg:px-8 bg-white p-6 md:p-8 rounded-[24px] border border-slate-100 shadow-[0_2px_15px_rgb(0,0,0,0.02)]">
+      <section className="py-12 bg-transparent">
+        <div className="container mx-auto px-4 lg:px-8 bg-transparent p-6 md:p-8 rounded-[24px] border border-black/5">
           <div className="flex justify-between items-center mb-8">
              <h2 className="text-2xl font-black text-slate-900">Target Exams (Sarkari Naukri)</h2>
              <Link to="/courses" className="text-[hsl(var(--primary-foreground))] bg-yellow-50 font-bold text-xs px-4 py-2 rounded-full hover:bg-yellow-100 flex items-center transition-colors">View All <ChevronRight className="w-3 h-3 ml-1" /></Link>
@@ -146,7 +165,7 @@ const Index = () => {
               { title: "Interview Prep", sub: "Mock Interviews", icon: "👔" },
               { title: "Class 11 & 12", sub: "School Foundation", icon: "📚" },
             ].map((exam, i) => (
-              <Link key={i} to="/contact" className="card-kgs bg-slate-50 p-5 sm:p-6 flex flex-col items-center text-center justify-center h-full hover:border-[hsl(var(--primary))]/50 hover:bg-white group">
+              <Link key={i} to="/contact" className="card-kgs bg-white/40 p-5 sm:p-6 flex flex-col items-center text-center justify-center h-full hover:border-black/20 hover:bg-white group">
                 <div className="text-3xl mb-3 opacity-90 group-hover:opacity-100 transition-opacity transform group-hover:-translate-y-1 duration-300 drop-shadow-sm">{exam.icon}</div>
                 <h3 className="font-extrabold text-slate-800 text-[14px] sm:text-[15px] mb-1 group-hover:text-amber-600 transition-colors leading-tight">{exam.title}</h3>
                 <p className="text-[10px] sm:text-[11px] text-slate-500 font-bold uppercase tracking-wide">{exam.sub}</p>
@@ -159,7 +178,7 @@ const Index = () => {
       {/* ── UPCOMING BATCHES (CONSULTATION FOCUS) ── */}
       <section className="py-16">
         <div className="container mx-auto px-4 lg:px-8">
-           <div className="text-center md:text-left mb-10 border-l-4 border-[hsl(var(--primary))] pl-4 py-1">
+           <div className="text-center md:text-left mb-10 border-l-4 border-slate-900 pl-4 py-1">
               <h2 className="text-3xl font-black text-slate-900 leading-none mb-2">Upcoming Batches (Gurukul)</h2>
               <p className="text-slate-500 font-medium">Join India's most trusted foundation & target batches for assured selection.</p>
            </div>
@@ -177,7 +196,7 @@ const Index = () => {
                           <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
                        </div>
                     </div>
-                    <div className="p-6 flex-1 flex flex-col items-start bg-white">
+                    <div className="p-6 flex-1 flex flex-col items-start bg-white/40">
                        <h3 className="font-extrabold text-slate-900 text-[17px] mb-3 leading-snug group-hover:text-blue-700 transition-colors">{course.title}</h3>
                        <p className="text-[13px] text-slate-600 mb-6 leading-relaxed flex-1 font-medium">{course.desc}</p>
                        
@@ -239,21 +258,21 @@ const Index = () => {
       </section>
 
       {/* ── ABOUT THE ACADEMY ADVANTAGE ── */}
-      <section className="py-20 bg-white border-y border-slate-200 relative overflow-hidden">
+      <section className="py-20 bg-transparent border-y border-black/5 relative overflow-hidden">
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
              
              <div className="flex-1 w-full order-2 lg:order-1">
                 <div className="grid grid-cols-2 gap-4">
                    <div className="space-y-4 pt-8">
-                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
                          <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                             <GraduationCap className="w-6 h-6" />
                          </div>
                          <h4 className="font-extrabold text-slate-900">Topper's Pedagogy</h4>
                          <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Basics to Advanced</p>
                       </div>
-                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
                          <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
                             <Video className="w-6 h-6" />
                          </div>
@@ -262,14 +281,14 @@ const Index = () => {
                       </div>
                    </div>
                    <div className="space-y-4">
-                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
                          <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                             <ShieldCheck className="w-6 h-6" />
                          </div>
                          <h4 className="font-extrabold text-slate-900">Rigorous 'Abhyas'</h4>
                          <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Mock Tests & Analysis</p>
                       </div>
-                      <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
                          <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                             <Clock className="w-6 h-6" />
                          </div>
@@ -300,26 +319,20 @@ const Index = () => {
       </section>
 
       {/* ── EXPERT FACULTY ── */}
-      <section className="py-16 bg-[#f8fafc]">
+      <section className="py-16 bg-transparent">
         <div className="container mx-auto px-4 lg:px-8">
            <div className="text-center md:text-left mb-10 border-l-4 border-slate-900 pl-4 py-1">
               <h2 className="text-3xl font-black text-slate-900 mb-2 leading-none">Guidance from Proven Educators</h2>
               <p className="text-slate-500 font-medium">Learn directly from India's most respected faculty who have guided thousands to final selection.</p>
            </div>
            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-              {[
-                { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
-                { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
-                { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
-                { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
-                { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
-              ].map((faculty, i) => (
+              {faculty.map((member, i) => (
                  <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border border-slate-200 shadow-[0_2px_15px_rgb(0,0,0,0.02)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                    <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-[hsl(var(--primary))]/50 shadow-inner flex items-end justify-center">
-                       <img src={faculty.img} alt={faculty.name} className="w-[90%] h-[90%] object-contain object-bottom" />
+                    <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-black/10 shadow-inner flex items-end justify-center">
+                       <img src={member.img} alt={member.name} className="w-[90%] h-[90%] object-contain object-bottom" />
                     </div>
-                    <h3 className="font-extrabold text-slate-900 text-[16px]">{faculty.name}</h3>
-                    <p className="text-[10px] text-slate-500 font-bold text-center mt-1 uppercase tracking-widest leading-snug">{faculty.sub}</p>
+                    <h3 className="font-extrabold text-slate-900 text-[16px]">{member.name}</h3>
+                    <p className="text-[10px] text-slate-500 font-bold text-center mt-1 uppercase tracking-widest leading-snug">{member.sub}</p>
                  </div>
               ))}
            </div>
@@ -327,7 +340,7 @@ const Index = () => {
       </section>
 
       {/* ── OFFLINE CENTERS ── */}
-      <section className="py-16 bg-white border-t border-slate-200">
+      <section className="py-16 bg-transparent border-t border-black/5">
         <div className="container mx-auto px-4 lg:px-8">
            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
              <div className="border-l-4 border-blue-600 pl-4 py-1">
@@ -343,9 +356,8 @@ const Index = () => {
              {[
                { city: "Jabalpur - Ranjhi Branch", address: "Main Road Ranjhi, Adarsh Market, Beside Police Petrol Pump, Jabalpur" },
                { city: "Jabalpur - Adhartal Branch", address: "Main Road Adhartal, Near Spring Day School, Opposite HDFC Bank" },
-               { city: "Bhopal - Corporate Office", address: "Zone-II, Maharana Pratap Nagar, Bhopal, Madhya Pradesh" },
              ].map((center, i) => (
-               <div key={i} className="bg-slate-50 p-8 rounded-3xl flex items-start gap-5 border border-slate-200 shadow-sm hover:border-[hsl(var(--primary))]/80 hover:shadow-md transition-all group cursor-pointer">
+               <div key={i} className="bg-white/40 p-8 rounded-3xl flex items-start gap-5 border border-black/5 shadow-sm hover:border-black/20 hover:shadow-md transition-all group cursor-pointer">
                  <div className="mt-1 shrink-0 bg-white shadow-sm p-3 rounded-2xl group-hover:bg-[hsl(var(--primary))] transition-colors">
                    <MapPin className="text-[hsl(var(--primary-foreground))] w-6 h-6" />
                  </div>

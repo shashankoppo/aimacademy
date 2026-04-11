@@ -1,21 +1,20 @@
 import React, { useState } from "react";
 import { 
-  ArrowLeft, Search, Filter, Calendar, Users, 
-  CheckCircle2, XCircle, Clock, Download, ChevronDown
+  Search, Calendar, Users, 
+  Download, Filter, CheckCircle2, UserCheck
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useAdminData } from "@/hooks/useAdminData";
+import { getAttendanceStatus, getAttendanceColor } from "@/lib/academic-logic";
 
 const AttendanceManagement = () => {
+  const { students } = useAdminData();
   const [viewMode, setViewMode] = useState<"students" | "staff">("students");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const studentAttendance = [
-    { id: 1, name: "Aarav Mehta", batch: "UPSC 2026-A", present: 22, absent: 3, percentage: "88%", status: "Regular" },
-    { id: 2, name: "Deepa Nair", batch: "SSC CGL Fast Track", present: 24, absent: 1, percentage: "96%", status: "Excellent" },
-    { id: 3, name: "Rahul Kumar", batch: "Banking IBPS", present: 18, absent: 7, percentage: "72%", status: "Irregular" },
-    { id: 4, name: "Priya Sharma", batch: "UPSC 2026-A", present: 20, absent: 5, percentage: "80%", status: "Regular" },
-    { id: 5, name: "Vikram Singh", batch: "MPPSC Evening", present: 23, absent: 2, percentage: "92%", status: "Excellent" },
-    { id: 6, name: "Ananya Joshi", batch: "SSC CGL Fast Track", present: 15, absent: 10, percentage: "60%", status: "At Risk" },
-  ];
+  const filteredStudents = students.filter(s => 
+    s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    s.batch.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const staffAttendance = [
     { id: 1, name: "Dr. Sandeep Kumar", role: "Sr. Faculty", clockIn: "08:45 AM", clockOut: "05:30 PM", status: "Present" },
@@ -26,137 +25,154 @@ const AttendanceManagement = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-20 pt-32">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
-          <div className="space-y-4">
-            <Link to="/admin" className="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-tight hover:underline">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Admin Panel
-            </Link>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">Attendance Management</h1>
-            <p className="text-slate-500 font-medium">Track student and staff attendance with institutional analytics.</p>
-          </div>
-          <div className="flex gap-3">
-            <button className="btn-outline-coursera py-2.5 px-6 flex items-center gap-2">
-              <Download className="w-4 h-4" /> Export Report
-            </button>
-            <button className="btn-coursera py-2.5 px-6 flex items-center gap-2">
-              <Calendar className="w-4 h-4" /> Mark Today
-            </button>
-          </div>
+    <div className="p-8">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">Attendance Tracker</h1>
+          <p className="text-slate-500 font-medium">Track student and staff attendance with institutional analytics.</p>
         </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-          {[
-            { label: "Total Present Today", value: "1,102 / 1,240", color: "text-emerald-600" },
-            { label: "Absent Students", value: "138", color: "text-red-600" },
-            { label: "Staff Present", value: "42 / 48", color: "text-blue-600" },
-            { label: "Avg Attendance Rate", value: "87.4%", color: "text-amber-600" },
-          ].map((stat, i) => (
-            <div key={i} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <p className="text-slate-400 font-bold tracking-wider text-[10px] uppercase mb-2">{stat.label}</p>
-              <h4 className={`text-2xl font-black ${stat.color}`}>{stat.value}</h4>
-            </div>
-          ))}
-        </div>
-
-        {/* Toggle */}
-        <div className="flex gap-4 mb-8">
-          <button onClick={() => setViewMode("students")} className={`py-2 px-6 rounded text-xs font-bold uppercase tracking-widest transition-all ${viewMode === "students" ? "bg-primary text-white" : "bg-white text-slate-400 border border-slate-200"}`}>
-            <Users className="w-4 h-4 inline mr-2" /> Student Attendance
+        <div className="flex gap-3">
+          <button className="flex items-center gap-2 px-6 py-2.5 font-bold text-sm bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">
+            <Download className="w-4 h-4" /> Export Report
           </button>
-          <button onClick={() => setViewMode("staff")} className={`py-2 px-6 rounded text-xs font-bold uppercase tracking-widest transition-all ${viewMode === "staff" ? "bg-primary text-white" : "bg-white text-slate-400 border border-slate-200"}`}>
-            <Users className="w-4 h-4 inline mr-2" /> Staff Attendance
+          <button className="flex items-center gap-2 px-6 py-2.5 font-bold text-sm bg-primary text-white rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+            <Calendar className="w-4 h-4" /> Mark Today
           </button>
         </div>
+      </div>
 
-        {/* Search */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Search by name, batch, or role..." className="w-full bg-slate-50 border border-slate-100 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        {[
+          { label: "Today's Presence", value: "92%", icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Absent Today", value: "24", icon: Users, color: "text-red-600", bg: "bg-red-50" },
+          { label: "Staff Status", value: "45/48", icon: CheckCircle2, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Avg Monthly Rate", value: "88%", icon: Calendar, color: "text-amber-600", bg: "bg-amber-50" },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center transition-all hover:shadow-md">
+            <p className="text-slate-400 font-black tracking-widest text-[9px] uppercase mb-2">{stat.label}</p>
+            <h4 className={`text-2xl font-black ${stat.color}`}>{stat.value}</h4>
           </div>
-          <button title="Filter" className="p-3 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100"><Filter className="w-4 h-4 text-slate-600" /></button>
+        ))}
+      </div>
+
+      {/* Toggle & Search */}
+      <div className="flex flex-col md:flex-row gap-6 items-center mb-8">
+        <div className="flex p-1.5 bg-slate-100 rounded-xl w-full md:w-auto">
+          <button 
+            onClick={() => setViewMode("students")} 
+            className={`flex-1 md:flex-none py-2 px-6 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${viewMode === "students" ? "bg-white text-primary shadow-sm" : "text-slate-500"}`}
+          >
+            Students
+          </button>
+          <button 
+            onClick={() => setViewMode("staff")} 
+            className={`flex-1 md:flex-none py-2 px-6 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${viewMode === "staff" ? "bg-white text-primary shadow-sm" : "text-slate-500"}`}
+          >
+            Staff
+          </button>
         </div>
 
-        {/* Tables */}
-        {viewMode === "students" ? (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Student</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Batch</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Present</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Absent</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Rate</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {studentAttendance.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
+        <div className="relative flex-1 group w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Search by name, batch, or role..." 
+            className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Tables */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          {viewMode === "students" ? (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Student</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Batch</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400 text-center">History (P/A)</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Attendance Rate</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Status Categorization</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {filteredStudents.map((s) => {
+                  const rate = parseInt(s.attendance);
+                  const statusLabel = getAttendanceStatus(rate);
+                  return (
+                    <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs">{s.name.charAt(0)}</div>
-                          <span className="font-bold text-slate-900 text-sm">{s.name}</span>
+                          <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-400 text-xs">{s.name.charAt(0)}</div>
+                          <span className="font-bold text-slate-900 text-sm group-hover:text-primary transition-colors">{s.name}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-5 text-sm text-slate-500">{s.batch}</td>
-                      <td className="px-8 py-5 font-bold text-emerald-600">{s.present}</td>
-                      <td className="px-8 py-5 font-bold text-red-500">{s.absent}</td>
-                      <td className="px-8 py-5 font-black text-slate-900">{s.percentage}</td>
+                      <td className="px-8 py-5 text-sm font-bold text-slate-500 lowercase first-letter:uppercase tracking-tight">{s.batch}</td>
                       <td className="px-8 py-5">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                          s.status === "Excellent" ? "bg-emerald-100 text-emerald-700" :
-                          s.status === "Regular" ? "bg-blue-100 text-blue-700" :
-                          s.status === "At Risk" ? "bg-red-100 text-red-700" :
-                          "bg-amber-100 text-amber-700"
-                        }`}>{s.status}</span>
+                         <div className="flex items-center justify-center gap-4">
+                            <span className="text-xs font-black text-emerald-600">22P</span>
+                            <span className="text-xs font-black text-red-400">3A</span>
+                         </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className="flex items-center gap-3">
+                           <div className="h-1.5 w-20 bg-slate-100 rounded-full overflow-hidden">
+                              <div className={`h-full ${getAttendanceColor(rate)}`} style={{ width: s.attendance }} />
+                           </div>
+                           <span className="font-black text-slate-900 text-xs">{s.attendance}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                          statusLabel === "Excellent" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                          statusLabel === "Regular" ? "bg-blue-50 text-blue-600 border border-blue-100" :
+                          statusLabel === "At Risk" ? "bg-red-50 text-red-600 border border-red-100" :
+                          "bg-amber-50 text-amber-600 border border-amber-100"
+                        }`}>{statusLabel}</span>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Staff</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Role</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Clock In</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Clock Out</th>
-                    <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Status</th>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Staff Member</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Role</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Shift Log</th>
+                  <th className="px-8 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Current Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {staffAttendance.map((s) => (
+                  <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-8 py-5 font-bold text-slate-900 text-sm group-hover:text-primary transition-colors">{s.name}</td>
+                    <td className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">{s.role}</td>
+                    <td className="px-8 py-5">
+                       <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-bold text-slate-600">IN: {s.clockIn}</span>
+                          <span className="text-[10px] font-medium text-slate-400">OUT: {s.clockOut}</span>
+                       </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                        s.status === "Present" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+                        s.status === "On Leave" ? "bg-red-50 text-red-600 border border-red-100" :
+                        "bg-amber-50 text-amber-700 border border-amber-100"
+                      }`}>{s.status}</span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {staffAttendance.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-8 py-5 font-bold text-slate-900 text-sm">{s.name}</td>
-                      <td className="px-8 py-5 text-sm text-slate-500">{s.role}</td>
-                      <td className="px-8 py-5 text-sm font-medium text-slate-600">{s.clockIn}</td>
-                      <td className="px-8 py-5 text-sm font-medium text-slate-600">{s.clockOut}</td>
-                      <td className="px-8 py-5">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                          s.status === "Present" ? "bg-emerald-100 text-emerald-700" :
-                          s.status === "On Leave" ? "bg-red-100 text-red-700" :
-                          "bg-amber-100 text-amber-700"
-                        }`}>{s.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -47,9 +47,9 @@ const Contact = () => {
   };
 
   return (
-    <div className="pt-[3.75rem] page-enter bg-white">
+    <div className="pt-[3.75rem] page-enter bg-background">
       {/* Hero */}
-      <section className="relative py-28 bg-hero overflow-hidden">
+      <section className="relative py-28 bg-transparent overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="absolute top-0 right-0 w-[400px] h-[350px] rounded-full bg-gold/5 blur-[130px]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -69,7 +69,7 @@ const Contact = () => {
       </section>
 
       {/* Content */}
-      <section className="section-padding bg-[#f8fbff] border-t border-slate-100">
+      <section className="section-padding bg-transparent border-t border-black/5">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
 

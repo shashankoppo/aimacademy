@@ -45,9 +45,9 @@ const Results = () => {
     : allToppers.filter((t) => t.year === activeYear);
 
   return (
-    <div className="pt-[3.75rem] page-enter bg-white">
+    <div className="pt-[3.75rem] page-enter bg-background">
       {/* Hero */}
-      <section className="relative py-22 md:py-28 bg-hero overflow-hidden border-b border-slate-100">
+      <section className="relative py-22 md:py-28 bg-transparent overflow-hidden border-b border-black/5">
         <div className="absolute inset-0 dot-grid-sm opacity-60" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-gold/5 blur-[150px]" />
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -72,7 +72,7 @@ const Results = () => {
       </section>
 
       {/* Hall of Fame Banner */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-transparent">
         <div className="container mx-auto px-4">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -91,7 +91,7 @@ const Results = () => {
       </section>
 
       {/* Stats */}
-      <section className="section-padding bg-[#f8fbff] border-y border-slate-100">
+      <section className="section-padding bg-transparent border-y border-black/5">
         <div className="container mx-auto">
           <SectionHeading label="Impact" title="Selection Overview" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -118,7 +118,7 @@ const Results = () => {
       </section>
 
       {/* Toppers with year filter */}
-      <section className="section-padding bg-white relative overflow-hidden">
+      <section className="section-padding bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 dot-grid opacity-30" />
         <div className="container mx-auto relative z-10">
           <SectionHeading label="Hall of Fame" title="Our Rank Holders" />
@@ -177,7 +177,7 @@ const Results = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="section-padding bg-[#f8fbff] border-t border-slate-100">
+      <section className="section-padding bg-transparent border-t border-black/5">
         <div className="container mx-auto">
           <SectionHeading label="Testimonials" title="What Our Toppers Say" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

@@ -32,6 +32,8 @@ import CourseManagement from "./pages/admin/CourseManagement";
 import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
+import { AdminProvider } from "@/hooks/useAdminData";
+import AdminLayout from "@/components/AdminLayout";
 
 const queryClient = new QueryClient();
 
@@ -60,19 +62,38 @@ const AppRoutes = () => {
         <Route path="/staff/dashboard" element={<StaffDashboard />} />
 
         {/* Admin Portal */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/payroll" element={<PayrollManagement />} />
-        <Route path="/admin/fees" element={<FeesManagement />} />
-        <Route path="/admin/attendance" element={<AttendanceManagement />} />
-        <Route path="/admin/fee-reminders" element={<FeeReminders />} />
-        <Route path="/admin/students" element={<StudentManagement />} />
-        <Route path="/admin/announcements" element={<Announcements />} />
-        <Route path="/admin/courses" element={<CourseManagement />} />
-        <Route path="/admin/website-settings" element={<AdminWebsiteSettings />} />
+        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+        <Route path="/admin/payroll" element={<AdminLayout><PayrollManagement /></AdminLayout>} />
+        <Route path="/admin/fees" element={<AdminLayout><FeesManagement /></AdminLayout>} />
+        <Route path="/admin/attendance" element={<AdminLayout><AttendanceManagement /></AdminLayout>} />
+        <Route path="/admin/fee-reminders" element={<AdminLayout><FeeReminders /></AdminLayout>} />
+        <Route path="/admin/students" element={<AdminLayout><StudentManagement /></AdminLayout>} />
+        <Route path="/admin/announcements" element={<AdminLayout><Announcements /></AdminLayout>} />
+        <Route path="/admin/courses" element={<AdminLayout><CourseManagement /></AdminLayout>} />
+        <Route path="/admin/website-settings" element={<AdminLayout><AdminWebsiteSettings /></AdminLayout>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
+  );
+};
+
+const AppContent = () => {
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/admin') || 
+                      location.pathname.startsWith('/student') || 
+                      location.pathname.startsWith('/teacher') || 
+                      location.pathname.startsWith('/staff');
+
+  return (
+    <GSAPWrapper>
+      {!isDashboard && <Navbar />}
+      <main className={isDashboard ? "" : "min-h-screen"}>
+        <AppRoutes />
+      </main>
+      {!isDashboard && <Footer />}
+      {!isDashboard && <FloatingButtons />}
+    </GSAPWrapper>
   );
 };
 
@@ -82,14 +103,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <GSAPWrapper>
-          <Navbar />
-          <main className="min-h-screen">
-            <AppRoutes />
-          </main>
-          <Footer />
-          <FloatingButtons />
-        </GSAPWrapper>
+        <AdminProvider>
+          <AppContent />
+        </AdminProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

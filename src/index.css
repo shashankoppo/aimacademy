@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* white */
+    --background: 60 100% 50%; /* #FFFF00 */
     --foreground: 222.2 84% 4.9%; /* slate-900 */
     /* Light Yellow Focus - Clean, professional but vibrant like top edtechs */
     --primary: 48 96% 58%; /* Clean lighter yellow (#FBE122 approx) */

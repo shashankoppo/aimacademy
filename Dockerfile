@@ -1,24 +1,31 @@
-# Step 1: Build the React application
-FROM node:18-alpine AS builder
+# Stage 1: Build the application
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies based on package manager files
-COPY package*.json ./
-RUN npm install
+# Enable corepack for faster package management
+RUN corepack enable
 
-# Copy all files and build the production bundle
+# Install dependencies efficiently
+COPY package*.json ./
+RUN npm ci
+
+# Copy source and build
 COPY . .
 RUN npm run build
 
-# Step 2: Serve the application using Nginx
-FROM nginx:alpine
+# Stage 2: Serve with Nginx
+FROM nginx:stable-alpine
 
-# Copy custom nginx configuration to handle React Router properly
+# Copy built assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy optimized nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the built assets from the builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Health check to ensure the container is running correctly
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
 
 EXPOSE 80
 

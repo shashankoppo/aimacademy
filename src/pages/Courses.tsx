@@ -194,9 +194,9 @@ const CourseCard = ({ course, index }: { course: typeof courses[0]; index: numbe
 };
 
 const Courses = () => (
-  <div className="pt-[3.75rem] page-enter bg-white">
+  <div className="pt-[3.75rem] page-enter bg-background">
     {/* Hero */}
-    <section className="relative py-22 md:py-28 bg-hero overflow-hidden border-b border-slate-100">
+    <section className="relative py-22 md:py-28 bg-transparent overflow-hidden border-b border-black/5">
       <div className="absolute inset-0 dot-grid-sm opacity-50" />
       <div className="absolute top-0 right-0 w-[600px] h-[500px] rounded-full bg-gold/5 blur-[150px]" />
       <div className="container mx-auto px-4 relative z-10 text-center">
@@ -223,7 +223,7 @@ const Courses = () => (
     </section>
 
     {/* Courses */}
-    <section className="section-padding bg-[#f8fbff] border-y border-slate-100">
+    <section className="section-padding bg-transparent border-y border-black/5">
       <div className="container mx-auto">
         <div className="flex flex-col gap-6">
           {courses.map((course, i) => <CourseCard key={course.title} course={course} index={i} />)}
@@ -232,7 +232,7 @@ const Courses = () => (
     </section>
 
     {/* CTA */}
-    <section className="section-padding bg-white border-t border-slate-100 relative overflow-hidden">
+    <section className="section-padding bg-transparent border-t border-black/5 relative overflow-hidden">
       <div className="absolute inset-0 dot-grid opacity-30" />
       <div className="container mx-auto max-w-2xl text-center relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>

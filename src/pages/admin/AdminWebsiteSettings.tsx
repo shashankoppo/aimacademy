@@ -10,19 +10,37 @@ const AdminWebsiteSettings = () => {
     "/images/STUDENT_BANNER.jpeg"
   ]);
 
+  const [faculty, setFaculty] = useState<{name: string, sub: string, img: string}[]>([
+    { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
+    { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
+    { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
+    { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
+    { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
+  ]);
+
   useEffect(() => {
-    const saved = localStorage.getItem("aim_hero_slides");
-    if (saved) {
+    const savedSlides = localStorage.getItem("aim_hero_slides");
+    if (savedSlides) {
       try { 
-        setSlides(JSON.parse(saved)); 
+        setSlides(JSON.parse(savedSlides)); 
       } catch (e) {
         console.error("Failed to parse saved slides");
+      }
+    }
+
+    const savedFaculty = localStorage.getItem("aim_faculty_data");
+    if (savedFaculty) {
+      try {
+        setFaculty(JSON.parse(savedFaculty));
+      } catch (e) {
+        console.error("Failed to parse saved faculty");
       }
     }
   }, []);
 
   const handleSave = () => {
     localStorage.setItem("aim_hero_slides", JSON.stringify(slides));
+    localStorage.setItem("aim_faculty_data", JSON.stringify(faculty));
     toast.success("Website settings updated successfully! View the homepage to see changes.");
   };
 
@@ -44,14 +62,44 @@ const AdminWebsiteSettings = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        toast.error("File is too large! Please select an image under 2MB to save reliably in the browser.");
+        toast.error("File is too large! Please select an image under 2MB.");
         return;
       }
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
         updateSlide(index, base64String);
-        toast.success("Image uploaded temporarily. Click 'Save Changes' to apply.");
+        toast.success("Image uploaded temporarily.");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Faculty Handlers
+  const addFaculty = () => {
+    setFaculty([...faculty, { name: "New Teacher", sub: "Subject Expert", img: "/images/faculty_placeholder.png" }]);
+  };
+
+  const removeFaculty = (index: number) => {
+    setFaculty(faculty.filter((_, i) => i !== index));
+  };
+
+  const updateFaculty = (index: number, field: 'name' | 'sub' | 'img', value: string) => {
+    const newFaculty = [...faculty];
+    newFaculty[index] = { ...newFaculty[index], [field]: value };
+    setFaculty(newFaculty);
+  };
+
+  const handleFacultyUpload = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1 * 1024 * 1024) {
+        toast.error("File too large! Max 1MB for faculty photos.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateFaculty(index, 'img', reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -66,7 +114,7 @@ const AdminWebsiteSettings = () => {
         
         <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-               <div className="p-3 rounded-xl bg-primary text-white">
+               <div className="p-3 rounded-xl bg-primary text-slate-900 border border-slate-200">
                   <Layout className="w-6 h-6" />
                </div>
                <div>
@@ -79,13 +127,14 @@ const AdminWebsiteSettings = () => {
             </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Hero Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
             <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                <div>
                   <h2 className="text-xl font-bold text-slate-900">Hero Section Banners</h2>
-                  <p className="text-sm text-slate-500 font-medium mt-1">Upload images or paste direct links to display on the homepage.</p>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Upload images for the homepage slider.</p>
                </div>
-               <button onClick={addSlide} className="flex items-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-bold py-2 px-4 rounded-lg shadow hover:brightness-105 transition-all text-sm shrink-0">
+               <button onClick={addSlide} className="flex items-center gap-2 bg-primary text-slate-900 font-bold py-2 px-4 rounded-lg shadow hover:brightness-105 transition-all text-sm shrink-0">
                   <Plus className="w-4 h-4" /> Add Slide
                </button>
             </div>
@@ -99,50 +148,90 @@ const AdminWebsiteSettings = () => {
                         ) : (
                             <ImageIcon className="w-6 h-6 text-slate-400" />
                         )}
-                        {/* Hidden Upload Input Overlaid on Image */}
                         <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                            <span className="text-white text-[10px] font-bold uppercase tracking-wider">Upload</span>
-                           <input 
-                             type="file" 
-                             accept="image/*" 
-                             onChange={(e) => handleFileUpload(index, e)} 
-                             className="hidden" 
-                           />
+                           <input type="file" accept="image/*" onChange={(e) => handleFileUpload(index, e)} className="hidden" />
                         </label>
                      </div>
 
-                     <div className="flex-1 w-full">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Image Path or URL Link</label>
-                        <div className="flex gap-2">
-                           <input 
-                              type="text" 
-                              value={slide}
-                              onChange={(e) => updateSlide(index, e.target.value)}
-                              placeholder="/images/example.jpg OR https://imgur.com/image.jpg"
-                              className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm"
-                           />
-                        </div>
-                        <p className="text-[11px] text-slate-500 font-medium mt-2">
-                           Hover over the left image box to upload from your PC, or paste an external URL. 
-                        </p>
+                     <div className="flex-1 w-full text-left">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Image Path or URL</label>
+                        <input 
+                           type="text" 
+                           value={slide}
+                           onChange={(e) => updateSlide(index, e.target.value)}
+                           className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm"
+                        />
                      </div>
 
-                     <button onClick={() => removeSlide(index)} aria-label="Remove slide" className="absolute top-2 right-2 sm:static p-2 sm:p-3 text-red-500 hover:bg-red-100 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-200 bg-white sm:bg-transparent">
-                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                     <button onClick={() => removeSlide(index)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                        <Trash2 className="w-5 h-5" />
                      </button>
                   </div>
                ))}
-               
-               {slides.length === 0 && (
-                  <div className="text-center py-10 text-slate-400 font-medium">
-                     No slides available. Click "Add Slide" to select an image.
-                  </div>
-               )}
             </div>
         </div>
+
+        {/* Teachers Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+               <div>
+                  <h2 className="text-xl font-bold text-slate-900">Manage Teachers</h2>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Update faculty names, subjects, and photos.</p>
+               </div>
+               <button onClick={addFaculty} className="flex items-center gap-2 bg-primary text-slate-900 font-bold py-2 px-4 rounded-lg shadow hover:brightness-105 transition-all text-sm shrink-0">
+                  <Plus className="w-4 h-4" /> Add Teacher
+               </button>
+            </div>
+            <div className="p-6 space-y-4">
+               {faculty.map((member, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 relative group">
+                     {/* Image Box */}
+                     <div className="w-full sm:w-20 h-20 bg-slate-200 rounded-full overflow-hidden shrink-0 flex items-center justify-center border border-slate-300 relative group/img">
+                        {member.img ? (
+                            <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <ImageIcon className="w-6 h-6 text-slate-400" />
+                        )}
+                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 cursor-pointer transition-opacity">
+                           <span className="text-white text-[8px] font-bold uppercase tracking-wider">Change</span>
+                           <input type="file" accept="image/*" onChange={(e) => handleFacultyUpload(index, e)} className="hidden" />
+                        </label>
+                     </div>
+
+                     <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                        <div>
+                           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block text-left">Teacher Name</label>
+                           <input 
+                              type="text" 
+                              value={member.name}
+                              onChange={(e) => updateFaculty(index, 'name', e.target.value)}
+                              className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm"
+                           />
+                        </div>
+                        <div>
+                           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block text-left">Specialization / Subject</label>
+                           <input 
+                              type="text" 
+                              value={member.sub}
+                              onChange={(e) => updateFaculty(index, 'sub', e.target.value)}
+                              className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm"
+                           />
+                        </div>
+                     </div>
+
+                     <button onClick={() => removeFaculty(index)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                        <Trash2 className="w-5 h-5" />
+                     </button>
+                  </div>
+               ))}
+            </div>
+        </div>
+
       </div>
     </div>
   );
 };
 
 export default AdminWebsiteSettings;
+

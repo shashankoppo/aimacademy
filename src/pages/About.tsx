@@ -55,9 +55,9 @@ const fadeUp = {
 
 const About = () => {
   return (
-    <div className="pt-[3.75rem] page-enter bg-white">
+    <div className="pt-[3.75rem] page-enter bg-background">
       {/* ══ HERO ══════════════════════════════════════════════ */}
-      <section className="relative py-24 md:py-32 bg-hero overflow-hidden border-b border-slate-100">
+      <section className="relative py-24 md:py-32 bg-transparent overflow-hidden border-b border-black/5">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-gold/5 blur-[120px]" />
         
@@ -96,7 +96,7 @@ const About = () => {
 
 
       {/* ══ MISSION & VISION ═══════════════════════════════════ */}
-      <section className="section-padding bg-[#f8fbff] border-y border-slate-100 relative overflow-hidden">
+      <section className="section-padding bg-transparent border-y border-black/5 relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="container mx-auto max-w-6xl relative z-10">
           <div className="grid md:grid-cols-2 gap-10">
@@ -201,7 +201,7 @@ const About = () => {
       </section>
 
       {/* ══ STATS ═════════════════════════════════════════════ */}
-      <section className="py-20 bg-hero">
+      <section className="py-20 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {stats.map((s, i) => (
@@ -224,7 +224,7 @@ const About = () => {
       </section>
 
       {/* ══ CORE VALUES ═══════════════════════════════════════ */}
-      <section className="section-padding bg-white relative overflow-hidden">
+      <section className="section-padding bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 dot-grid opacity-50" />
         <div className="container mx-auto relative z-10">
           <SectionHeading 
@@ -256,7 +256,7 @@ const About = () => {
       </section>
 
       {/* ══ LEADERSHIP ════════════════════════════════════════ */}
-      <section className="section-padding bg-[#f8fbff] border-y border-slate-100 relative overflow-hidden">
+      <section className="section-padding bg-transparent border-y border-black/5 relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-30" />
         <div className="container mx-auto relative z-10">
           <SectionHeading label="Leadership" title="Guided by the Best" description="Meet the people who bridge the gap between your dreams and your name in the final merit list." />
@@ -317,7 +317,7 @@ const About = () => {
       </section>
 
       {/* ══ JABALPUR PRIDE ═════════════════════════════════════ */}
-      <section className="section-padding bg-white relative overflow-hidden">
+      <section className="section-padding bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 dot-grid opacity-30" />
         <div className="container mx-auto relative z-10">
           <div className="glass-card rounded-[2.5rem] p-10 md:p-20 border border-slate-200 bg-white shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
