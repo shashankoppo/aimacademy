@@ -3,35 +3,37 @@ import { Youtube, Instagram, Facebook, Twitter, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-transparent border-t border-black/5 text-slate-600 pt-16">
-      <div className="container mx-auto px-4 lg:px-8">
+    <footer className="bg-slate-950 text-slate-400 pt-20 pb-10 mt-20 relative overflow-hidden">
+      {/* Accent Line */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
+      <div className="container mx-auto px-4 lg:px-8 relative z-10">
         
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
           
           {/* Brand Info */}
           <div className="lg:col-span-4">
-             <Link to="/" className="flex items-center gap-2 mb-4">
-               <img src="/images/logo_main.png" alt="Logo" className="w-14 grayscale opacity-80" />
+             <Link to="/" className="flex items-center gap-2 mb-6">
+               <img src="/images/logo_main.png" alt="Logo" className="w-14" />
                <div className="flex flex-col">
-                 <span className="font-bold text-lg leading-none text-slate-800">AIM Academy</span>
-                 <span className="text-[9px] text-slate-500 uppercase tracking-widest">Coaching Institute</span>
+                 <span className="font-bold text-xl leading-none text-white tracking-tight">AIM Academy</span>
+                 <span className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mt-1">Coaching Institute</span>
                </div>
              </Link>
-             <p className="text-sm leading-relaxed mb-6">
+             <p className="text-sm leading-relaxed mb-6 text-slate-400">
                AIM Academy is India's most trusted online education platform that provides affordable & comprehensive learning experience to students for various competitive exams.
              </p>
              <div className="flex gap-4">
-                <a href="#" aria-label="Facebook" className="text-slate-400 hover:text-blue-600 transition-colors"><Facebook className="w-5 h-5"/></a>
-                <a href="#" aria-label="Twitter" className="text-slate-400 hover:text-blue-400 transition-colors"><Twitter className="w-5 h-5"/></a>
-                <a href="#" aria-label="YouTube" className="text-slate-400 hover:text-red-600 transition-colors"><Youtube className="w-5 h-5"/></a>
-                <a href="#" aria-label="Instagram" className="text-slate-400 hover:text-pink-600 transition-colors"><Instagram className="w-5 h-5"/></a>
+                <a href="#" aria-label="Facebook" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Facebook className="w-5 h-5"/></a>
+                <a href="#" aria-label="Twitter" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Twitter className="w-5 h-5"/></a>
+                <a href="#" aria-label="YouTube" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Youtube className="w-5 h-5"/></a>
+                <a href="#" aria-label="Instagram" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Instagram className="w-5 h-5"/></a>
              </div>
           </div>
 
           {/* Links 1 */}
           <div className="lg:col-span-2">
-            <h4 className="font-bold text-slate-900 mb-4">Company</h4>
+            <h4 className="font-black text-white uppercase tracking-widest text-xs mb-8">Company</h4>
             <ul className="space-y-3 text-sm">
               <li><Link to="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
@@ -43,7 +45,7 @@ const Footer = () => {
 
           {/* Links 2 */}
           <div className="lg:col-span-3">
-            <h4 className="font-bold text-slate-900 mb-4">Popular Exams</h4>
+            <h4 className="font-black text-white uppercase tracking-widest text-xs mb-8">Popular Exams</h4>
             <ul className="space-y-3 text-sm">
               <li><Link to="/courses" className="hover:text-blue-600 transition-colors">UPSC & MP PSC</Link></li>
               <li><Link to="/courses" className="hover:text-blue-600 transition-colors">SI & Police Constable</Link></li>
@@ -55,7 +57,7 @@ const Footer = () => {
 
           {/* Contact */}
           <div className="lg:col-span-3">
-            <h4 className="font-bold text-slate-900 mb-4">Course Related Query</h4>
+            <h4 className="font-black text-white uppercase tracking-widest text-xs mb-8">Course Related Query</h4>
             <ul className="space-y-3 text-sm">
               <li><Link to="/contact" className="hover:text-blue-600 transition-colors font-semibold">Ask Your Doubts</Link></li>
               <li className="flex items-center gap-2">
@@ -68,15 +70,15 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-black/5 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-          <div className="text-center md:text-left">
-            <p>© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
-            <p className="mt-1 opacity-70">Technical Partner: <span className="font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
+        <div className="border-t border-white/5 py-10 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium">
+          <div className="text-center md:text-left space-y-2">
+            <p className="text-slate-300">© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
+            <p className="opacity-50">Technical Partner: <span className="text-primary font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy policy</Link>
-            <span className="text-slate-300 hidden sm:inline">|</span>
-            <Link to="/terms" className="hover:text-blue-600 transition-colors">Terms & Conditions</Link>
+          <div className="flex flex-wrap gap-6 uppercase tracking-widest">
+            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy policy</Link>
+            <span className="text-white/10 hidden sm:inline">|</span>
+            <Link to="/terms" className="hover:text-primary transition-colors">Terms & Conditions</Link>
           </div>
         </div>
 

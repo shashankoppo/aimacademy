@@ -16,18 +16,30 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
-      {/* Top Thin Bar */}
-      <div className="bg-[#0f172a] border-b border-white/5 hidden md:block">
-        <div className="container mx-auto px-4 lg:px-8 py-1.5 flex justify-between items-center text-[10px] text-slate-300 font-bold uppercase tracking-wider">
-          <div className="flex items-center gap-6">
-            <span>All Exams</span>
-            <a href="tel:8757354880" className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Phone className="w-3 h-3" /> Call Us: +91 70672 31189
-            </a>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link to="/contact" className="hover:text-primary font-bold text-blue-700 transition-colors">Book Free Consultation</Link>
-          </div>
+      {/* Top Banner Banner */}
+      <div className="bg-[#0f172a] text-white overflow-hidden py-2 hidden md:block">
+        <div className="animate-marquee whitespace-nowrap flex gap-10 items-center">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Join India's Most Trusted Institute | AIM Academy Global Studies
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Call: +91 70672 31189 | Get Free Consultation Today
+          </span>
+          {/* Duplicate for seamless loop */}
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Join India's Most Trusted Institute | AIM Academy Global Studies
+          </span>
         </div>
       </div>
 
