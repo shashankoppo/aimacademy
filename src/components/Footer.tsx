@@ -3,11 +3,11 @@ import { Youtube, Instagram, Facebook, Twitter, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-white text-slate-600 pt-20 pb-10 border-t border-slate-100">
+    <footer className="bg-white text-slate-600 pt-16 pb-4 border-t border-slate-100">
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-10">
           
           {/* Brand Info */}
           <div className="lg:col-span-4">
@@ -68,7 +68,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-100 py-10 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium uppercase tracking-wider">
+        <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium uppercase tracking-wider">
           <div className="text-center md:text-left space-y-2">
             <p className="text-slate-900">© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
             <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span></p>
