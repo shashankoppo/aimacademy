@@ -16,29 +16,14 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
-      {/* Top Banner Banner */}
-      <div className="bg-[#0f172a] text-white overflow-hidden py-2 hidden md:block">
+      {/* Top Running Banner */}
+      <div className="bg-blue-600 text-white overflow-hidden py-2 hidden md:block">
         <div className="animate-marquee whitespace-nowrap flex gap-10 items-center">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27
+            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27 | Join India's Most Trusted Institute | AIM Academy: Synonym of Success | Call: +91 70672 31189
           </span>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Join India's Most Trusted Institute | AIM Academy Global Studies
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Call: +91 70672 31189 | Get Free Consultation Today
-          </span>
-          {/* Duplicate for seamless loop */}
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Join India's Most Trusted Institute | AIM Academy Global Studies
+            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27 | Join India's Most Trusted Institute | AIM Academy: Synonym of Success | Call: +91 70672 31189
           </span>
         </div>
       </div>
@@ -48,16 +33,16 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <img src="/images/logo_main.png" alt="Logo" className="w-14" />
           <div className="flex flex-col">
-             <span className="font-bold text-lg leading-none text-slate-800">AIM Academy</span>
-             <span className="text-[9px] text-slate-500 uppercase tracking-wide">Global Studies</span>
+            <span className="font-bold text-lg leading-none text-slate-800 tracking-tight">AIM Academy</span>
+            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Synonym of Success</span>
           </div>
         </Link>
 
         {/* Global Search Like KGS */}
         <div className="hidden lg:flex items-center flex-1 max-w-md mx-8 relative">
-          <input 
-            type="text" 
-            placeholder="What do you want to learn?" 
+          <input
+            type="text"
+            placeholder="What do you want to learn?"
             className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:border-primary/50 transition-colors"
           />
           <Search className="w-4 h-4 text-slate-400 absolute left-4" />
@@ -83,9 +68,9 @@ const Navbar = () => {
       {isOpen && (
         <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 shadow-lg px-4 py-4 flex flex-col gap-4">
           <div className="relative mb-2">
-            <input 
-              type="text" 
-              placeholder="What do you want to learn?" 
+            <input
+              type="text"
+              placeholder="What do you want to learn?"
               className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-4 pl-10 text-sm focus:outline-none"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3" />
