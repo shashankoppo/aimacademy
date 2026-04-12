@@ -71,7 +71,7 @@ const Footer = () => {
         <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium uppercase tracking-wider">
           <div className="text-center md:text-left space-y-2">
             <p className="text-slate-900">© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
-            <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span></p>
+            <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
           </div>
           <div className="flex flex-wrap gap-6">
             <Link to="/privacy" className="hover:text-primary transition-colors">Privacy policy</Link>
