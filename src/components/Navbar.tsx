@@ -40,9 +40,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src="/images/logo_main.png" alt="Logo" className="w-14" />
-          <div className="flex flex-col">
-            <span className="font-bold text-lg leading-none text-slate-800">AIM Academy</span>
-            <span className="text-[9px] text-slate-500 uppercase tracking-wide mt-1">Synonym of Success</span>
+          <div className="flex flex-col leading-none">
+            <span className="font-bold text-lg text-slate-800 leading-none">
+              <span className="text-slate-800">AIM </span>
+              <span className="relative inline-flex flex-col">
+                <span className="font-bold text-lg text-slate-800 leading-none">Academy</span>
+                <span className="text-[8px] text-slate-500 uppercase tracking-widest font-semibold leading-tight">Synonym of Success</span>
+              </span>
+            </span>
           </div>
         </Link>
 

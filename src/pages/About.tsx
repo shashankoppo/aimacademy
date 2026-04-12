@@ -154,7 +154,7 @@ const About = () => {
                 <img 
                   src="/images/founder_solo.png" 
                   alt="Dr. Imran Khan - Founder & Director" 
-                  className="h-full w-full object-cover object-[center_8%] scale-[1.03]"
+                  className="h-full w-full object-cover object-top scale-100"
                 />
               </div>
               

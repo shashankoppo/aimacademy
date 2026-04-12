@@ -30,6 +30,7 @@ import StudentManagement from "./pages/admin/StudentManagement";
 import Announcements from "./pages/admin/Announcements";
 import CourseManagement from "./pages/admin/CourseManagement";
 import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
+import WhatsAppCenter from "./pages/admin/WhatsAppCenter";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
 import { AdminProvider } from "@/hooks/useAdminData";
@@ -71,6 +72,7 @@ const AppRoutes = () => {
         <Route path="/admin/announcements" element={<AdminLayout><Announcements /></AdminLayout>} />
         <Route path="/admin/courses" element={<AdminLayout><CourseManagement /></AdminLayout>} />
         <Route path="/admin/website-settings" element={<AdminLayout><AdminWebsiteSettings /></AdminLayout>} />
+        <Route path="/admin/whatsapp" element={<AdminLayout><WhatsAppCenter /></AdminLayout>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
