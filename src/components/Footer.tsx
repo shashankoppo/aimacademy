@@ -3,7 +3,7 @@ import { Youtube, Instagram, Facebook, Twitter, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#f8fafc] border-t border-slate-200 text-slate-600 pt-16">
+    <footer className="bg-transparent border-t border-black/5 text-slate-600 pt-16">
       <div className="container mx-auto px-4 lg:px-8">
         
         {/* Top Section */}
@@ -68,8 +68,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-200 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-          <p>© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
+        <div className="border-t border-black/5 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <div className="text-center md:text-left">
+            <p>© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
+            <p className="mt-1 opacity-70">Technical Partner: <span className="font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
+          </div>
           <div className="flex flex-wrap gap-4">
             <Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy policy</Link>
             <span className="text-slate-300 hidden sm:inline">|</span>
