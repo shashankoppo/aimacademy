@@ -10,6 +10,8 @@ const AdminWebsiteSettings = () => {
     "/images/STUDENT_BANNER.jpeg"
   ]);
 
+  const [bannerText, setBannerText] = useState("New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189");
+
   const [faculty, setFaculty] = useState<{name: string, sub: string, img: string}[]>([
     { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
     { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
@@ -19,6 +21,9 @@ const AdminWebsiteSettings = () => {
   ]);
 
   useEffect(() => {
+    const savedBanner = localStorage.getItem("aim_top_banner");
+    if (savedBanner) setBannerText(savedBanner);
+
     const savedSlides = localStorage.getItem("aim_hero_slides");
     if (savedSlides) {
       try { 
@@ -39,6 +44,7 @@ const AdminWebsiteSettings = () => {
   }, []);
 
   const handleSave = () => {
+    localStorage.setItem("aim_top_banner", bannerText);
     localStorage.setItem("aim_hero_slides", JSON.stringify(slides));
     localStorage.setItem("aim_faculty_data", JSON.stringify(faculty));
     toast.success("Website settings updated successfully! View the homepage to see changes.");
@@ -125,6 +131,24 @@ const AdminWebsiteSettings = () => {
             <button onClick={handleSave} className="flex items-center gap-2 bg-slate-900 text-white font-bold px-6 py-3 rounded-xl shadow-md hover:bg-slate-800 transition-colors">
                <Save className="w-5 h-5" /> Save Changes
             </button>
+        </div>
+
+        {/* Top Banner Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+               <h2 className="text-xl font-bold text-slate-900">Announcement Banner</h2>
+               <p className="text-sm text-slate-500 font-medium mt-1">Update the scrolling text at the very top of the website.</p>
+            </div>
+            <div className="p-6">
+               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">Banner Text</label>
+               <input 
+                  type="text" 
+                  value={bannerText}
+                  onChange={(e) => setBannerText(e.target.value)}
+                  className="w-full font-medium text-slate-700 bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-primary transition-all text-sm"
+                  placeholder="Enter the banner text..."
+               />
+            </div>
         </div>
 
         {/* Hero Section */}

@@ -1,31 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [bannerText, setBannerText] = useState("New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("aim_top_banner");
+    if (saved) setBannerText(saved);
+  }, []);
 
   const navLinks = [
     { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
     { name: "Courses", path: "/courses" },
-    { name: "Practice", path: "/courses" },
-    { name: "Current Affairs", path: "/resources" },
-    { name: "Test Series", path: "/resources" },
-    { name: "Study Materials", path: "/resources" },
+    { name: "Resources", path: "/resources" },
+    { name: "Contact", path: "/contact" },
   ];
 
   return (
     <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
       {/* Top Running Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 text-white overflow-hidden py-2.5 hidden md:block border-b border-white/5">
-        <div className="animate-marquee whitespace-nowrap flex gap-12 items-center">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-            New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189
+      <div className="bg-blue-600 text-white overflow-hidden py-1.5 hidden md:block border-b border-white/5">
+        <div className="animate-marquee whitespace-nowrap inline-block">
+          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
+            {bannerText}
           </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-            New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189
+          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
+            {bannerText}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
+            {bannerText}
           </span>
         </div>
       </div>
