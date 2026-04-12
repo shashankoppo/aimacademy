@@ -8,7 +8,7 @@ import {
 
 const StaffDashboard = () => {
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
       <div className="container mx-auto max-w-7xl">
         
         {/* Header Section */}
@@ -26,10 +26,10 @@ const StaffDashboard = () => {
             </div>
           </div>
           <div className="flex gap-4">
-             <button className="flex items-center gap-2 bg-slate-900 text-white font-bold py-3 px-6 rounded hover:bg-slate-800 transition-all">
-                <Bell className="w-4 h-4" /> Broadcast Alert
-             </button>
-             <button className="btn-coursera py-3">Generate Monthly Report</button>
+            <button className="flex items-center gap-2 bg-slate-900 text-white font-bold py-3 px-6 rounded hover:bg-slate-800 transition-all">
+              <Bell className="w-4 h-4" /> Broadcast Alert
+            </button>
+            <button className="btn-coursera py-3">Generate Monthly Report</button>
           </div>
         </div>
 
@@ -43,7 +43,7 @@ const StaffDashboard = () => {
                 { label: "New Admissions", value: "12", icon: UserPlus, color: "text-amber-500" },
                 { label: "Pending Tasks", value: "08", icon: Clock, color: "text-red-500" },
               ].map((stat, i) => (
-                <div key={i} className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-lg transition-all">
+                <div key={i} className="bg-white/40 backdrop-blur-sm p-6 rounded-xl border border-black/5 shadow-sm hover:shadow-lg transition-all">
                    <div className="flex items-center justify-between mb-4">
                       <div className={`p-2 rounded-lg bg-slate-50 ${stat.color}`}>
                          <stat.icon className="w-5 h-5" />
@@ -59,7 +59,7 @@ const StaffDashboard = () => {
            <div className="lg:col-span-8 flex flex-col gap-8">
               
               {/* Daily Staff Attendance */}
-              <div className="bg-white rounded-xl border border-slate-100 p-8">
+              <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-black/5 p-8">
                  <div className="flex justify-between items-center mb-8">
                     <h2 className="heading-display text-xl">Staff Attendance Log</h2>
                     <div className="flex gap-2">
@@ -98,7 +98,7 @@ const StaffDashboard = () => {
 
               {/* Reports Center */}
               <div className="grid sm:grid-cols-2 gap-6">
-                 <div className="bg-white rounded-xl border border-slate-100 p-8 shadow-sm">
+                 <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-black/5 p-8 shadow-sm">
                     <div className="p-3 w-fit rounded-lg bg-blue-50 text-blue-600 mb-6"><PieChart className="w-6 h-6" /></div>
                     <h3 className="heading-display text-lg mb-2">Financial Reports</h3>
                     <p className="text-sm text-slate-500 mb-8 leading-relaxed">Download fee collection, expenditure, and pending balances reports for this quarter.</p>
@@ -106,7 +106,7 @@ const StaffDashboard = () => {
                        <Download className="w-4 h-4" /> Download PDF
                     </button>
                  </div>
-                 <div className="bg-white rounded-xl border border-slate-100 p-8 shadow-sm">
+                 <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-black/5 p-8 shadow-sm">
                     <div className="p-3 w-fit rounded-lg bg-amber-50 text-amber-600 mb-6"><FileText className="w-6 h-6" /></div>
                     <h3 className="heading-display text-lg mb-2">Academic Audit</h3>
                     <p className="text-sm text-slate-500 mb-8 leading-relaxed">Generate reports for course completion, mock test attendance, and faculty performance.</p>
@@ -128,10 +128,10 @@ const StaffDashboard = () => {
                  </h3>
                  <div className="space-y-4 relative z-10">
                     {[ 
-                      "Coordinate Prelims Batch-A Mock Test",
-                      "Update Salary Slips for April cycle",
-                      "Renew AWS EdStart Partnership",
-                      "Finalize Q2 Facility Maintenance"
+                      "Coordinate MP PSC Batch-A Mock Test",
+                      "Update Vyapam Course Material Slips",
+                      "Finalize SI Physical Training Schedule",
+                      "Verify SAMVIDA 3rd Hall Tickets"
                     ].map(task => (
                       <div key={task} className="flex gap-4 p-4 rounded bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer group">
                          <div className="w-5 h-5 rounded border border-white/30 group-hover:bg-primary transition-all shrink-0" />
@@ -141,7 +141,7 @@ const StaffDashboard = () => {
                  </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-slate-100 p-8">
+              <div className="bg-white/40 backdrop-blur-sm rounded-xl border border-black/5 p-8">
                  <h3 className="heading-display text-lg mb-6">Upcoming Events</h3>
                  <div className="space-y-6">
                     {[ 

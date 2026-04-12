@@ -45,11 +45,11 @@ const Footer = () => {
           <div className="lg:col-span-3">
             <h4 className="font-bold text-slate-900 mb-4">Popular Exams</h4>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">UPSC & State PSC</Link></li>
-              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">SSC Exams</Link></li>
-              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">Defence Exams</Link></li>
-              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">Banking Exams</Link></li>
-              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">Foundation Courses</Link></li>
+              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">UPSC & MP PSC</Link></li>
+              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">SI & Police Constable</Link></li>
+              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">SSC & CGL Special</Link></li>
+              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">Railways & Vyapam</Link></li>
+              <li><Link to="/courses" className="hover:text-blue-600 transition-colors">Samvida & Teaching</Link></li>
             </ul>
           </div>
 

@@ -40,7 +40,7 @@ const Login = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-20 px-6">
+    <div className="min-h-screen bg-transparent flex items-center justify-center py-20 px-6">
       <div className="max-w-5xl w-full grid lg:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
         
         {/* Left Side: Branding & Info */}

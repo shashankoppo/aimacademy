@@ -9,7 +9,7 @@ const TeacherDashboard = () => {
   const [activeTab, setActiveTab] = useState<"assign" | "tests" | "performance">("assign");
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
       <div className="container mx-auto max-w-7xl">
         
         {/* Header Section */}
@@ -82,10 +82,10 @@ const TeacherDashboard = () => {
                        <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Step 1: Choose Course</label>
                        <div className="space-y-3">
                           {[ 
-                            "UPSC Prelims Crash Course 2024",
-                            "Mains Answer Writing Strategy",
-                            "Ethics Masterclass (Case Studies)",
-                            "Indian Polity & Governance"
+                            "MP PSC (Complete Foundations)",
+                            "Vyapam Group 2 & 4 Combined",
+                            "Constable/SI (Hindi Special)",
+                            "SSC CGL (Adv Math Shortcut)"
                           ].map(course => (
                             <label key={course} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-primary/20 cursor-pointer group transition-all">
                                <span className="font-bold text-slate-700 text-sm">{course}</span>

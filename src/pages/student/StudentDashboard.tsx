@@ -8,19 +8,19 @@ import { Link } from "react-router-dom";
 
 const StudentDashboard = () => {
   const courses = [
-    { title: "UPSC CSE 2024 Foundations", progress: 65, nextLesson: "Ethics & Integrity", icon: GraduationCap },
-    { title: "Advanced Ethics (Mains)", progress: 40, nextLesson: "Corporate Governance", icon: BookOpen },
-    { title: "CSAT Strategy & Practice", progress: 85, nextLesson: "Data Interpretation Quizzes", icon: BarChart3 },
+    { title: "MP PSC (Pre & Mains) 2026", progress: 65, nextLesson: "MP History & Culture", icon: GraduationCap },
+    { title: "SUB INSPECTOR (Theory)", progress: 40, nextLesson: "Hindi Grammar Intensive", icon: BookOpen },
+    { title: "SSC & CGL Math Shortcuts", progress: 85, nextLesson: "Geometry Tricks #5", icon: BarChart3 },
   ];
 
   const mockTests = [
-    { id: 1, title: "Prelims GS Full Mock #12", date: "April 02, 2026", duration: "120 Min", status: "Upcoming" },
-    { id: 2, title: "Mains Answer Writing Drill", date: "April 05, 2026", duration: "180 Min", status: "Open" },
-    { id: 3, title: "Weekly Geography Quiz", date: "Ready to start", duration: "30 Min", status: "Start" },
+    { id: 1, title: "MP PSC Full Mock #08", date: "April 02, 2026", duration: "120 Min", status: "Upcoming" },
+    { id: 2, title: "Vyapam Combined Group Test", date: "April 05, 2026", duration: "180 Min", status: "Open" },
+    { id: 3, title: "SI Physical Fitness Tracker", date: "Ready to start", duration: "30 Min", status: "Start" },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
       <div className="container mx-auto max-w-7xl">
         
         {/* Header Section */}
@@ -51,7 +51,7 @@ const StudentDashboard = () => {
              { label: "Study Hours", value: "156", icon: Clock },
              { label: "Global Rank", value: "#142", icon: Award },
            ].map((stat, i) => (
-             <div key={i} className="bg-white p-6 rounded-xl border border-slate-100 flex items-center gap-4 hover:shadow-lg transition-all cursor-default">
+             <div key={i} className="bg-white/40 backdrop-blur-sm p-6 rounded-xl border border-black/5 flex items-center gap-4 hover:shadow-lg transition-all cursor-default">
                <div className="p-3 rounded-lg bg-surface-accent text-primary">
                  <stat.icon className="w-6 h-6" />
                </div>

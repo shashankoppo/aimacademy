@@ -156,14 +156,14 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
             {[
-              { title: "UPSC & MPPSC", sub: "Foundation & Target", icon: "🏛️" },
-              { title: "SSC Exams", sub: "CGL, CHSL, MTS", icon: "📊" },
-              { title: "Defence Exams", sub: "NDA, CDS, AFCAT", icon: "🎖️" },
-              { title: "Banking Exams", sub: "SBI & IBPS", icon: "🏦" },
-              { title: "Railway Exams", sub: "RRB NTPC, ALP", icon: "🚂" },
-              { title: "State Police", sub: "SI & Constable", icon: "🛡️" },
-              { title: "Interview Prep", sub: "Mock Interviews", icon: "👔" },
-              { title: "Class 11 & 12", sub: "School Foundation", icon: "📚" },
+              { title: "UPSC", sub: "Fundamental Course", icon: "🏛️" },
+              { title: "MP PSC", sub: "Pre & Mains Program", icon: "📊" },
+              { title: "SUB INSPECTOR", sub: "Pre & Physical Prep", icon: "🛡️" },
+              { title: "RAILWAY", sub: "NTPC, ALP, Group D", icon: "🚂" },
+              { title: "SSC / CGL", sub: "Central Govt Jobs", icon: "🏦" },
+              { title: "CONSTABLE / PATWARI", sub: "State Specialized", icon: "👮" },
+              { title: "SAMVIDA 3rd", sub: "Teacher Recruitment", icon: "📚" },
+              { title: "OTHER VYAPAM", sub: "All State Level Exams", icon: "📝" },
             ].map((exam, i) => (
               <Link key={i} to="/contact" className="card-kgs bg-white/40 p-5 sm:p-6 flex flex-col items-center text-center justify-center h-full hover:border-black/20 hover:bg-white group">
                 <div className="text-3xl mb-3 opacity-90 group-hover:opacity-100 transition-opacity transform group-hover:-translate-y-1 duration-300 drop-shadow-sm">{exam.icon}</div>
