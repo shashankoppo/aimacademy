@@ -17,13 +17,15 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
       {/* Top Running Banner */}
-      <div className="bg-blue-600 text-white overflow-hidden py-2 hidden md:block">
-        <div className="animate-marquee whitespace-nowrap flex gap-10 items-center">
+      <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 text-white overflow-hidden py-2.5 hidden md:block border-b border-white/5">
+        <div className="animate-marquee whitespace-nowrap flex gap-12 items-center">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27 | Join India's Most Trusted Institute | AIM Academy: Synonym of Success | Call: +91 70672 31189
+            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+            New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189
           </span>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
-            Admissions Open for MP PSC & UPSC Foundation Batches 2026-27 | Join India's Most Trusted Institute | AIM Academy: Synonym of Success | Call: +91 70672 31189
+            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+            New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189
           </span>
         </div>
       </div>
@@ -33,8 +35,8 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <img src="/images/logo_main.png" alt="Logo" className="w-14" />
           <div className="flex flex-col">
-            <span className="font-bold text-lg leading-none text-slate-800 tracking-tight">AIM Academy</span>
-            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Synonym of Success</span>
+            <span className="font-black text-xl leading-none text-slate-800 tracking-tighter">AIM ACADEMY</span>
+            <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
           </div>
         </Link>
 

@@ -14,8 +14,8 @@ const Footer = () => {
              <Link to="/" className="flex items-center gap-2 mb-6">
                <img src="/images/logo_main.png" alt="Logo" className="w-14" />
                <div className="flex flex-col">
-                 <span className="font-bold text-xl leading-none text-slate-800">AIM Academy</span>
-                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Synonym of Success</span>
+                 <span className="font-black text-xl leading-none text-slate-800 tracking-tighter">AIM ACADEMY</span>
+                 <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
                </div>
              </Link>
              <p className="text-sm leading-relaxed mb-6 text-slate-500">
