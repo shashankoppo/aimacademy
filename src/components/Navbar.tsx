@@ -17,8 +17,8 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
       {/* Top Thin Bar */}
-      <div className="bg-transparent border-b border-black/5 hidden md:block">
-        <div className="container mx-auto px-4 lg:px-8 py-1.5 flex justify-between items-center text-[11px] text-slate-500 font-medium">
+      <div className="bg-[#0f172a] border-b border-white/5 hidden md:block">
+        <div className="container mx-auto px-4 lg:px-8 py-1.5 flex justify-between items-center text-[10px] text-slate-300 font-bold uppercase tracking-wider">
           <div className="flex items-center gap-6">
             <span>All Exams</span>
             <a href="tel:8757354880" className="flex items-center gap-1 hover:text-primary transition-colors">

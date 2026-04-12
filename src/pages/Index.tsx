@@ -179,7 +179,7 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4 lg:px-8">
            <div className="text-center md:text-left mb-10 border-l-4 border-slate-900 pl-4 py-1">
-              <h2 className="text-3xl font-black text-slate-900 leading-none mb-2">Upcoming Batches (Gurukul)</h2>
+              <h2 className="text-3xl font-black text-slate-900 leading-none mb-2">Upcoming Batches</h2>
               <p className="text-slate-500 font-medium">Join India's most trusted foundation & target batches for assured selection.</p>
            </div>
            
