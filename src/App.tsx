@@ -1,7 +1,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,10 +31,14 @@ import Announcements from "./pages/admin/Announcements";
 import CourseManagement from "./pages/admin/CourseManagement";
 import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
 import WhatsAppCenter from "./pages/admin/WhatsAppCenter";
+import NotesManagement from "./pages/admin/NotesManagement";
+import VideoManagement from "./pages/admin/VideoManagement";
+import UserManagement from "./pages/admin/UserManagement";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
 import { AdminProvider } from "@/hooks/useAdminData";
 import AdminLayout from "@/components/AdminLayout";
+import RequireAuth from "@/auth/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -52,27 +56,181 @@ const AppRoutes = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
 
+        {/* Protected Panel Redirects */}
+        <Route path="/teacher" element={<Navigate to="/teacher/dashboard" replace />} />
+        <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
+        <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
+
         {/* Student Portal */}
-        <Route path="/student/dashboard" element={<StudentDashboard />} />
-        <Route path="/student/mock-test" element={<MockTestInterface />} />
+        <Route
+          path="/student/dashboard"
+          element={
+            <RequireAuth allowedRoles={["STUDENT"]}>
+              <StudentDashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/student/mock-test"
+          element={
+            <RequireAuth allowedRoles={["STUDENT"]}>
+              <MockTestInterface />
+            </RequireAuth>
+          }
+        />
 
         {/* Teacher Portal */}
-        <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <RequireAuth allowedRoles={["TEACHER"]}>
+              <TeacherDashboard />
+            </RequireAuth>
+          }
+        />
 
         {/* Staff Portal */}
-        <Route path="/staff/dashboard" element={<StaffDashboard />} />
+        <Route
+          path="/staff/dashboard"
+          element={
+            <RequireAuth allowedRoles={["STAFF"]}>
+              <StaffDashboard />
+            </RequireAuth>
+          }
+        />
 
         {/* Admin Portal */}
-        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-        <Route path="/admin/payroll" element={<AdminLayout><PayrollManagement /></AdminLayout>} />
-        <Route path="/admin/fees" element={<AdminLayout><FeesManagement /></AdminLayout>} />
-        <Route path="/admin/attendance" element={<AdminLayout><AttendanceManagement /></AdminLayout>} />
-        <Route path="/admin/fee-reminders" element={<AdminLayout><FeeReminders /></AdminLayout>} />
-        <Route path="/admin/students" element={<AdminLayout><StudentManagement /></AdminLayout>} />
-        <Route path="/admin/announcements" element={<AdminLayout><Announcements /></AdminLayout>} />
-        <Route path="/admin/courses" element={<AdminLayout><CourseManagement /></AdminLayout>} />
-        <Route path="/admin/website-settings" element={<AdminLayout><AdminWebsiteSettings /></AdminLayout>} />
-        <Route path="/admin/whatsapp" element={<AdminLayout><WhatsAppCenter /></AdminLayout>} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/payroll"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <PayrollManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/fees"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <FeesManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/attendance"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <AttendanceManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/fee-reminders"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <FeeReminders />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/students"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <StudentManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/announcements"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <Announcements />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/notes"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <NotesManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/videos"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <VideoManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/courses"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <CourseManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/website-settings"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <AdminWebsiteSettings />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <UserManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/admin/whatsapp"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <WhatsAppCenter />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

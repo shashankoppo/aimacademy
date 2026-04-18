@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Shield, User, GraduationCap, Briefcase, ArrowRight, Lock, Mail, AlertCircle, Eye, EyeOff, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_BASE_URL } from "@/lib/admin-api";
 
 const DEMO_CREDENTIALS: Record<string, { id: string; password: string; redirect: string; name: string }> = {
   student:  { id: "student@aim.edu",  password: "student123",  redirect: "/student/dashboard", name: "Aarav Mehta" },
@@ -9,6 +10,8 @@ const DEMO_CREDENTIALS: Record<string, { id: string; password: string; redirect:
   staff:    { id: "staff@aim.edu",    password: "staff123",    redirect: "/staff/dashboard",   name: "Rajesh Varma" },
   admin:    { id: "admin@aim.edu",    password: "admin@2026",  redirect: "/admin",             name: "Administrator" },
 };
+
+type RoleKey = "student" | "teacher" | "staff" | "admin";
 
 const Login = () => {
   const [role, setRole] = useState<"student" | "teacher" | "staff" | "admin">("student");
@@ -19,16 +22,36 @@ const Login = () => {
   const [showCredentials, setShowCredentials] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const cred = DEMO_CREDENTIALS[role];
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: userId.trim().toLowerCase(), password, role }),
+      });
+      const data = await response.json();
 
-    if (userId.trim().toLowerCase() === cred.id && password === cred.password) {
-      navigate(cred.redirect);
-    } else {
-      setError("Invalid User ID or Password. Please check your credentials.");
+      if (response.ok && data.success) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        
+        const actualRole = (data.user?.role ?? "").toString().toUpperCase();
+        const redirects: Record<string, string> = {
+          STUDENT: "/student/dashboard",
+          TEACHER: "/teacher/dashboard",
+          STAFF: "/staff/dashboard",
+          ADMIN: "/admin",
+        };
+        navigate(redirects[actualRole] || "/");
+      } else {
+        setError(data.message || "Invalid User ID or Password.");
+      }
+    } catch (err) {
+      setError("Server is not responding. Please check backend connection.");
     }
   };
 
@@ -95,7 +118,7 @@ const Login = () => {
             {roles.map((r) => (
               <button
                 key={r.id}
-                onClick={() => { setRole(r.id as any); setError(""); setUserId(""); setPassword(""); }}
+                onClick={() => { setRole(r.id as RoleKey); setError(""); setUserId(""); setPassword(""); }}
                 className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
                   role === r.id 
                     ? "border-primary bg-primary/5 ring-2 ring-primary/10" 

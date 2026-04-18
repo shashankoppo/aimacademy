@@ -24,15 +24,15 @@ This transformation enables AIM Academy to operate as a modern hybrid education 
 
 The primary objectives of the portal include:
 
-* Centralized academic monitoring
-* Digital attendance automation
-* Mock test performance tracking
-* Course lifecycle management
-* Staff workflow coordination
-* Mandatory financial tracking system
-* Automated fee reminder engine
-* Role-based administrative control
-* Institutional data visibility dashboard
+- Centralized academic monitoring
+- Digital attendance automation
+- Mock test performance tracking
+- Course lifecycle management
+- Staff workflow coordination
+- Mandatory financial tracking system
+- Automated fee reminder engine
+- Role-based administrative control
+- Institutional data visibility dashboard
 
 The system reduces manual workload and increases operational transparency across departments.
 
@@ -58,21 +58,21 @@ Each role receives controlled permissions and personalized dashboards based on r
 
 ### Implemented Routes & Pages
 
-| Route | Module | Role |
-|-------|--------|------|
-| `/login` | Unified Authentication Portal | All Users |
-| `/student/dashboard` | Student Excellence Center | Student |
-| `/student/mock-test` | Interactive Mock Test Engine | Student |
-| `/teacher/dashboard` | Faculty & Mentorship Panel | Teacher |
-| `/staff/dashboard` | Operational Command Portal | Staff |
-| `/admin` | Admin Command Center | Administrator |
-| `/admin/students` | Student Management | Administrator |
-| `/admin/courses` | Course Lifecycle Management | Administrator |
-| `/admin/fees` | Fee Collection Tracker | Administrator |
+| Route                  | Module                        | Role          |
+| ---------------------- | ----------------------------- | ------------- |
+| `/login`               | Unified Authentication Portal | All Users     |
+| `/student/dashboard`   | Student Excellence Center     | Student       |
+| `/student/mock-test`   | Interactive Mock Test Engine  | Student       |
+| `/teacher/dashboard`   | Faculty & Mentorship Panel    | Teacher       |
+| `/staff/dashboard`     | Operational Command Portal    | Staff         |
+| `/admin`               | Admin Command Center          | Administrator |
+| `/admin/students`      | Student Management            | Administrator |
+| `/admin/courses`       | Course Lifecycle Management   | Administrator |
+| `/admin/fees`          | Fee Collection Tracker        | Administrator |
 | `/admin/fee-reminders` | Automated Fee Reminder Engine | Administrator |
-| `/admin/payroll` | Payroll Management | Administrator |
-| `/admin/attendance` | Attendance Analytics | Administrator |
-| `/admin/announcements` | Broadcast & Notices | Administrator |
+| `/admin/payroll`       | Payroll Management            | Administrator |
+| `/admin/attendance`    | Attendance Analytics          | Administrator |
+| `/admin/announcements` | Broadcast & Notices           | Administrator |
 
 ---
 
@@ -136,16 +136,16 @@ The Administrator Dashboard functions as the institutional command center.
 
 ### Management Modules (8 Modules):
 
-| Module | Description |
-|--------|-------------|
-| **Student Management** | Full CRUD operations, filtering by course/status, attendance bars, pagination |
-| **Course Management** | Course cards with lifecycle (Active/Upcoming/Completed), batch/students/faculty allocation |
-| **Fees Management** | Student fee table with Paid/Overdue/Part Paid status, collection analytics |
-| **Fee Reminder Engine** | Overdue tracking, bulk reminders, notification channels, automated workflow |
-| **Payroll Management** | Staff salary table with payment status, CSV import, payroll analytics |
-| **Attendance Tracker** | Dual-view (Students/Staff), attendance rates, At Risk identification |
-| **Announcements** | Create/publish notices, audience targeting, pinning, type categorization |
-| **System Settings** | Platform configuration (future expansion) |
+| Module                  | Description                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| **Student Management**  | Full CRUD operations, filtering by course/status, attendance bars, pagination              |
+| **Course Management**   | Course cards with lifecycle (Active/Upcoming/Completed), batch/students/faculty allocation |
+| **Fees Management**     | Student fee table with Paid/Overdue/Part Paid status, collection analytics                 |
+| **Fee Reminder Engine** | Overdue tracking, bulk reminders, notification channels, automated workflow                |
+| **Payroll Management**  | Staff salary table with payment status, CSV import, payroll analytics                      |
+| **Attendance Tracker**  | Dual-view (Students/Staff), attendance rates, At Risk identification                       |
+| **Announcements**       | Create/publish notices, audience targeting, pinning, type categorization                   |
+| **System Settings**     | Platform configuration (future expansion)                                                  |
 
 ### Additional Features:
 
@@ -194,13 +194,13 @@ The Course Lifecycle Module supports structured academic program delivery.
 
 ### Courses Managed:
 
-| Course | Duration | Fee |
-|--------|----------|-----|
-| UPSC Civil Services (CSE) | 12–18 Months | ₹1,20,000 |
-| State PSC (MPPSC) | 6–12 Months | ₹75,000 |
-| SSC CGL / CHSL | 6 Months | ₹45,000 |
-| Banking / IBPS | 4–6 Months | ₹40,000 |
-| Railways / Defence / Teaching | 3–6 Months | ₹30,000 |
+| Course                        | Duration     | Fee       |
+| ----------------------------- | ------------ | --------- |
+| UPSC Civil Services (CSE)     | 12–18 Months | ₹1,20,000 |
+| State PSC (MPPSC)             | 6–12 Months  | ₹75,000   |
+| SSC CGL / CHSL                | 6 Months     | ₹45,000   |
+| Banking / IBPS                | 4–6 Months   | ₹40,000   |
+| Railways / Defence / Teaching | 3–6 Months   | ₹30,000   |
 
 ---
 
@@ -262,12 +262,12 @@ The system supports reminders for:
 
 ### Supported Notification Channels:
 
-| Channel | Status |
-|---------|--------|
-| Dashboard Alerts | ✅ Active |
+| Channel           | Status    |
+| ----------------- | --------- |
+| Dashboard Alerts  | ✅ Active |
 | SMS Notifications | ✅ Active |
-| WhatsApp Messages | 🔵 Ready |
-| Email Reminders | 🔵 Ready |
+| WhatsApp Messages | 🔵 Ready  |
+| Email Reminders   | 🔵 Ready  |
 
 ---
 
@@ -334,49 +334,49 @@ On Due Date → Alert Triggered
 
 ### Typography:
 
-| Use Case | Font | Weight |
-|----------|------|--------|
-| Headlines | Inter | 900 (Black) |
-| Body Text | Inter | 400–500 |
-| Labels/Badges | Inter | 700 (Bold), UPPERCASE |
-| Editorial Accents | Playfair Display | Italic |
+| Use Case          | Font             | Weight                |
+| ----------------- | ---------------- | --------------------- |
+| Headlines         | Inter            | 900 (Black)           |
+| Body Text         | Inter            | 400–500               |
+| Labels/Badges     | Inter            | 700 (Bold), UPPERCASE |
+| Editorial Accents | Playfair Display | Italic                |
 
 ---
 
 ## COLOR STRATEGY (60–30–10 MODEL)
 
-| Layer | Weight | Color | Purpose |
-|-------|--------|-------|---------|
-| Academic Base | 60% | White / #F8FAFC | Readability |
-| Authority | 30% | Coursera Blue #0056D2 | Headers, CTAs |
-| Interaction | 10% | Status colors | Alerts, badges |
+| Layer         | Weight | Color                 | Purpose        |
+| ------------- | ------ | --------------------- | -------------- |
+| Academic Base | 60%    | White / #F8FAFC       | Readability    |
+| Authority     | 30%    | Coursera Blue #0056D2 | Headers, CTAs  |
+| Interaction   | 10%    | Status colors         | Alerts, badges |
 
 ### Status Color System:
 
-| Status | Color | Usage |
-|--------|-------|-------|
-| Paid / Excellent / Present | Emerald Green | Positive states |
-| Overdue / At Risk | Red | Critical alerts |
-| Part Paid / Irregular / Late | Amber | Warning states |
-| Processing / Active | Blue | Neutral active |
+| Status                       | Color         | Usage           |
+| ---------------------------- | ------------- | --------------- |
+| Paid / Excellent / Present   | Emerald Green | Positive states |
+| Overdue / At Risk            | Red           | Critical alerts |
+| Part Paid / Irregular / Late | Amber         | Warning states  |
+| Processing / Active          | Blue          | Neutral active  |
 
 ---
 
 # 14. TECHNICAL INFRASTRUCTURE STACK
 
-| Component | Technology |
-|-----------|-----------|
+| Component              | Technology                            |
+| ---------------------- | ------------------------------------- |
 | **Frontend Framework** | React 18 (component-based modular UI) |
-| **Language** | TypeScript (type-safe development) |
-| **Build Engine** | Vite (high-speed bundling) |
-| **Routing** | React Router v6 (SPA navigation) |
-| **State Management** | React Hooks (useState, useEffect) |
-| **Animation** | GSAP + Framer Motion |
-| **Styling** | Tailwind CSS (custom academic theme) |
-| **Icons** | Lucide-React (200+ icons) |
-| **Data Fetching** | TanStack React Query |
-| **Notifications** | Sonner Toast System |
-| **Deployment** | AWS-ready architecture |
+| **Language**           | TypeScript (type-safe development)    |
+| **Build Engine**       | Vite (high-speed bundling)            |
+| **Routing**            | React Router v6 (SPA navigation)      |
+| **State Management**   | React Hooks (useState, useEffect)     |
+| **Animation**          | GSAP + Framer Motion                  |
+| **Styling**            | Tailwind CSS (custom academic theme)  |
+| **Icons**              | Lucide-React (200+ icons)             |
+| **Data Fetching**      | TanStack React Query                  |
+| **Notifications**      | Sonner Toast System                   |
+| **Deployment**         | AWS-ready architecture                |
 
 ### File Structure:
 
@@ -451,16 +451,16 @@ Academic datasets managed within the portal include:
 
 # 17. FUTURE EXPANSION ROADMAP
 
-| Phase | Module | Timeline |
-|-------|--------|----------|
-| Phase 3A | Online Live Classes Module | Q2 2026 |
-| Phase 3B | Video Lecture Library | Q2 2026 |
-| Phase 4A | Digital Certification Engine | Q3 2026 |
-| Phase 4B | Parent Monitoring Dashboard | Q3 2026 |
-| Phase 5 | Mobile Application (iOS & Android) | Q4 2026 |
-| Phase 6A | AI-based Performance Analytics ("AIM-BOT") | Q1 2027 |
-| Phase 6B | Multi-branch Campus Sync | Q1 2027 |
-| Phase 7 | Online Payment Gateway + Auto Receipts | Q2 2027 |
+| Phase    | Module                                     | Timeline |
+| -------- | ------------------------------------------ | -------- |
+| Phase 3A | Online Live Classes Module                 | Q2 2026  |
+| Phase 3B | Video Lecture Library                      | Q2 2026  |
+| Phase 4A | Digital Certification Engine               | Q3 2026  |
+| Phase 4B | Parent Monitoring Dashboard                | Q3 2026  |
+| Phase 5  | Mobile Application (iOS & Android)         | Q4 2026  |
+| Phase 6A | AI-based Performance Analytics ("AIM-BOT") | Q1 2027  |
+| Phase 6B | Multi-branch Campus Sync                   | Q1 2027  |
+| Phase 7  | Online Payment Gateway + Auto Receipts     | Q2 2027  |
 
 ---
 
@@ -509,19 +509,19 @@ This positions AIM Academy as a digitally structured competitive education insti
 
 # 20. AUTHORIZATION SUMMARY
 
-| Field | Detail |
-|-------|--------|
-| **Project Title** | AIM Academy Integrated Academic & Financial Portal |
-| **Version** | 2.0 |
-| **Technology Partner** | Evolucentsphere Pvt Ltd |
-| **Strategic Division** | ELSxGlobal |
-| **Total Pages Implemented** | 20+ |
-| **Total Admin Modules** | 8 |
-| **Portal Roles** | 4 (Student, Teacher, Staff, Admin) |
-| **TypeScript Compilation** | ✅ Zero Errors |
-| **Deployment Stage** | ARCHITECTURE COMPLETE — READY FOR IMPLEMENTATION PHASE ✅ |
+| Field                       | Detail                                                    |
+| --------------------------- | --------------------------------------------------------- |
+| **Project Title**           | AIM Academy Integrated Academic & Financial Portal        |
+| **Version**                 | 2.0                                                       |
+| **Technology Partner**      | Evolucentsphere Pvt Ltd                                   |
+| **Strategic Division**      | ELSxGlobal                                                |
+| **Total Pages Implemented** | 20+                                                       |
+| **Total Admin Modules**     | 8                                                         |
+| **Portal Roles**            | 4 (Student, Teacher, Staff, Admin)                        |
+| **TypeScript Compilation**  | ✅ Zero Errors                                            |
+| **Deployment Stage**        | ARCHITECTURE COMPLETE — READY FOR IMPLEMENTATION PHASE ✅ |
 
 ---
 
-*This document is confidential and intended solely for AIM Academy and Evolucentsphere Pvt Ltd stakeholders.*  
-*© 2026 Evolucentsphere Pvt Ltd — ELSxGlobal Division. All Rights Reserved.*
+_This document is confidential and intended solely for AIM Academy and Evolucentsphere Pvt Ltd stakeholders._  
+_© 2026 Evolucentsphere Pvt Ltd — ELSxGlobal Division. All Rights Reserved._

@@ -1,14 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
+import { apiRequest } from "@/lib/admin-api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [bannerText, setBannerText] = useState("New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189");
 
   useEffect(() => {
-    const saved = localStorage.getItem("aim_top_banner");
-    if (saved) setBannerText(saved);
+    const loadBanner = async () => {
+      try {
+        const settings = await apiRequest<{ bannerText: string }>("/admin/website-settings");
+        setBannerText(settings.bannerText);
+      } catch {
+        const saved = localStorage.getItem("aim_top_banner");
+        if (saved) setBannerText(saved);
+      }
+    };
+    void loadBanner();
   }, []);
 
   const navLinks = [

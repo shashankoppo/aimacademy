@@ -1,0 +1,373 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  role      String   @default("STUDENT")
+  name      String
+  email     String?  @unique
+  phone     String?  @unique
+  password  String
+  student   StudentProfile?
+  teacher   TeacherProfile?
+  isActive  Boolean  @default(true)
+  failedLoginCount Int @default(0)
+  lockedUntil DateTime?
+  lastLoginAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  refreshTokens RefreshToken[]
+  userRoles     UserRole[]
+  auditLogs     AuditLog[] @relation("AuditActor")
+
+  assignedCourseAccesses StudentCourseAccess[] @relation("AssignedByUser")
+  createdMockTests       MockTest[]            @relation("MockTestCreatedBy")
+  createdResources       TeacherResource[]     @relation("TeacherResourceCreatedBy")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedByTokenId String?
+  createdByIp String?
+  revokedByIp String?
+  userAgent  String?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  description String?
+
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  actorUserId  String?
+  actor        User?    @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  action       String
+  targetType   String?
+  targetId     String?
+  metadataJson String?
+  ip           String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([actorUserId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model StudentProfile {
+  id          String        @id @default(uuid())
+  userId      String        @unique
+  user        User          @relation(fields: [userId], references: [id])
+  batchId     String?
+  batch       Batch?        @relation(fields: [batchId], references: [id])
+  attendances Attendance[]
+  results     TestResult[]
+  fees        FeeRecord[]
+}
+
+model TeacherProfile {
+  id       String   @id @default(uuid())
+  userId   String   @unique
+  user     User     @relation(fields: [userId], references: [id])
+  subjects String
+  batches  Batch[]
+}
+
+model Course {
+  id        String   @id @default(uuid())
+  name      String
+  duration  String?
+  feeAmount Float?
+  status    String   @default("ACTIVE")
+  batches   Batch[]
+}
+
+model Batch {
+  id       String           @id @default(uuid())
+  name     String
+  courseId String
+  course   Course           @relation(fields: [courseId], references: [id])
+  students StudentProfile[]
+  teachers TeacherProfile[]
+  tests    Test[]
+}
+
+model Test {
+  id       String       @id @default(uuid())
+  title    String
+  date     DateTime
+  duration Int
+  maxMarks Int
+  batchId  String
+  batch    Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  results  TestResult[]
+}
+
+model TestResult {
+  id            String         @id @default(uuid())
+  studentId     String
+  testId        String
+  marksObtained Float
+  student       StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test          Test           @relation(fields: [testId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id        String         @id @default(uuid())
+  date      DateTime
+  status    Boolean
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model FeeRecord {
+  id          String         @id @default(uuid())
+  totalAmount Float
+  paidAmount  Float          @default(0)
+  dueDate     DateTime
+  status      String         @default("UNPAID")
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  target    String
+  type      String
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model AdminCourse {
+  id        Int            @id @default(autoincrement())
+  title     String         @unique
+  students  Int            @default(0)
+  faculty   String
+  status    String         @default("Active")
+  duration  String
+  fee       String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now()) @updatedAt
+  studentList AdminStudent[]
+
+  courseAccesses StudentCourseAccess[]
+  mockTests      MockTest[]        @relation("MockTestCourse")
+  resources      TeacherResource[] @relation("TeacherResourceCourse")
+}
+
+model AdminStudent {
+  id                   Int          @id @default(autoincrement())
+  name                 String
+  email                String       @unique
+  course               String
+  batch                String
+  joinDate             String
+  feeStatus            String
+  attendance           String
+  phone                String       @unique
+  totalFee             Int          @default(0)
+  paidFee              Int          @default(0)
+  nextInstallmentLabel String       @default("Installment 1")
+  nextInstallmentAmount Int         @default(0)
+  nextDueDate          String       @default("")
+  remindersSent        Int          @default(0)
+  lastReminderAt       DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @default(now()) @updatedAt
+  courseId             Int?
+  courseRef            AdminCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  courseAccesses StudentCourseAccess[]
+  mockAttempts   MockTestAttempt[]
+}
+
+model AdminStaff {
+  id               Int      @id @default(autoincrement())
+  name             String
+  role             String
+  salary           Int
+  payrollStatus    String   @default("Pending")
+  payrollDate      String
+  attendanceStatus String   @default("Present")
+  clockIn          String   @default("-")
+  clockOut         String   @default("-")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now()) @updatedAt
+}
+
+model WebsiteSettings {
+  id         Int      @id @default(autoincrement())
+  bannerText String
+  slidesJson String
+  facultyJson String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
+
+model AdminNote {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  category     String
+  thumbnailUrl String?
+  fileUrl      String?
+  viewUrl      String?
+  isVisible    Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model AdminVideo {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  youtubeUrl   String
+  thumbnailUrl String
+  isVisible    Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
+
+model StudentCourseAccess {
+  id               String      @id @default(uuid())
+  studentId        Int
+  courseId         Int
+  assignedByUserId String
+  student          AdminStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course           AdminCourse  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  assignedBy       User         @relation("AssignedByUser", fields: [assignedByUserId], references: [id], onDelete: Cascade)
+  createdAt        DateTime     @default(now())
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+  @@index([assignedByUserId])
+}
+
+model MockTest {
+  id               String       @id @default(uuid())
+  title            String
+  scheduledAt      DateTime
+  durationMinutes  Int
+  questionCount    Int
+  courseId         Int?
+  batch            String?
+  isPublished      Boolean      @default(false)
+  createdByUserId  String
+  createdBy        User         @relation("MockTestCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  course           AdminCourse? @relation("MockTestCourse", fields: [courseId], references: [id], onDelete: SetNull)
+  questions        MockQuestion[]
+  attempts         MockTestAttempt[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @default(now()) @updatedAt
+
+  @@index([createdByUserId])
+  @@index([scheduledAt])
+  @@index([courseId])
+}
+
+model MockQuestion {
+  id          String   @id @default(uuid())
+  mockTestId  String
+  order       Int
+  question    String
+  optionsJson String
+  correctIndex Int
+
+  mockTest MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+
+  @@unique([mockTestId, order])
+  @@index([mockTestId])
+}
+
+model MockTestAttempt {
+  id         String      @id @default(uuid())
+  mockTestId String
+  studentId  Int
+  answersJson String
+  score      Int
+  total      Int
+  submittedAt DateTime   @default(now())
+  publishedAt DateTime?
+
+  mockTest MockTest     @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  student  AdminStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([mockTestId, studentId])
+  @@index([studentId])
+  @@index([mockTestId])
+}
+
+model TeacherResource {
+  id              String      @id @default(uuid())
+  title           String
+  description     String
+  url             String
+  courseId        Int?
+  batch           String?
+  isPublished     Boolean     @default(true)
+  createdByUserId String
+  createdBy       User         @relation("TeacherResourceCreatedBy", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  course          AdminCourse? @relation("TeacherResourceCourse", fields: [courseId], references: [id], onDelete: SetNull)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @default(now()) @updatedAt
+
+  @@index([courseId])
+  @@index([createdByUserId])
+}

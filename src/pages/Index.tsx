@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { MapPin, Clock, Youtube, ShieldCheck, GraduationCap, Video, ArrowRight, ChevronRight, ChevronLeft, PhoneCall, Handshake, Users, Award, X, Play, Download, CheckCircle2 } from "lucide-react";
+import { apiRequest } from "@/lib/admin-api";
+import { useAdminData } from "@/hooks/useAdminData";
 
 const Index = () => {
+  const { videos } = useAdminData();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
   const [heroSlides, setHeroSlides] = useState([
@@ -20,30 +23,41 @@ const Index = () => {
   ]);
 
   useEffect(() => {
+    const loadWebsiteSettings = async () => {
+      try {
+        const settings = await apiRequest<{ slides: string[]; faculty: { name: string; sub: string; img: string }[] }>("/admin/website-settings");
+        if (settings.slides?.length) setHeroSlides(settings.slides);
+        if (settings.faculty?.length) setFaculty(settings.faculty);
+      } catch {
+        const savedSlides = localStorage.getItem("aim_hero_slides");
+        if (savedSlides) {
+          try {
+            const parsedSlides = JSON.parse(savedSlides);
+            if (parsedSlides && parsedSlides.length > 0) {
+              setHeroSlides(parsedSlides);
+            }
+          } catch {
+            // Ignore invalid local cache and fall back to defaults.
+          }
+        }
+
+        const savedFaculty = localStorage.getItem("aim_faculty_data");
+        if (savedFaculty) {
+          try {
+            const parsedFaculty = JSON.parse(savedFaculty);
+            if (parsedFaculty && parsedFaculty.length > 0) {
+              setFaculty(parsedFaculty);
+            }
+          } catch {
+            // Ignore invalid local cache and fall back to defaults.
+          }
+        }
+      }
+    };
+
     // Lead Magnet Popup after 5 seconds
     const popupTimer = setTimeout(() => setShowPopup(true), 5000);
-
-    // Check if admin has set custom slider images
-    const savedSlides = localStorage.getItem("aim_hero_slides");
-    if (savedSlides) {
-      try {
-        const parsedSlides = JSON.parse(savedSlides);
-        if (parsedSlides && parsedSlides.length > 0) {
-          setHeroSlides(parsedSlides);
-        }
-      } catch(e) {}
-    }
-
-    // Check if admin has set custom faculty
-    const savedFaculty = localStorage.getItem("aim_faculty_data");
-    if (savedFaculty) {
-      try {
-        const parsedFaculty = JSON.parse(savedFaculty);
-        if (parsedFaculty && parsedFaculty.length > 0) {
-          setFaculty(parsedFaculty);
-        }
-      } catch(e) {}
-    }
+    void loadWebsiteSettings();
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -53,6 +67,13 @@ const Index = () => {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  const visibleVideos = [...videos]
+    .filter((video) => video.isVisible)
+    .sort((a, b) => {
+      if (a.isFeatured === b.isFeatured) return a.displayOrder - b.displayOrder;
+      return a.isFeatured ? -1 : 1;
+    })
+    .slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#FFFF00] font-sans text-slate-800">
@@ -176,7 +197,7 @@ const Index = () => {
       </section>
 
       {/* ── UPCOMING BATCHES (CONSULTATION FOCUS) ── */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-4 lg:px-8">
            <div className="text-center md:text-left mb-10 border-l-4 border-slate-900 pl-4 py-1">
               <h2 className="text-3xl font-black text-slate-900 leading-none mb-2">Upcoming Batches</h2>
@@ -231,7 +252,7 @@ const Index = () => {
            </div>
 
            {/* Video Social Proof Vault */}
-           <div className="mt-10">
+           <div className="mt-14">
               <div className="flex justify-between flex-wrap gap-4 items-end mb-6">
                  <div>
                     <h3 className="text-2xl font-black text-slate-900 leading-none">Toppers' Voice (Suniye Toppers ki Zubaan)</h3>
@@ -242,17 +263,23 @@ const Index = () => {
                  </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                 {[1, 2, 3, 4].map((v) => (
-                    <div key={v} className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg">
-                       <img src="/images/results_banner.jpg" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt="Video Thumbnail" />
+                 {visibleVideos.map((video) => (
+                    <a key={video.id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg block">
+                       <img src={video.thumbnailUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt={video.title} />
                        <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-10 h-12 bg-red-600 text-white rounded flex items-center justify-center group-hover:bg-red-500 transition-colors">
                              <Play className="w-5 h-5 ml-0.5" />
                           </div>
                        </div>
-                    </div>
+                       <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                          <p className="text-white text-[11px] font-bold leading-snug">{video.title}</p>
+                       </div>
+                    </a>
                  ))}
               </div>
+              {visibleVideos.length === 0 && (
+                <div className="rounded-xl border border-slate-200 bg-white/50 px-6 py-10 text-center text-slate-400 font-medium">Published videos will appear here automatically.</div>
+              )}
            </div>
         </div>
       </section>

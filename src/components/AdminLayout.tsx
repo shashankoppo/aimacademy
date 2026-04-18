@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   Users, Wallet, Settings, LayoutDashboard, UserRound, CreditCard,
   TrendingUp, Clock, CheckCircle2, Bell, BookOpen, Calendar,
-  Megaphone, GraduationCap, BarChart3, Shield, Menu, X, ArrowLeft, MessageSquare
+  Megaphone, GraduationCap, BarChart3, Shield, Menu, X, ArrowLeft, MessageSquare, FileText, Youtube
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, link: "/admin" },
+    { title: "Access Control", icon: UserRound, link: "/admin/users" },
     { title: "Students", icon: Users, link: "/admin/students" },
     { title: "Courses", icon: BookOpen, link: "/admin/courses" },
     { title: "Fees", icon: CreditCard, link: "/admin/fees" },
@@ -21,6 +22,8 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { title: "Payroll", icon: Wallet, link: "/admin/payroll" },
     { title: "Attendance", icon: Calendar, link: "/admin/attendance" },
     { title: "Announcements", icon: Megaphone, link: "/admin/announcements" },
+    { title: "Notes", icon: FileText, link: "/admin/notes" },
+    { title: "Videos", icon: Youtube, link: "/admin/videos" },
     { title: "WhatsApp Center", icon: MessageSquare, link: "/admin/whatsapp" },
     { title: "Website Settings", icon: Settings, link: "/admin/website-settings" },
   ];
