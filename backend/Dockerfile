@@ -15,32 +15,36 @@ RUN npm run build
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
 
+# Install dependencies needed for Prisma/OpenSSL on Alpine
+RUN apk add --no-cache openssl ca-certificates
+
 WORKDIR /app
 
 RUN corepack enable
 
-# Pre-create data directory with correct ownership
-RUN mkdir -p /data && chown -R node:node /data
+# Ensure data directory exists
+RUN mkdir -p /data
 
 COPY package*.json ./
+# Install only production dependencies
 RUN npm ci --omit=dev
 
 # Copy compiled output
 COPY --from=builder /app/dist ./dist
 
-# Copy Prisma schema + generated client
+# Copy Prisma schema and dependencies
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
 
 # Entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-# Critical: Convert potentially Windows line endings to Linux for Alpine
 RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && \
     chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Use the node user
-USER node
+# Run as root to avoid permission issues with mounted volumes on host
+# This is often necessary for SQLite on Ubuntu VPS deployments
+USER root
 
 EXPOSE 5000
 ENTRYPOINT ["docker-entrypoint.sh"]
