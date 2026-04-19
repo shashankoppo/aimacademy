@@ -5,10 +5,11 @@ set -e
 echo "[Entrypoint] Checking /data directory..."
 mkdir -p /data
 
-echo "[Entrypoint] Running Prisma migrations..."
-# Since prisma is now in dependencies, we don't need to install it at runtime
-npx prisma migrate deploy --schema=./prisma/schema.prisma || {
-  echo "[Critical] Migration failed. Ensure /data is writable and DATABASE_URL is correct."
+echo "[Entrypoint] Pushing Prisma schema to database..."
+# The project has no migration history files, so we must use 'db push'
+# to ensure tables are created dynamically on the first run.
+npx prisma db push --schema=./prisma/schema.prisma --accept-data-loss || {
+  echo "[Critical] Database initialization failed. Ensure /data is writable."
   exit 1
 }
 

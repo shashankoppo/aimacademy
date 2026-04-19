@@ -25,17 +25,16 @@ RUN corepack enable
 # Ensure data directory exists
 RUN mkdir -p /data
 
+# Copy package files and Prisma schema FIRST
 COPY package*.json ./
-# Install only production dependencies
-RUN npm ci --omit=dev
+COPY prisma ./prisma
+
+# Install production dependencies and explicitly generate the client 
+# This ensures all query/migration engines are correctly downloaded for this stage
+RUN npm ci --omit=dev && npx prisma generate
 
 # Copy compiled output
 COPY --from=builder /app/dist ./dist
-
-# Copy Prisma schema and generated client
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY prisma ./prisma
 
 # Entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
