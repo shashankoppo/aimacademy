@@ -276,8 +276,8 @@ model AdminVideo {
   id           Int      @id @default(autoincrement())
   title        String
   description  String
-  youtubeUrl   String
-  thumbnailUrl String
+  youtubeUrl   String   @unique
+  thumbnailUrl String?
   isVisible    Boolean  @default(true)
   isFeatured   Boolean  @default(false)
   displayOrder Int      @default(0)

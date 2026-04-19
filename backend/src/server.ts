@@ -18,7 +18,7 @@ import { authenticate, requirePermission } from "./middleware/auth";
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 app.set("trust proxy", 1);
 
