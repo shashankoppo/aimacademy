@@ -1,9 +1,29 @@
 services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aim-academy-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - ./backend/data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   aim-academy:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: aim-academy-frontend
+    depends_on:
+      - backend
     ports:
       - "9010:80"
     restart: unless-stopped
