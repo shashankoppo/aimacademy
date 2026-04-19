@@ -106,6 +106,8 @@ interface DashboardData {
   websiteSettings: WebsiteSettings | null;
 }
 
+type PublicContentData = Pick<DashboardData, "notes" | "videos" | "websiteSettings">;
+
 interface AdminContextType extends DashboardData {
   loading: boolean;
   error: string | null;
@@ -185,13 +187,38 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [syncLocalWebsiteSettings]);
 
+  const refreshPublicData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiRequest<PublicContentData>("/public/content");
+      setNotes(data.notes);
+      setVideos(data.videos);
+      setWebsiteSettings(data.websiteSettings ?? defaultSettings);
+      syncLocalWebsiteSettings(data.websiteSettings ?? defaultSettings);
+      setError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load public content";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [syncLocalWebsiteSettings]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = getStoredUser();
     const isAdmin = (user?.role ?? "").toString().toUpperCase() === "ADMIN";
     const isAdminRoute = location.pathname.startsWith("/admin");
-    if (token && isAdmin && isAdminRoute) void refreshData();
-  }, [location.pathname, refreshData]);
+    if (isAdminRoute) {
+      if (token && isAdmin) {
+        void refreshData();
+      } else {
+        setLoading(false);
+      }
+      return;
+    }
+    void refreshPublicData();
+  }, [location.pathname, refreshData, refreshPublicData]);
 
   const addStudent = async (student: Omit<Student, "id" | "remindersSent" | "lastReminderAt" | "courseId">) => {
     const created = await apiRequest<Student>("/admin/students", {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, ArrowRight, BookOpen, Download, ExternalLink, Search, Bell, Tag, Clock } from "lucide-react";
+import { FileText, ArrowRight, BookOpen, Download, ExternalLink, Search, Bell, Tag, Clock, Eye } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import { useAdminData } from "@/hooks/useAdminData";
 
@@ -34,6 +34,13 @@ const catColors: Record<string, string> = {
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.55 } }),
+};
+
+const getDownloadName = (title: string, url?: string | null) => {
+  const fallback = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "study-material"}.pdf`;
+  if (!url || url.startsWith("data:")) return fallback;
+  const name = url.split("/").pop()?.split("?")[0];
+  return name || fallback;
 };
 
 const Resources = () => {
@@ -129,9 +136,18 @@ const Resources = () => {
                   <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-gold-dark bg-gold/5 border border-gold/15 px-2 py-0.5 rounded-full">{note.category}</span>
                   <h3 className="font-body font-semibold text-navy text-sm mt-2 mb-1.5 leading-snug">{note.title}</h3>
                   <p className="text-slate-500 font-body text-xs leading-relaxed mb-3">{note.description}</p>
-                  <button onClick={() => window.open(note.fileUrl || note.viewUrl || "#", "_blank")} className="inline-flex items-center gap-1.5 text-xs font-bold text-gold-dark hover:text-navy transition-colors font-body underline underline-offset-4">
-                    <Download className="w-3.5 h-3.5" /> Download Free
-                  </button>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    {note.fileUrl && (
+                      <a href={note.fileUrl} download={getDownloadName(note.title, note.fileUrl)} className="inline-flex items-center gap-1.5 text-xs font-bold text-gold-dark hover:text-navy transition-colors font-body underline underline-offset-4">
+                        <Download className="w-3.5 h-3.5" /> Download Free
+                      </a>
+                    )}
+                    {(note.viewUrl || note.fileUrl) && (
+                      <a href={note.viewUrl || note.fileUrl || "#"} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-bold text-gold-dark hover:text-navy transition-colors font-body underline underline-offset-4">
+                        <Eye className="w-3.5 h-3.5" /> View
+                      </a>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}

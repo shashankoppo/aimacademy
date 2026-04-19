@@ -8,7 +8,7 @@ import iamRoutes from "./routes/iamRoutes";
 import teacherRoutes from "./routes/teacherRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import staffRoutes from "./routes/staffRoutes";
-import { seedAdminData } from "./controllers/adminController";
+import { getPublicContent, seedAdminData } from "./controllers/adminController";
 import { ensureIamSeeded } from "./seed/iamSeed";
 import { ensureDemoUsers } from "./seed/demoUsers";
 import { ensurePortalSeeded } from "./seed/portalSeed";
@@ -34,6 +34,7 @@ app.use(attachRequestId);
 
 // Main App API Routes
 app.use('/api/auth', authRoutes);
+app.get("/api/public/content", getPublicContent);
 app.use('/api/admin', adminRoutes);
 app.use("/api/admin/iam", authenticate, requirePermission("admin:access"), iamRoutes);
 app.use("/api/teacher", teacherRoutes);

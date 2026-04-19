@@ -1,13 +1,25 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { MapPin, Clock, Youtube, ShieldCheck, GraduationCap, Video, ArrowRight, ChevronRight, ChevronLeft, PhoneCall, Handshake, Users, Award, X, Play, Download, CheckCircle2 } from "lucide-react";
-import { apiRequest } from "@/lib/admin-api";
-import { useAdminData } from "@/hooks/useAdminData";
+import { useAdminData, type VideoItem } from "@/hooks/useAdminData";
+
+const getYouTubeVideoId = (url: string) => {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+  return match?.[1] ?? null;
+};
+
+const getYouTubeEmbedUrl = (url: string) => {
+  const id = getYouTubeVideoId(url);
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&modestbranding=1` : null;
+};
+
+const POPUP_CLOSED_KEY = "AIM_ACADEMY_HOME_POPUP_CLOSED";
 
 const Index = () => {
-  const { videos } = useAdminData();
+  const { videos, websiteSettings } = useAdminData();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPopup, setShowPopup] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
   const [heroSlides, setHeroSlides] = useState([
     "/images/HEROMAIN 007.jpeg",     
     "/images/STUDENT BANNER 01.jpeg",      
@@ -23,47 +35,31 @@ const Index = () => {
   ]);
 
   useEffect(() => {
-    const loadWebsiteSettings = async () => {
-      try {
-        const settings = await apiRequest<{ slides: string[]; faculty: { name: string; sub: string; img: string }[] }>("/admin/website-settings");
-        if (settings.slides?.length) setHeroSlides(settings.slides);
-        if (settings.faculty?.length) setFaculty(settings.faculty);
-      } catch {
-        const savedSlides = localStorage.getItem("aim_hero_slides");
-        if (savedSlides) {
-          try {
-            const parsedSlides = JSON.parse(savedSlides);
-            if (parsedSlides && parsedSlides.length > 0) {
-              setHeroSlides(parsedSlides);
-            }
-          } catch {
-            // Ignore invalid local cache and fall back to defaults.
-          }
-        }
-
-        const savedFaculty = localStorage.getItem("aim_faculty_data");
-        if (savedFaculty) {
-          try {
-            const parsedFaculty = JSON.parse(savedFaculty);
-            if (parsedFaculty && parsedFaculty.length > 0) {
-              setFaculty(parsedFaculty);
-            }
-          } catch {
-            // Ignore invalid local cache and fall back to defaults.
-          }
-        }
-      }
-    };
+    if (sessionStorage.getItem(POPUP_CLOSED_KEY) === "true") {
+      return;
+    }
 
     // Lead Magnet Popup after 5 seconds
     const popupTimer = setTimeout(() => setShowPopup(true), 5000);
-    void loadWebsiteSettings();
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 4000); // Slides every 4 seconds
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      clearTimeout(popupTimer);
+    };
   }, [heroSlides.length]);
+
+  useEffect(() => {
+    if (websiteSettings?.slides?.length) setHeroSlides(websiteSettings.slides);
+    if (websiteSettings?.faculty?.length) setFaculty(websiteSettings.faculty);
+  }, [websiteSettings]);
+
+  const closePopup = () => {
+    sessionStorage.setItem(POPUP_CLOSED_KEY, "true");
+    setShowPopup(false);
+  };
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
@@ -73,7 +69,8 @@ const Index = () => {
       if (a.isFeatured === b.isFeatured) return a.displayOrder - b.displayOrder;
       return a.isFeatured ? -1 : 1;
     })
-    .slice(0, 4);
+    .slice(0, 10);
+  const activeEmbedUrl = activeVideo ? getYouTubeEmbedUrl(activeVideo.youtubeUrl) : null;
 
   return (
     <div className="min-h-screen bg-[#FFFF00] font-sans text-slate-800">
@@ -210,7 +207,7 @@ const Index = () => {
                 { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", filled: 94, seatsLeft: 5 },
                 { img: "/images/hero_combo_bottom.jpeg", title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", filled: 98, seatsLeft: 2 },
               ].map((course, i) => (
-                 <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full shadow-[0_2px_15px_rgb(0,0,0,0.03)] border-slate-200">
+                 <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full">
                     <div className="relative aspect-video overflow-hidden bg-slate-100">
                        <img src={course.img} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                        <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md">
@@ -262,9 +259,9 @@ const Index = () => {
                     <Youtube className="w-4 h-4"/> Watch All Videos
                  </Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                  {visibleVideos.map((video) => (
-                    <a key={video.id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg block">
+                    <button key={video.id} type="button" onClick={() => setActiveVideo(video)} className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg block text-left">
                        <img src={video.thumbnailUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt={video.title} />
                        <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-10 h-12 bg-red-600 text-white rounded flex items-center justify-center group-hover:bg-red-500 transition-colors">
@@ -274,7 +271,7 @@ const Index = () => {
                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
                           <p className="text-white text-[11px] font-bold leading-snug">{video.title}</p>
                        </div>
-                    </a>
+                    </button>
                  ))}
               </div>
               {visibleVideos.length === 0 && (
@@ -290,38 +287,34 @@ const Index = () => {
           <div className="flex flex-col lg:flex-row gap-12 items-center">
              
              <div className="flex-1 w-full order-2 lg:order-1">
-                <div className="grid grid-cols-2 gap-4">
-                   <div className="space-y-4 pt-8">
-                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
-                         <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <GraduationCap className="w-6 h-6" />
-                         </div>
-                         <h4 className="font-extrabold text-slate-900">Topper's Pedagogy</h4>
-                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Basics to Advanced</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="bg-white/40 p-6 rounded-3xl border-2 border-slate-200 shadow-lg flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                         <GraduationCap className="w-6 h-6" />
                       </div>
-                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
-                         <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
-                            <Video className="w-6 h-6" />
-                         </div>
-                         <h4 className="font-extrabold text-slate-900">1-on-1 Mentorship</h4>
-                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Direct Access</p>
-                      </div>
+                      <h4 className="font-extrabold text-slate-900">Topper's Pedagogy</h4>
+                      <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Basics to Advanced</p>
                    </div>
-                   <div className="space-y-4">
-                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
-                         <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                            <ShieldCheck className="w-6 h-6" />
-                         </div>
-                         <h4 className="font-extrabold text-slate-900">Rigorous 'Abhyas'</h4>
-                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Mock Tests & Analysis</p>
+                   <div className="bg-white/40 p-6 rounded-3xl border-2 border-slate-200 shadow-lg flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                         <ShieldCheck className="w-6 h-6" />
                       </div>
-                      <div className="bg-white/40 p-6 rounded-3xl border border-black/5 shadow-sm flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
-                         <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                            <Clock className="w-6 h-6" />
-                         </div>
-                         <h4 className="font-extrabold text-slate-900">Legacy of Results</h4>
-                         <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Decades of Success</p>
+                      <h4 className="font-extrabold text-slate-900">Rigorous 'Abhyas'</h4>
+                      <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Mock Tests & Analysis</p>
+                   </div>
+                   <div className="bg-white/40 p-6 rounded-3xl border-2 border-slate-200 shadow-lg flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                         <Video className="w-6 h-6" />
                       </div>
+                      <h4 className="font-extrabold text-slate-900">1-on-1 Mentorship</h4>
+                      <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Direct Access</p>
+                   </div>
+                   <div className="bg-white/40 p-6 rounded-3xl border-2 border-slate-200 shadow-lg flex flex-col justify-center items-center text-center hover:-translate-y-1 transition-transform group">
+                      <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                         <Clock className="w-6 h-6" />
+                      </div>
+                      <h4 className="font-extrabold text-slate-900">Legacy of Results</h4>
+                      <p className="text-[11px] text-slate-500 mt-2 font-bold uppercase tracking-wide">Decades of Success</p>
                    </div>
                 </div>
              </div>
@@ -354,7 +347,7 @@ const Index = () => {
            </div>
            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               {faculty.map((member, i) => (
-                 <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border border-slate-200 shadow-[0_2px_15px_rgb(0,0,0,0.02)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                 <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-black/10 shadow-inner flex items-end justify-center">
                        <img src={member.img} alt={member.name} className="w-[90%] h-[90%] object-contain object-bottom" />
                     </div>
@@ -384,7 +377,7 @@ const Index = () => {
                { city: "Jabalpur - Ranjhi Branch", address: "Main Road Ranjhi, Adarsh Market, Beside Police Petrol Pump, Jabalpur" },
                { city: "Jabalpur - Adhartal Branch", address: "Main Road Adhartal, Near Spring Day School, Opposite HDFC Bank" },
              ].map((center, i) => (
-               <div key={i} className="bg-white/40 p-8 rounded-3xl flex items-start gap-5 border border-black/5 shadow-sm hover:border-black/20 hover:shadow-md transition-all group cursor-pointer">
+               <div key={i} className="bg-white/40 p-8 rounded-3xl flex items-start gap-5 border-2 border-slate-200 shadow-lg hover:border-black/20 hover:shadow-xl transition-all group cursor-pointer">
                  <div className="mt-1 shrink-0 bg-white shadow-sm p-3 rounded-2xl group-hover:bg-[hsl(var(--primary))] transition-colors">
                    <MapPin className="text-[hsl(var(--primary-foreground))] w-6 h-6" />
                  </div>
@@ -413,9 +406,9 @@ const Index = () => {
       {/* ── LEAD MAGNET EXIT-INTENT POPUP ── */}
       {showPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
-           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPopup(false)}></div>
+           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closePopup}></div>
            <div className="bg-white max-w-md w-[90%] mx-auto rounded-3xl overflow-hidden shadow-2xl relative z-10 animate-in zoom-in duration-300">
-              <button onClick={() => setShowPopup(false)} className="absolute top-4 right-4 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors z-20">
+              <button onClick={closePopup} className="absolute top-4 right-4 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors z-20">
                  <X className="w-4 h-4" />
               </button>
               <div className="bg-gradient-to-br from-blue-600 to-indigo-800 p-8 text-center relative overflow-hidden">
@@ -430,7 +423,7 @@ const Index = () => {
                  <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500" /> High-Yield 'Sarkari' Target Material
                  </div>
-                 <form onSubmit={(e) => { e.preventDefault(); setShowPopup(false); }} className="space-y-4">
+                 <form onSubmit={(e) => { e.preventDefault(); closePopup(); }} className="space-y-4">
                     <div>
                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">WhatsApp Number</label>
                        <div className="flex relative">
@@ -445,6 +438,25 @@ const Index = () => {
                  <p className="text-[10px] text-center text-slate-400 font-medium mt-4">We respect your privacy. No spam, just pure value.</p>
               </div>
            </div>
+        </div>
+      )}
+
+      {activeVideo && activeEmbedUrl && (
+        <div className="fixed inset-0 z-[120] bg-slate-950/95 flex items-center justify-center p-3 sm:p-6">
+          <button onClick={() => setActiveVideo(null)} aria-label="Close video" className="absolute top-4 right-4 w-10 h-10 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+          <div className="w-full max-w-6xl">
+            <div className="aspect-video w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-white/10">
+              <iframe
+                title={activeVideo.title}
+                src={activeEmbedUrl}
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
         </div>
       )}
 

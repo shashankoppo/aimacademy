@@ -50,13 +50,8 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <img src="/images/logo_main.png" alt="Logo" className="w-14" />
           <div className="flex flex-col leading-none">
-            <span className="font-bold text-lg text-slate-800 leading-none">
-              <span className="text-slate-800">AIM </span>
-              <span className="relative inline-flex flex-col">
-                <span className="font-bold text-lg text-slate-800 leading-none">Academy</span>
-                <span className="text-[8px] text-slate-500 uppercase tracking-widest font-semibold leading-tight">Synonym of Success</span>
-              </span>
-            </span>
+            <span className="font-bold text-lg text-slate-800 leading-none tracking-tighter">AIM Academy</span>
+            <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end">Synonym of Success</span>
           </div>
         </Link>
 

@@ -331,6 +331,38 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
   }
 };
 
+export const getPublicContent = async (_req: Request, res: Response) => {
+  try {
+    await seedAdminData();
+    const [settings, notes, videos] = await Promise.all([
+      prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
+      prisma.adminNote.findMany({
+        where: { isVisible: true },
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+      }),
+      prisma.adminVideo.findMany({
+        where: { isVisible: true },
+        orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "asc" }],
+      }),
+    ]);
+
+    res.json({
+      notes,
+      videos,
+      websiteSettings: settings
+        ? {
+            id: settings.id,
+            bannerText: settings.bannerText,
+            slides: JSON.parse(settings.slidesJson),
+            faculty: JSON.parse(settings.facultyJson),
+          }
+        : null,
+    });
+  } catch (error) {
+    handleError(res, error, "Failed to load public content");
+  }
+};
+
 export const getAdminStudents = async (_req: Request, res: Response) => {
   try {
     await seedAdminData();
