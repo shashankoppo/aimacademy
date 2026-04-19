@@ -47,7 +47,7 @@ function createSimplePdf(text: string): Buffer {
 }
 
 export const getStaffDashboard = async (_req: Request, res: Response) => {
-  const staff = await prisma.adminStaff.findMany({ orderBy: { id: "asc" } });
+  const staff = await prisma.adminStaff.findMany({ orderBy: { id: "asc" } }) as any[];
   const present = staff.filter((s) => s.attendanceStatus === "Present").length;
   const total = staff.length;
 

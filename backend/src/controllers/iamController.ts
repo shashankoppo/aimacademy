@@ -114,12 +114,12 @@ export const listRoles = async (_req: Request, res: Response) => {
   });
   res.json({
     success: true,
-    roles: roles.map((r) => ({
+    roles: roles.map((r: any) => ({
       id: r.id,
       key: r.key,
       name: r.name,
       isSystem: r.isSystem,
-      permissions: r.rolePermissions.map((rp) => rp.permission.key).sort(),
+      permissions: r.rolePermissions.map((rp: any) => rp.permission.key).sort(),
     })),
   });
 };

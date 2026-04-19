@@ -19,7 +19,7 @@ async function findStudentRecordForUser(userId: string) {
     const digits = normalizePhoneDigits(user.phone);
     if (digits) {
       const all = await prisma.adminStudent.findMany({ select: { id: true, name: true, email: true, phone: true, course: true, batch: true, attendance: true, feeStatus: true, totalFee: true, paidFee: true, nextDueDate: true, courseId: true } });
-      const match = all.find((s) => normalizePhoneDigits(s.phone) === digits);
+      const match = all.find((s: any) => normalizePhoneDigits(s.phone) === digits);
       if (match) return { user, student: match };
     }
   }
@@ -43,12 +43,12 @@ export const getStudentDashboard = async (req: Request, res: Response) => {
   });
 
   const assignedCourses = accesses.length
-    ? accesses.map((a) => a.course)
+    ? accesses.map((a: any) => a.course)
     : student.courseId
       ? await prisma.adminCourse.findMany({ where: { id: student.courseId } })
       : await prisma.adminCourse.findMany({ where: { title: student.course } });
 
-  const courseIds = assignedCourses.map((c) => c.id);
+  const courseIds = assignedCourses.map((c: any) => c.id);
   const publishedTests = await prisma.mockTest.findMany({
     where: {
       isPublished: true,
@@ -63,9 +63,9 @@ export const getStudentDashboard = async (req: Request, res: Response) => {
     where: { studentId: student.id },
     select: { mockTestId: true, score: true, total: true, submittedAt: true, publishedAt: true },
   });
-  const attemptByTest = new Map(attempts.map((a) => [a.mockTestId, a] as const));
+  const attemptByTest = new Map(attempts.map((a: any) => [a.mockTestId, a] as const));
 
-  const mockTests = publishedTests.slice(0, 3).map((t) => {
+  const mockTests = publishedTests.slice(0, 3).map((t: any) => {
     const a = attemptByTest.get(t.id);
     const status = a ? "Completed" : t.scheduledAt.getTime() > Date.now() ? "Upcoming" : "Open";
     return {
@@ -77,7 +77,7 @@ export const getStudentDashboard = async (req: Request, res: Response) => {
     };
   });
 
-  const courses = assignedCourses.map((c) => {
+  const courses = assignedCourses.map((c: any) => {
     const courseTests = publishedTests.filter((t) => t.courseId === c.id);
     const done = courseTests.filter((t) => attemptByTest.has(t.id)).length;
     const progress = courseTests.length ? Math.min(100, Math.round((done / courseTests.length) * 100)) : 0;
@@ -95,7 +95,7 @@ export const getStudentDashboard = async (req: Request, res: Response) => {
     take: 5,
   });
 
-  const alerts = announcements.map((a) => ({
+  const alerts = announcements.map((a: any) => ({
     title: a.title,
     time: a.createdAt.toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
     type: a.type,
@@ -128,10 +128,10 @@ export const getStudentMockTestCurrent = async (req: Request, res: Response) => 
 
   const student = found.student;
   const accesses = await prisma.studentCourseAccess.findMany({ where: { studentId: student.id }, select: { courseId: true } });
-  const courseIds = accesses.map((a) => a.courseId);
+  const courseIds = accesses.map((a: any) => a.courseId);
 
   const attempts = await prisma.mockTestAttempt.findMany({ where: { studentId: student.id }, select: { mockTestId: true } });
-  const attemptedIds = new Set(attempts.map((a) => a.mockTestId));
+  const attemptedIds = new Set(attempts.map((a: any) => a.mockTestId));
 
   const tests = await prisma.mockTest.findMany({
     where: {
@@ -158,7 +158,7 @@ export const getStudentMockTestCurrent = async (req: Request, res: Response) => 
       id: next.id,
       title: next.title,
       durationSeconds: next.durationMinutes * 60,
-      questions: questions.map((q) => ({
+      questions: questions.map((q: any) => ({
         id: q.id,
         question: q.question,
         options: JSON.parse(q.optionsJson) as string[],
@@ -196,7 +196,7 @@ export const getStudentMockTestById = async (req: Request, res: Response) => {
       id: test.id,
       title: test.title,
       durationSeconds: test.durationMinutes * 60,
-      questions: questions.map((q) => ({
+      questions: questions.map((q: any) => ({
         id: q.id,
         question: q.question,
         options: JSON.parse(q.optionsJson) as string[],
@@ -271,7 +271,7 @@ export const listStudentResults = async (req: Request, res: Response) => {
 
   res.json({
     success: true,
-    results: attempts.map((a) => ({
+    results: attempts.map((a: any) => ({
       id: a.id,
       testId: a.mockTestId,
       title: a.mockTest.title,

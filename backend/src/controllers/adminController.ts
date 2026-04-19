@@ -138,7 +138,7 @@ export const seedAdminData = async () => {
   }
 
   const courses = await prisma.adminCourse.findMany();
-  const courseMap = new Map(courses.map((course) => [course.title, course]));
+  const courseMap = new Map(courses.map((course: any) => [course.title, course]));
   const studentSeeds = [
     { name: "Aarav Mehta", email: "aarav@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Paid", attendance: "88%", phone: "+91 98765 43210", totalFee: 120000, paidFee: 120000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("UPSC 2026-A")?.id },
     { name: "Deepa Nair", email: "deepa@aim.edu", course: "SSC CGL Fast Track", batch: "Evening", joinDate: "Mar 2025", feeStatus: "Paid", attendance: "96%", phone: "+91 87654 32109", totalFee: 45000, paidFee: 45000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("SSC CGL Fast Track")?.id },
@@ -644,7 +644,7 @@ export const markAttendance = async (_req: Request, res: Response) => {
   try {
     const students = await prisma.adminStudent.findMany();
     const updated = await Promise.all(
-      students.map((student, index) => {
+      students.map((student: any, index: number) => {
         const nextRate = Math.min(100, Math.max(55, parseInt(student.attendance, 10) + (index % 3 === 0 ? 1 : 0)));
         return prisma.adminStudent.update({
           where: { id: student.id },
@@ -655,7 +655,7 @@ export const markAttendance = async (_req: Request, res: Response) => {
 
     const staff = await prisma.adminStaff.findMany();
     await Promise.all(
-      staff.map((member) =>
+      staff.map((member: any) =>
         prisma.adminStaff.update({
           where: { id: member.id },
           data: {

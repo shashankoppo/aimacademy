@@ -194,7 +194,7 @@ export const updateMockTest = async (req: Request, res: Response) => {
   const scheduledAt = payload.scheduledAt ? new Date(payload.scheduledAt) : undefined;
   if (scheduledAt && Number.isNaN(scheduledAt.getTime())) return res.status(400).json({ success: false, message: "Invalid scheduled date." });
 
-  const updated = await prisma.$transaction(async (tx) => {
+  const updated = await prisma.$transaction(async (tx: any) => {
     const test = await tx.mockTest.update({
       where: { id: existing.id },
       data: {
@@ -250,7 +250,7 @@ export const publishResults = async (req: Request, res: Response) => {
   if (testIds.length === 0) return res.json({ success: true, publishedTests: 0, publishedAttempts: 0 });
 
   const now = new Date();
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: any) => {
     const publishedTests = await tx.mockTest.updateMany({
       where: { id: { in: testIds } },
       data: { isPublished: true },

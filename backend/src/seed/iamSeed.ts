@@ -100,7 +100,7 @@ export async function ensureIamSeeded() {
   // Ensure each user has a matching UserRole entry for their primary role.
   const rolesByKey = await prisma.role.findMany();
   const roleIdByKey = new Map(rolesByKey.map((r) => [r.key, r.id] as const));
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany() as any[];
   for (const u of users) {
     const roleId = roleIdByKey.get(u.role);
     if (!roleId) continue;
