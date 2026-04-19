@@ -84,9 +84,9 @@ export async function ensureIamSeeded() {
     // Ensure role permissions match exactly the intended set for system roles.
     if (role.isSystem) {
       const perms = await prisma.permission.findMany({ where: { key: { in: role.permissionKeys } } });
-      const desired = new Set(perms.map((p) => p.id));
+      const desired = new Set(perms.map((p: any) => p.id));
       const existing = await prisma.rolePermission.findMany({ where: { roleId: r.id } });
-      const existingSet = new Set(existing.map((rp) => rp.permissionId));
+      const existingSet = new Set(existing.map((rp: any) => rp.permissionId));
 
       for (const rp of existing) {
         if (!desired.has(rp.permissionId)) await prisma.rolePermission.delete({ where: { roleId_permissionId: { roleId: rp.roleId, permissionId: rp.permissionId } } });
@@ -99,7 +99,7 @@ export async function ensureIamSeeded() {
 
   // Ensure each user has a matching UserRole entry for their primary role.
   const rolesByKey = await prisma.role.findMany();
-  const roleIdByKey = new Map(rolesByKey.map((r) => [r.key, r.id] as const));
+  const roleIdByKey = new Map(rolesByKey.map((r: any) => [r.key, r.id] as const));
   const users = await prisma.user.findMany() as any[];
   for (const u of users) {
     const roleId = roleIdByKey.get(u.role);

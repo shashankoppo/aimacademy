@@ -124,8 +124,8 @@ export const updateStaffAttendance = async (req: Request, res: Response) => {
 export const downloadFinancialReport = async (_req: Request, res: Response) => {
   const students = await prisma.adminStudent.findMany();
   const courses = await prisma.adminCourse.findMany();
-  const revenue = students.reduce((sum, s) => sum + (s.paidFee ?? 0), 0);
-  const overdue = students.filter((s) => s.feeStatus === "Overdue").length;
+  const revenue = students.reduce((sum: number, s: any) => sum + (s.paidFee ?? 0), 0);
+  const overdue = students.filter((s: any) => s.feeStatus === "Overdue").length;
 
   const report = [
     "AIM Academy Financial Report",

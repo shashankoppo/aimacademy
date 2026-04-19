@@ -18,7 +18,7 @@ export const getTeacherDashboard = async (req: Request, res: Response) => {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, role: true } });
   const courses = await prisma.adminCourse.findMany({ orderBy: { title: "asc" } });
   const batches = await prisma.adminStudent.findMany({ distinct: ["batch"], select: { batch: true }, orderBy: { batch: "asc" } });
-  res.json({ success: true, teacher: user, courses, batches: batches.map((b) => b.batch) });
+  res.json({ success: true, teacher: user, courses, batches: batches.map((b: any) => b.batch) });
 };
 
 export const listStudentsForTeacher = async (req: Request, res: Response) => {
@@ -75,7 +75,7 @@ export const assignCourseAccess = async (req: Request, res: Response) => {
   const uniqueIds = Array.from(new Set(students.map((s) => s.id)));
   if (uniqueIds.length === 0) return res.status(400).json({ success: false, message: "Select at least one student or batch." });
 
-  const created = await prisma.$transaction(async (tx) => {
+  const created = await prisma.$transaction(async (tx: any) => {
     let count = 0;
     for (const studentId of uniqueIds) {
       await tx.studentCourseAccess.upsert({
@@ -115,7 +115,7 @@ export const listMockTests = async (req: Request, res: Response) => {
   });
   res.json({
     success: true,
-    tests: tests.map((t) => ({
+    tests: tests.map((t: any) => ({
       id: t.id,
       title: t.title,
       scheduledAt: t.scheduledAt,
@@ -150,7 +150,7 @@ export const createMockTest = async (req: Request, res: Response) => {
   const scheduledAt = new Date(payload.scheduledAt);
   if (Number.isNaN(scheduledAt.getTime())) return res.status(400).json({ success: false, message: "Invalid scheduled date." });
 
-  const created = await prisma.$transaction(async (tx) => {
+  const created = await prisma.$transaction(async (tx: any) => {
     const test = await tx.mockTest.create({
       data: {
         title: payload.title,
@@ -246,7 +246,7 @@ export const deleteMockTest = async (req: Request, res: Response) => {
 export const publishResults = async (req: Request, res: Response) => {
   const userId = req.authUser!.id;
   const tests = await prisma.mockTest.findMany({ where: { createdByUserId: userId } });
-  const testIds = tests.map((t) => t.id);
+  const testIds = tests.map((t: any) => t.id);
   if (testIds.length === 0) return res.json({ success: true, publishedTests: 0, publishedAttempts: 0 });
 
   const now = new Date();
@@ -275,7 +275,7 @@ export const getTeacherAnalytics = async (req: Request, res: Response) => {
   const byStudent = new Map<number, { student: { id: number; name: string }; scores: number[] }>();
   for (const a of attempts) {
     const pct = a.total > 0 ? Math.round((a.score / a.total) * 100) : 0;
-    const cur = byStudent.get(a.studentId) ?? { student: { id: a.studentId, name: a.student.name }, scores: [] };
+    const cur = byStudent.get(a.studentId) ?? { student: { id: a.studentId, name: a.student.name }, scores: [] as number[] };
     cur.scores.push(pct);
     byStudent.set(a.studentId, cur);
   }

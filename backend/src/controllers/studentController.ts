@@ -78,8 +78,8 @@ export const getStudentDashboard = async (req: Request, res: Response) => {
   });
 
   const courses = assignedCourses.map((c: any) => {
-    const courseTests = publishedTests.filter((t) => t.courseId === c.id);
-    const done = courseTests.filter((t) => attemptByTest.has(t.id)).length;
+    const courseTests = publishedTests.filter((t: any) => t.courseId === c.id);
+    const done = courseTests.filter((t: any) => attemptByTest.has(t.id)).length;
     const progress = courseTests.length ? Math.min(100, Math.round((done / courseTests.length) * 100)) : 0;
     return {
       id: c.id,
@@ -144,7 +144,7 @@ export const getStudentMockTestCurrent = async (req: Request, res: Response) => 
   });
 
   const now = Date.now();
-  const next = tests.find((t) => !attemptedIds.has(t.id) && t.scheduledAt.getTime() <= now) ?? tests.find((t) => !attemptedIds.has(t.id));
+  const next = tests.find((t: any) => !attemptedIds.has(t.id) && t.scheduledAt.getTime() <= now) ?? tests.find((t: any) => !attemptedIds.has(t.id));
   if (!next) return res.status(404).json({ success: false, message: "No mock tests available." });
 
   const questions = await prisma.mockQuestion.findMany({
@@ -177,7 +177,7 @@ export const getStudentMockTestById = async (req: Request, res: Response) => {
 
   const student = found.student;
   const accesses = await prisma.studentCourseAccess.findMany({ where: { studentId: student.id }, select: { courseId: true } });
-  const courseIds = accesses.map((a) => a.courseId);
+  const courseIds = accesses.map((a: any) => a.courseId);
 
   const test = await prisma.mockTest.findFirst({
     where: {
@@ -291,7 +291,7 @@ export const listStudentResources = async (req: Request, res: Response) => {
 
   const student = found.student;
   const accesses = await prisma.studentCourseAccess.findMany({ where: { studentId: student.id }, select: { courseId: true } });
-  const courseIds = accesses.map((a) => a.courseId);
+  const courseIds = accesses.map((a: any) => a.courseId);
 
   const resources = await prisma.teacherResource.findMany({
     where: {

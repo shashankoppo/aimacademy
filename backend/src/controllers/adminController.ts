@@ -138,7 +138,7 @@ export const seedAdminData = async () => {
   }
 
   const courses = await prisma.adminCourse.findMany();
-  const courseMap = new Map(courses.map((course: any) => [course.title, course]));
+  const courseMap = new Map<string, any>(courses.map((course: any) => [course.title, course]));
   const studentSeeds = [
     { name: "Aarav Mehta", email: "aarav@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Paid", attendance: "88%", phone: "+91 98765 43210", totalFee: 120000, paidFee: 120000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("UPSC 2026-A")?.id },
     { name: "Deepa Nair", email: "deepa@aim.edu", course: "SSC CGL Fast Track", batch: "Evening", joinDate: "Mar 2025", feeStatus: "Paid", attendance: "96%", phone: "+91 87654 32109", totalFee: 45000, paidFee: 45000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("SSC CGL Fast Track")?.id },
