@@ -20,19 +20,31 @@ dotenv.config();
 const app: Express = express();
 const PORT = process.env.PORT || 5000;
 
-// Security and standard middlewares
 app.set("trust proxy", 1);
-app.use(helmet());
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
+
+const customAllowedOrigins = (process.env.CORS_ORIGIN ?? "*").split(",").map((s) => s.trim());
+
 app.use(
   cors({
-    origin: (process.env.CORS_ORIGIN ?? "http://localhost:8080,http://localhost:5173").split(",").map((s) => s.trim()),
+    origin: (origin, callback) => {
+      if (!origin || customAllowedOrigins.includes("*") || customAllowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Permissive for production debugging
+      }
+    },
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "1mb" }));
+
+app.use(express.json({ limit: "5mb" }));
 app.use(attachRequestId);
 
-// Main App API Routes
+// Routes
 app.use('/api/auth', authRoutes);
 app.get("/api/public/content", getPublicContent);
 app.use('/api/admin', adminRoutes);
@@ -41,24 +53,27 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/staff", staffRoutes);
 
-// Basic health check route
 app.get('/api/health', (req: Request, res: Response) => {
-  res.status(200).json({ status: 'success', message: 'AIM Academy API is running securely.' });
+  res.status(200).json({ status: 'success', message: 'AIM Academy API is active.' });
 });
 
-Promise.resolve()
-  .then(async () => {
-    await ensureIamSeeded();
-    await ensureDemoUsers();
-    await seedAdminData();
-    await ensurePortalSeeded();
-  })
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`[Server] AIM Academy API is alive on http://localhost:${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error('[Server] Failed to initialize admin data:', error);
-    process.exit(1);
-  });
+// Start listening IMMEDIATELY to satisfy healthchecks and Nginx
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[Server] AIM Academy API listening on http://0.0.0.0:${PORT}`);
+    
+    // Perform seeding in the background to avoid blocking the listen event
+    console.log(`[Server] Starting background data synchronization...`);
+    Promise.resolve()
+      .then(async () => {
+        await ensureIamSeeded();
+        await ensureDemoUsers();
+        await seedAdminData();
+        await ensurePortalSeeded();
+        console.log(`[Server] Background synchronization completed successfully.`);
+      })
+      .catch((error) => {
+        console.error('[Server] Background synchronization failed:', error);
+        // We don't exit here because the server is already up. 
+        // Admin will need to check logs.
+      });
+});

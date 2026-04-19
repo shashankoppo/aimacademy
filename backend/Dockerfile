@@ -3,11 +3,12 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+RUN corepack enable
+
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
-# Generate Prisma client for the build platform
 RUN npx prisma generate
 RUN npm run build
 
@@ -16,21 +17,30 @@ FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
-# Install only production deps
+RUN corepack enable
+
+# Pre-create data directory with correct ownership
+RUN mkdir -p /data && chown -R node:node /data
+
 COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copy compiled output
 COPY --from=builder /app/dist ./dist
 
-# Copy Prisma schema + generated client (needed at runtime for query engine)
+# Copy Prisma schema + generated client
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY prisma ./prisma
 
-# Entrypoint: run migrations then start
+# Entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Critical: Convert potentially Windows line endings to Linux for Alpine
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && \
+    chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Use the node user
+USER node
 
 EXPOSE 5000
 ENTRYPOINT ["docker-entrypoint.sh"]
