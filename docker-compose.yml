@@ -22,10 +22,10 @@ services:
       - "5000:5000"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s # Reduced from 30s for faster startup
+      timeout: 5s
       retries: 5
-      start_period: 60s # Increased for intensive seeding
+      start_period: 20s # Reduced from 60s as we listen immediately now
 
   aim-academy:
     build:
