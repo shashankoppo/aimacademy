@@ -1,21 +1,14 @@
 #!/bin/sh
 set -e
 
+# Wait for a brief moment to ensure system is ready
 echo "[Entrypoint] Checking /data directory..."
-if [ ! -d "/data" ]; then
-  mkdir -p /data
-fi
-touch /data/.permcheck && rm /data/.permcheck || echo "[Warning] /data is not writable. This will cause Prisma to fail."
+mkdir -p /data
 
 echo "[Entrypoint] Running Prisma migrations..."
-# Check if prisma exists in node_modules
-if [ ! -f "./node_modules/.bin/prisma" ]; then
-  echo "[Debug] Prisma binary not found in node_modules, installing..."
-  npm install prisma @prisma/client
-fi
-
+# Since prisma is now in dependencies, we don't need to install it at runtime
 npx prisma migrate deploy --schema=./prisma/schema.prisma || {
-  echo "[Critical] Migration failed. Check logs above."
+  echo "[Critical] Migration failed. Ensure /data is writable and DATABASE_URL is correct."
   exit 1
 }
 
