@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const staffController_1 = require("../controllers/staffController");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate);
+router.use((0, auth_1.requirePermission)("staff:access"));
+router.get("/dashboard", staffController_1.getStaffDashboard);
+router.post("/broadcast", (0, auth_1.requirePermission)("staff:broadcast"), staffController_1.broadcastAlert);
+router.post("/attendance/update", (0, auth_1.requirePermission)("staff:manage_attendance"), staffController_1.updateStaffAttendance);
+router.get("/reports/financial", (0, auth_1.requirePermission)("staff:generate_reports"), staffController_1.downloadFinancialReport);
+router.get("/reports/audit", (0, auth_1.requirePermission)("staff:generate_reports"), staffController_1.downloadAcademicAudit);
+exports.default = router;

@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const iamController_1 = require("../controllers/iamController");
+const router = (0, express_1.Router)();
+router.use((0, auth_1.requirePermission)("pam:manage_users"));
+router.get("/users", iamController_1.listUsers);
+router.post("/users", iamController_1.createUser);
+router.put("/users/:id", iamController_1.updateUser);
+router.post("/users/:id/reset-password", iamController_1.resetUserPassword);
+router.get("/roles", iamController_1.listRoles);
+router.get("/permissions", iamController_1.listPermissions);
+exports.default = router;
