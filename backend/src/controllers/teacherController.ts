@@ -353,3 +353,63 @@ export const deleteResource = async (req: Request, res: Response) => {
   await prisma.teacherResource.delete({ where: { id: existing.id } });
   res.json({ success: true });
 };
+
+export const getMockTestQuestions = async (req: Request, res: Response) => {
+  const userId = req.authUser!.id;
+  const testId = req.params.id;
+  const test = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  if (!test) return res.status(404).json({ success: false, message: "Mock test not found." });
+
+  const questions = await prisma.mockQuestion.findMany({
+    where: { mockTestId: test.id },
+    orderBy: { order: "asc" },
+  });
+
+  res.json({
+    success: true,
+    testTitle: test.title,
+    questions: questions.map((q: any) => ({
+      id: q.id,
+      order: q.order,
+      question: q.question,
+      options: JSON.parse(q.optionsJson),
+      correctIndex: q.correctIndex,
+    })),
+  });
+};
+
+const questionsSchema = z.object({
+  questions: z.array(
+    z.object({
+      id: z.string(),
+      question: z.string().trim().min(3),
+      options: z.array(z.string().trim().min(1)).min(2),
+      correctIndex: z.number().int().nonnegative(),
+    })
+  ),
+});
+
+export const updateMockTestQuestions = async (req: Request, res: Response) => {
+  const userId = req.authUser!.id;
+  const testId = req.params.id;
+  const payload = questionsSchema.parse(req.body);
+
+  const test = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  if (!test) return res.status(404).json({ success: false, message: "Mock test not found." });
+
+  await prisma.$transaction(async (tx: any) => {
+    for (const q of payload.questions) {
+      await tx.mockQuestion.update({
+        where: { id: q.id, mockTestId: test.id },
+        data: {
+          question: q.question,
+          optionsJson: JSON.stringify(q.options),
+          correctIndex: q.correctIndex,
+        },
+      });
+    }
+  });
+
+  res.json({ success: true, message: "Questions updated successfully." });
+};
+

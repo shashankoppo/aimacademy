@@ -6,6 +6,7 @@ import {
   createResource,
   deleteMockTest,
   deleteResource,
+  getMockTestQuestions,
   getTeacherAnalytics,
   getTeacherDashboard,
   listMockTests,
@@ -13,6 +14,7 @@ import {
   listStudentsForTeacher,
   publishResults,
   updateMockTest,
+  updateMockTestQuestions,
   updateResource,
 } from "../controllers/teacherController";
 
@@ -27,8 +29,11 @@ router.post("/assign", requirePermission("teacher:assign_courses"), assignCourse
 
 router.get("/mock-tests", requirePermission("teacher:manage_tests"), listMockTests);
 router.post("/mock-tests", requirePermission("teacher:manage_tests"), createMockTest);
+router.get("/mock-tests/:id/questions", requirePermission("teacher:manage_tests"), getMockTestQuestions);
+router.put("/mock-tests/:id/questions", requirePermission("teacher:manage_tests"), updateMockTestQuestions);
 router.put("/mock-tests/:id", requirePermission("teacher:manage_tests"), updateMockTest);
 router.delete("/mock-tests/:id", requirePermission("teacher:manage_tests"), deleteMockTest);
+
 
 router.post("/publish-results", requirePermission("teacher:publish_results"), publishResults);
 router.get("/analytics", requirePermission("teacher:view_analytics"), getTeacherAnalytics);
