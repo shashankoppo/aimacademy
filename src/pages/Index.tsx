@@ -131,7 +131,7 @@ const Index = () => {
                       <GraduationCap className="w-6 h-6" />
                    </div>
                    <div>
-                      <p className="text-2xl font-black text-slate-900 leading-none">12,000+</p>
+                      <p className="text-2xl font-black text-slate-900 leading-none">7,000+</p>
                       <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Students Mentored</p>
                    </div>
                 </div>
@@ -141,7 +141,7 @@ const Index = () => {
                       <Users className="w-6 h-6" />
                    </div>
                    <div>
-                      <p className="text-2xl font-black text-slate-900 leading-none">50+</p>
+                      <p className="text-2xl font-black text-slate-900 leading-none">9+2</p>
                       <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Expert Faculty</p>
                    </div>
                 </div>
@@ -151,7 +151,7 @@ const Index = () => {
                       <Award className="w-6 h-6" />
                    </div>
                    <div>
-                      <p className="text-2xl font-black text-slate-900 leading-none">15+</p>
+                      <p className="text-2xl font-black text-slate-900 leading-none">13+</p>
                       <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Years Legacy</p>
                    </div>
                 </div>
