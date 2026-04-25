@@ -347,9 +347,26 @@ const Index = () => {
            </div>
            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               {faculty.map((member, i) => (
-                 <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-black/10 shadow-inner flex items-end justify-center">
-                       <img src={member.img} alt={member.name} className="w-[90%] h-[90%] object-contain object-bottom" />
+                 <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-[0_0_15px_rgba(0,0,0,0.15)] hover:shadow-[0_0_25px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300">
+                    <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-black/10 shadow-inner flex items-center justify-center">
+                       <img 
+                          src={member.img} 
+                          alt={member.name} 
+                          className={`
+                             transition-all duration-500
+                             ${member.name === "Amit Sir" ? "w-full h-full object-cover" : "w-[95%] h-[95%] object-contain"}
+                          `}
+                          style={{
+                             objectPosition: 
+                                member.name === "Rahul Sir" ? "65% center" : 
+                                member.name === "Amit Sir" ? "center 10%" : 
+                                "center",
+                             transform: 
+                                member.name === "Rahul Sir" ? "scale(1.15)" : 
+                                member.name === "Neha Ma'am" ? "scale(1.1)" : 
+                                "scale(1.0)"
+                          }}
+                       />
                     </div>
                     <h3 className="font-extrabold text-slate-900 text-[16px]">{member.name}</h3>
                     <p className="text-[10px] text-slate-500 font-bold text-center mt-1 uppercase tracking-widest leading-snug">{member.sub}</p>
@@ -375,7 +392,7 @@ const Index = () => {
            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
              {[
                { city: "Jabalpur - Ranjhi Branch", address: "Main Road Ranjhi, Adarsh Market, Beside Police Petrol Pump, Jabalpur" },
-               { city: "Jabalpur - Adhartal Branch", address: "Main Road Adhartal, Near Spring Day School, Opposite HDFC Bank" },
+               { city: "Jabalpur - Adhartal Branch", address: "Main Road Adhartal, Beside Indore Sweets, Keshari Traders, Opposite to Durga Patr Emporium" },
              ].map((center, i) => (
                <div key={i} className="bg-white/40 p-8 rounded-3xl flex items-start gap-5 border-2 border-slate-200 shadow-lg hover:border-black/20 hover:shadow-xl transition-all group cursor-pointer">
                  <div className="mt-1 shrink-0 bg-white shadow-sm p-3 rounded-2xl group-hover:bg-[hsl(var(--primary))] transition-colors">
