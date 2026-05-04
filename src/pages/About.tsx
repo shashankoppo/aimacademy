@@ -37,11 +37,13 @@ const values = [
 ];
 
 const team = [
-  { name: "Mr. Irshad Mansuri", role: "Maths Faculty", bio: "Expert in competitive mathematics with proven success strategies.", image: "/images/faculty_1.png", color: "bg-[#e2e8f0]" },
-  { name: "Mr. Abhishek Sengar", role: "English Faculty", bio: "Specialist in English grammar and vocabulary for SSC/Banking.", image: "/images/faculty_2.png", color: "bg-[#f1f5f9]" },
-  { name: "Mr. Shubham Patel", role: "MP/Current Affairs", bio: "Deep insights into MP current affairs and polity.", image: "/images/faculty_3.png", color: "bg-[#e2e8f0]" },
-  { name: "Mr. Atul Rajpoot", role: "MP/English Faculty", bio: "Renowned mentor for English and State specific subjects.", image: "/images/faculty_4.png", color: "bg-[#f1f5f9]" },
-  { name: "Mr. Sandeep Yadav", role: "Maths Faculty", bio: "Simplifies complex quantitative aptitude topics easily.", image: "/images/faculty_5.png", color: "bg-[#e2e8f0]" },
+  { name: "Mr. Sandeep Yadav", role: "Maths Faculty", bio: "Expert in competitive mathematics with proven success strategies across SSC & Banking.", image: "/images/faculty_1.png", color: "bg-[#e2e8f0]" },
+  { name: "Mr. Irshad Mansoori", role: "Maths Faculty", bio: "Specialist in Quantitative Aptitude, simplifying complex topics for quick revision.", image: "/images/faculty_2.png", color: "bg-[#f1f5f9]" },
+  { name: "Mr. Shubham Patel", role: "MP / Current Affairs", bio: "Deep insights into Madhya Pradesh GK, current affairs and polity for state exams.", image: "/images/faculty_3.png", color: "bg-[#e2e8f0]" },
+  { name: "Mr. Abhishek Sengar", role: "English Faculty", bio: "Specialist in English grammar, comprehension and vocabulary for SSC/Banking/PSC.", image: "/images/faculty_4.png", color: "bg-[#f1f5f9]" },
+  { name: "Mr. Atul Rajpoot", role: "MP / English Faculty", bio: "Renowned mentor for English and MP state-specific subjects.", image: "/images/faculty_5.png", color: "bg-[#e2e8f0]" },
+  { name: "Mr. Yogesh Tiwari", role: "Science Faculty", bio: "Clarity-first approach to General Science for Railway, SSC & Police exams.", image: "/images/faculty_1.png", color: "bg-[#f1f5f9]" },
+  { name: "Mr. Pushparaj Kushwaha", role: "History & Polity", bio: "Expert in Indian History, Polity and Geography with engaging storytelling methods.", image: "/images/faculty_2.png", color: "bg-[#e2e8f0]" },
 ];
 
 const fadeUp = {
@@ -170,14 +172,19 @@ const About = () => {
               viewport={{ once: true }}
               className="relative flex justify-center"
             >
-              <div className="relative w-full max-w-sm aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white/10 bg-gradient-to-b from-white/5 to-transparent shadow-2xl">
-                <img 
-                  src="/images/founder_solo.png" 
-                  alt="Dr. Imran Khan - Founder & Director" 
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ objectPosition: "center 15%", transform: "scale(1.15)" }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-navy to-transparent"></div>
+              <div className="relative w-full max-w-[300px] mx-auto">
+                {/* Decorative ring */}
+                <div className="absolute -inset-3 rounded-[2rem] border-2 border-gold/20 pointer-events-none z-20" />
+                {/* Photo container */}
+                <div className="relative aspect-[3/4] rounded-[1.75rem] overflow-hidden border-4 border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+                  <img 
+                    src="/images/founder_solo.png" 
+                    alt="Dr. Imran Khan - Founder & Director" 
+                    className="w-full h-full object-cover object-top"
+                  />
+                  {/* Bottom fade so image blends into navy section */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
+                </div>
               </div>
               
               {/* Floating Badge */}

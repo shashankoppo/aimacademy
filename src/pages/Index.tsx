@@ -27,11 +27,14 @@ const Index = () => {
    ]);
 
    const [faculty, setFaculty] = useState([
-      { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
-      { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
-      { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
-      { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
-      { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
+      { name: "Dr. Imran Khan", sub: "Founder, Director & GS Faculty", img: "/images/founder_solo.png" },
+      { name: "Mr. Sandeep Yadav", sub: "Maths Faculty", img: "/images/faculty_1.png" },
+      { name: "Mr. Irshad Mansoori", sub: "Maths Faculty", img: "/images/faculty_2.png" },
+      { name: "Mr. Shubham Patel", sub: "MP / Current Affairs", img: "/images/faculty_3.png" },
+      { name: "Mr. Abhishek Sengar", sub: "English Faculty", img: "/images/faculty_4.png" },
+      { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png" },
+      { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png" },
+      { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png" },
    ]);
 
    useEffect(() => {
@@ -141,7 +144,7 @@ const Index = () => {
                         <Users className="w-6 h-6" />
                      </div>
                      <div>
-                        <p className="text-2xl font-black text-slate-900 leading-none">9+2</p>
+                        <p className="text-2xl font-black text-slate-900 leading-none">8+2</p>
                         <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">Expert Faculty</p>
                      </div>
                   </div>
