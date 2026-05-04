@@ -1,23 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Phone, Search } from "lucide-react";
+import { Menu, X, Search, Globe, ChevronRight } from "lucide-react";
 import { apiRequest } from "@/lib/admin-api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [bannerText, setBannerText] = useState("New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189");
+  const [showTranslate, setShowTranslate] = useState(false);
+  const [bannerText, setBannerText] = useState(
+    "🚀 Admissions Open for MP PSC & UPSC Foundation Batch 2025-26 | Call +91 70672 31189  •  🏆 AIM Academy: Jabalpur's #1 Selection Hub for 14+ Years  •  🌟 Free Career Counseling with Expert Faculty | Book Now  •  🎓 Exclusive Merit-based Scholarships Available for 2025 Sessions  •  📚 New Batches for SSC, Banking & All Govt Exams Starting Soon  •  📍 Visit our Jabalpur Campus for a Demo Class & Mentorship  •  ✨ 7,000+ Students Already Transformed Their Careers  •  ✅ Join the Legacy of Success | Join AIM Academy - The Synonym of Success"
+  );
+  const translateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadBanner = async () => {
       try {
         const settings = await apiRequest<{ bannerText: string }>("/admin/website-settings");
-        setBannerText(settings.bannerText);
+        if (settings.bannerText) setBannerText(settings.bannerText);
       } catch {
         const saved = localStorage.getItem("aim_top_banner");
         if (saved) setBannerText(saved);
       }
     };
     void loadBanner();
+  }, []);
+
+  // Inject Google Translate script once globally
+  useEffect(() => {
+    if (!document.getElementById("google-translate-script")) {
+      // @ts-ignore
+      window.googleTranslateElementInit = () => {
+        // @ts-ignore
+        new window.google.translate.TranslateElement(
+          { 
+            pageLanguage: "en", 
+            includedLanguages: 'hi,en,mr,gu,pa,ta,te',
+            layout: 0, 
+            autoDisplay: false 
+          },
+          "google_translate_element"
+        );
+      };
+      const s = document.createElement("script");
+      s.id = "google-translate-script";
+      s.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      s.async = true;
+      document.body.appendChild(s);
+    }
+  }, []);
+
+  // Close translate dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (translateRef.current && !translateRef.current.contains(e.target as Node)) {
+        setShowTranslate(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const navLinks = [
@@ -29,78 +68,163 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-full bg-[#FFFF00] shadow-sm z-50 sticky top-0">
-      {/* Top Running Banner */}
-      <div className="bg-blue-600 text-white overflow-hidden py-1.5 hidden md:block border-b border-white/5">
-        <div className="animate-marquee whitespace-nowrap inline-block">
-          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
+    <header className="w-full z-50 sticky top-0 shadow-md">
+      {/* ── TOP RUNNING NOTIFICATION BANNER ── */}
+      <div className="bg-blue-600 text-white overflow-hidden py-1 relative border-b border-white/10 flex items-center">
+        <div className="animate-marquee whitespace-nowrap flex">
+          <span className="text-[11px] font-bold uppercase tracking-[0.15em] px-24 text-white">
             {bannerText}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
-            {bannerText}
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider mx-10">
+          <span className="text-[11px] font-bold uppercase tracking-[0.15em] px-24 text-white">
             {bannerText}
           </span>
         </div>
       </div>
 
-      {/* Main Nav */}
-      <div className="container mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3">
-          <img src="/images/logo_main.png" alt="Logo" className="w-12 h-12 object-contain" />
-          <div className="flex flex-col">
-            <span className="font-black text-xl leading-none text-slate-900 tracking-tighter">AIM ACADEMY</span>
-            <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
-          </div>
-        </Link>
-
-        {/* Global Search Like KGS */}
-        <div className="hidden lg:flex items-center flex-1 max-w-md mx-8 relative">
-          <input
-            type="text"
-            placeholder="What do you want to learn?"
-            className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 px-4 pl-10 text-sm focus:outline-none focus:border-primary/50 transition-colors"
-          />
-          <Search className="w-4 h-4 text-slate-400 absolute left-4" />
-        </div>
-
-        <div className="hidden lg:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <Link key={link.name} to={link.path} className="text-sm font-medium text-slate-700 hover:text-primary transition-colors">
-              {link.name}
-            </Link>
-          ))}
-          <Link to="/login" className="btn-primary ml-2 py-2 px-5 text-sm">
-            Login / Register
+      <nav className="bg-[#FFFF00] border-b border-black/5">
+        {/* Main Nav Container */}
+        <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
+          
+          {/* Logo Area */}
+          <Link to="/" className="flex items-center gap-3 shrink-0">
+            <div className="relative">
+              <img src="/images/logo_main.png" alt="Logo" className="w-14 h-14 object-contain" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-[#FFFF00]" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black text-xl leading-none text-slate-900 tracking-tighter">AIM ACADEMY</span>
+              <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
+            </div>
           </Link>
-        </div>
 
-        <button className="lg:hidden text-slate-700" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* Mobile Nav */}
-      {isOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-slate-100 shadow-lg px-4 py-4 flex flex-col gap-4">
-          <div className="relative mb-2">
+          {/* Search - Hidden on Small Screens */}
+          <div className="hidden xl:flex items-center flex-1 max-w-md mx-8 relative">
+            <div className="absolute left-4 text-slate-400">
+              <Search className="w-4 h-4" />
+            </div>
             <input
               type="text"
-              placeholder="What do you want to learn?"
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-4 pl-10 text-sm focus:outline-none"
+              placeholder="Search courses, results, faculty..."
+              className="w-full bg-white/80 border border-slate-300 rounded-full py-2.5 px-10 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all placeholder:text-slate-400"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3" />
           </div>
-          {navLinks.map((link) => (
-            <Link key={link.name} to={link.path} className="text-sm font-medium text-slate-700 p-2 hover:bg-slate-50 rounded" onClick={() => setIsOpen(false)}>
-              {link.name}
+
+          {/* Desktop Links & Actions */}
+          <div className="hidden lg:flex items-center gap-6">
+            <div className="flex items-center gap-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="text-sm font-bold text-slate-800 hover:text-slate-900 hover:underline underline-offset-4 decoration-2 decoration-slate-900 transition-all px-1"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="h-6 w-px bg-slate-800/20" />
+
+            {/* ── TRANSLATE DROPDOWN ── */}
+            <div className="relative" ref={translateRef}>
+              <button
+                onClick={() => setShowTranslate((p) => !p)}
+                className={`flex items-center gap-2 text-[12px] font-black px-4 py-2 rounded-full border-2 transition-all shadow-sm ${
+                  showTranslate
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-900 border-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                <Globe className={`w-4 h-4 ${showTranslate ? "animate-spin-slow" : ""}`} />
+                <span>LAN / हिंदी</span>
+              </button>
+
+              <div 
+                className={`absolute right-0 top-[calc(100%+12px)] bg-white border-2 border-slate-900 rounded-2xl shadow-[8px_8px_0px_rgba(0,0,0,0.1)] p-5 min-w-[260px] z-[500] transition-all duration-300 ${
+                  showTranslate ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible"
+                }`}
+              >
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[11px] text-slate-500 font-black uppercase tracking-widest">
+                      Translate Page
+                    </p>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  </div>
+                  
+                  {/* GOOGLE TRANSLATE TARGET ID - ALWAYS PRESENT FOR SCRIPT */}
+                  <div
+                    id="google_translate_element"
+                    className="
+                      [&_.goog-te-gadget]:font-sans [&_.goog-te-gadget]:!text-[0px]
+                      [&_select]:w-full [&_select]:rounded-xl [&_select]:border-2 [&_select]:border-slate-200
+                      [&_select]:px-4 [&_select]:py-3 [&_select]:text-sm [&_select]:outline-none
+                      [&_select]:bg-slate-50 [&_select]:cursor-pointer [&_select]:font-bold
+                      [&_select:hover]:border-slate-900
+                      [&_.goog-logo-link]:hidden [&_.goog-te-gadget-simple]:border-none
+                      [&_.goog-te-gadget-icon]:hidden
+                    "
+                  />
+                  <p className="text-[10px] text-slate-400 mt-4 italic text-center">
+                    Select your preferred language
+                  </p>
+              </div>
+            </div>
+
+            <Link 
+              to="/login" 
+              className="bg-slate-900 text-white font-black py-2.5 px-6 rounded-full text-sm hover:scale-105 active:scale-95 transition-all shadow-lg"
+            >
+              LOGIN
             </Link>
-          ))}
-          <Link to="/login" className="btn-primary text-center w-full" onClick={() => setIsOpen(false)}>Login / Register</Link>
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="flex lg:hidden items-center gap-3">
+             <button 
+               onClick={() => setShowTranslate(!showTranslate)}
+               className={`p-2 rounded-full border-2 transition-all ${showTranslate ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-900 border-slate-200"}`}
+             >
+                <Globe className="w-5 h-5" />
+             </button>
+             <button 
+               className="p-2 bg-slate-900 text-white rounded-lg shadow-md" 
+               onClick={() => setIsOpen(!isOpen)}
+             >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile Nav Overlay */}
+        {isOpen && (
+          <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b-4 border-slate-900 shadow-2xl px-6 py-8 flex flex-col gap-6 z-[400] animate-in slide-in-from-top duration-300">
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="text-xl font-black text-slate-900 p-3 hover:bg-[#FFFF00] rounded-xl flex items-center justify-between group transition-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.name}
+                  <ChevronRight className="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                </Link>
+              ))}
+            </div>
+
+            <div className="h-px bg-slate-100 w-full" />
+
+            <Link
+              to="/login"
+              className="bg-slate-900 text-white text-center py-4 rounded-2xl font-black text-lg shadow-xl"
+              onClick={() => setIsOpen(false)}
+            >
+              STUDENT LOGIN
+            </Link>
+          </div>
+        )}
+      </nav>
+    </header>
   );
 };
 
