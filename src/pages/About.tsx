@@ -9,7 +9,7 @@ const stats = [
   { label: "Elite Selections", value: "500+", sub: "UPSC & State PSC" },
   { label: "Expert Mentors",   value: "15+",   sub: "Ex-Officers & SMEs" },
   { label: "Legacy of Trust",  value: "14+",   sub: "Years of Excellence" },
-  { label: "Success Rate",    value: "95%",   sub: "Industry Leading" },
+  { label: "Success Rate",    value: "65%",   sub: "Industry Leading" },
 ];
 
 const values = [
@@ -30,7 +30,7 @@ const values = [
   { 
     icon: Trophy, 
     title: "Outcome Driven", 
-    desc: "Our curriculum is live. It evolves with the changing patterns of UPSC and other competitive exams to ensure you stay ahead.",
+    desc: "Our curriculum is live. It evolves with the changing patterns of civil services and other competitive exams to ensure you stay ahead.",
     color: "from-amber-500/10 to-amber-500/0",
     border: "border-amber-500/20"
   },
@@ -53,7 +53,25 @@ const fadeUp = {
   }),
 };
 
+import { useEffect } from "react";
+
 const About = () => {
+  useEffect(() => {
+    if (!document.getElementById('google-translate-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+      
+      // @ts-ignore
+      window.googleTranslateElementInit = () => {
+        // @ts-ignore
+        new window.google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+      };
+    }
+  }, []);
+
   return (
     <div className="pt-[3.75rem] page-enter bg-background">
       {/* ══ HERO ══════════════════════════════════════════════ */}
@@ -68,7 +86,7 @@ const About = () => {
             transition={{ duration: 0.5 }}
             className="badge-gold inline-flex items-center gap-2 mb-8"
           >
-            <Zap className="w-3 h-3" /> Since 2010
+            <Zap className="w-3 h-3" /> Since 2014
           </motion.div>
           
           <motion.h1 
@@ -95,10 +113,12 @@ const About = () => {
 
 
 
-      {/* ══ MISSION & VISION ═══════════════════════════════════ */}
       <section className="section-padding bg-transparent border-y border-black/5 relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="flex justify-end mb-6">
+            <div id="google_translate_element" className="bg-white/50 p-2 rounded-lg backdrop-blur-sm border border-slate-200"></div>
+          </div>
           <div className="grid md:grid-cols-2 gap-10">
             <motion.div 
               initial={{ opacity: 0, x: -30 }} 
@@ -150,12 +170,14 @@ const About = () => {
               viewport={{ once: true }}
               className="relative flex justify-center"
             >
-              <div className="relative w-full max-w-sm aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white/10 bg-gradient-to-b from-white/5 to-transparent">
+              <div className="relative w-full max-w-sm aspect-[4/5] rounded-3xl overflow-hidden border-4 border-white/10 bg-gradient-to-b from-white/5 to-transparent shadow-2xl">
                 <img 
                   src="/images/founder_solo.png" 
                   alt="Dr. Imran Khan - Founder & Director" 
-                  className="h-full w-full object-cover object-top scale-100"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ objectPosition: "center 15%", transform: "scale(1.15)" }}
                 />
+                <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-navy to-transparent"></div>
               </div>
               
               {/* Floating Badge */}
@@ -174,16 +196,19 @@ const About = () => {
               <div className="badge-gold mb-6 inline-flex border-none bg-gold/10 text-gold-light">
                 <Star className="w-3 h-3 fill-gold-light text-gold-light mr-2" /> From the Director's Desk
               </div>
-              <h2 className="heading-display text-4xl md:text-5xl text-white mb-6">
-                Redefining Competitive Education in <span className="text-gradient-gold">Jabalpur.</span>
+              <h2 className="heading-display text-4xl md:text-5xl text-gold-light mb-6">
+                Redefining Competitive Education in <span className="text-white">Jabalpur.</span>
               </h2>
-              <div className="space-y-4 text-slate-300 font-body text-lg leading-relaxed mb-8 relative">
-                <Quote className="absolute -top-4 -left-6 w-12 h-12 text-white/5" />
+              <div className="space-y-4 text-slate-200 font-body text-lg leading-relaxed mb-8 relative">
+                <Quote className="absolute -top-4 -left-6 w-12 h-12 text-white/10" />
                 <p>
-                  "When we started AIM Academy over a decade ago, our vision was simple: to ensure that no deserving student from Central India has to leave their hometown in search of quality UPSC or PSC coaching."
+                  "When we started AIM Academy over a decade ago, our vision was simple: to ensure that no deserving student from Central India has to leave their hometown in search of quality all government exam coaching."
                 </p>
                 <p>
-                  "Today, with hundreds of officers proudly serving the nation, we stand as a testament that true dedication, high-quality mentorship, and an ethical educational ecosystem can produce top-tier results right here in Jabalpur."
+                  "Today, with hundreds of official selections proudly serving the nation, we stand as a testament that true dedication, high-quality mentorship, and an ethical educational ecosystem can produce top-tier results right here in Jabalpur."
+                </p>
+                <p className="text-gold font-medium text-2xl mt-6">
+                  "आपकी तलाश का अंतिम पड़ाव"
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -192,7 +217,7 @@ const About = () => {
                 </div>
                 <div>
                   <div className="text-white font-bold font-display tracking-wider">AIM ACADEMY</div>
-                  <div className="text-gold-light text-[10px] uppercase tracking-[0.2em]">Est. 2012</div>
+                  <div className="text-gold-light text-[10px] uppercase tracking-[0.2em]">Est. 2014</div>
                 </div>
               </div>
             </motion.div>
@@ -276,17 +301,10 @@ const About = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent pointer-events-none" />
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              ...team,
-              { name: "Prof. Rajesh Gupta", role: "Head of GS Department", bio: "Renowned academician and researcher with a focus on Indian Polity and History.", initial: "G", color: "bg-emerald-600", icon: BookOpen },
-              { name: "Ms. Sneha Kapoor", role: "Lead CSAT Specialist", bio: "Logic and Analytics expert who has trained over 5,000 students for competitive exams.", initial: "K", color: "bg-rose-600", icon: Target },
-              { name: "Mr. Vivek Saxena", role: "Current Affairs Lead", bio: "Daily analysis expert with a unique methodology for linking static & dynamic syllabus.", initial: "S", color: "bg-sky-600", icon: Zap }
-            ].map((item, i) => {
-              const m = item as typeof team[0] & { initial?: string; icon?: React.ElementType };
-              return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((item, i) => (
                 <motion.div
-                  key={m.name}
+                  key={item.name}
                   custom={i}
                   initial="hidden"
                   whileInView="visible"
@@ -294,24 +312,17 @@ const About = () => {
                   variants={fadeUp}
                   className="bento-item p-8 bg-white shadow-xl group border-l-4 border-l-transparent hover:border-l-gold transition-all"
                 >
-                  <div className={`w-20 h-20 rounded-2xl ${m.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl border-2 border-white/20 overflow-hidden`}>
-                    {m.image ? (
-                      <img src={m.image} alt={m.name} className="w-full h-full object-cover object-top" />
-                    ) : m.icon ? (
-                      <m.icon className="w-8 h-8 text-white/90" />
-                    ) : (
-                      <span className="text-white font-display font-bold text-2xl">{m.initial}</span>
-                    )}
+                  <div className={`w-20 h-20 rounded-2xl ${item.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl border-2 border-white/20 overflow-hidden`}>
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
                   </div>
-                  <h3 className="heading-display text-xl text-navy mb-1 group-hover:text-gold-dark transition-colors">{m.name}</h3>
-                  <div className="text-gold-dark text-[10px] font-extrabold font-body mb-4 uppercase tracking-[0.2em]">{m.role}</div>
-                  <p className="text-slate-500 font-body text-sm leading-relaxed mb-6">{m.bio}</p>
+                  <h3 className="heading-display text-xl text-navy mb-1 group-hover:text-gold-dark transition-colors">{item.name}</h3>
+                  <div className="text-gold-dark text-[10px] font-extrabold font-body mb-4 uppercase tracking-[0.2em]">{item.role}</div>
+                  <p className="text-slate-500 font-body text-sm leading-relaxed mb-6">{item.bio}</p>
                   <div className="flex gap-1.5 opacity-30 group-hover:opacity-100 transition-opacity">
                      {[...Array(5)].map((_, j) => <Star key={j} className="w-3 h-3 text-gold fill-gold" />)}
                   </div>
                 </motion.div>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>
@@ -356,7 +367,7 @@ const About = () => {
               Join the Legacy of <span className="text-gradient-gold">Achievement.</span>
             </h2>
             <p className="text-slate-500 max-w-lg mx-auto mb-10 font-body leading-relaxed">
-              Started in 2010 with just 5 students, we are now an ecosystem of 10,000+ alumni. Start your success story today.
+              Started in 2014 with a dream to serve Central India, we are now a trusted ecosystem of 7,000+ students. Start your success story today.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <a href="/contact" className="btn-gold px-10 py-5 rounded-2xl font-body font-bold text-lg">Work With a Mentor</a>
