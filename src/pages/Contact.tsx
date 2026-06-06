@@ -79,8 +79,10 @@ const Contact = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-3 glass-card rounded-3xl p-7 md:p-10 border border-slate-200 shadow-xl bg-white/80"
+              className="lg:col-span-3 rounded-[2.5rem] p-8 md:p-12 border-0 shadow-[0_20px_60px_rgba(0,0,0,0.08)] bg-white relative overflow-hidden"
             >
+              {/* Decorative top gradient line */}
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold via-amber-400 to-gold" />
               {submitted ? (
                 <div className="flex flex-col items-center justify-center min-h-[480px] text-center py-10">
                   <motion.div
@@ -217,7 +219,7 @@ const Contact = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="glass-card rounded-2xl p-5 bg-white flex items-start gap-4 group hover:border-gold/20 transition-all border border-slate-100 shadow-sm"
+                  className="rounded-2xl p-6 bg-white flex items-start gap-5 group hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all border border-slate-100 shadow-sm"
                 >
                   <div className="w-10 h-10 rounded-xl bg-navy/5 border border-navy/10 flex items-center justify-center shrink-0 group-hover:bg-gold/10 transition-colors">
                     <info.icon className="w-5 h-5 text-navy/40 group-hover:text-gold-dark" />

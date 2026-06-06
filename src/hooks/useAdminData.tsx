@@ -64,6 +64,7 @@ export interface FacultyMember {
   name: string;
   sub: string;
   img: string;
+  bio?: string;
 }
 
 export interface WebsiteSettings {

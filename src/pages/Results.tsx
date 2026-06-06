@@ -156,17 +156,19 @@ const Results = () => {
                   initial="hidden"
                   animate="visible"
                   variants={fadeUp}
-                  className={`glass-card rounded-2xl p-5 bg-white border border-slate-200 shadow-lg hover:scale-[1.05] transition-transform duration-300 relative group`}
+                  className="rounded-[2rem] p-6 md:p-8 bg-white border-0 shadow-[0_15px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-500 relative group flex flex-col items-center justify-center text-center h-full"
                 >
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-navy flex items-center justify-center shadow-lg border-2 border-white">
-                    <span className="text-xl">{t.badge}</span>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center shadow-xl border-4 border-white group-hover:scale-110 transition-transform duration-500 z-10">
+                    <span className="text-2xl drop-shadow-md">{t.badge}</span>
                   </div>
-                  <div className="mt-6 text-center">
-                    <div className="font-syne font-extrabold text-2xl text-gradient-gold mb-1">{t.rank}</div>
-                    <div className="font-display font-bold text-navy text-sm mb-1">{t.name}</div>
-                    <div className="text-slate-400 text-[10px] font-body uppercase tracking-wider mb-4">{t.exam}</div>
-                    <p className="text-slate-500 text-[11px] font-body leading-relaxed italic border-t border-slate-50 pt-4 px-2">
-                      "{t.quote}"
+                  <div className="mt-4 flex flex-col items-center w-full">
+                    <div className="font-syne font-black text-3xl text-slate-900 mb-1 tracking-tight group-hover:text-gold-dark transition-colors">{t.rank}</div>
+                    <div className="font-display font-bold text-slate-600 text-base mb-1">{t.name}</div>
+                    <div className="text-gold-dark font-bold text-[10px] uppercase tracking-[0.2em] mb-5">{t.exam}</div>
+                    <p className="text-slate-500 text-xs font-body leading-relaxed italic border-t border-slate-100 pt-5 px-2 relative w-full">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-2 text-slate-300">"</span>
+                      {t.quote}
+                      <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-2 text-slate-300">"</span>
                     </p>
                   </div>
                 </motion.div>
@@ -189,19 +191,20 @@ const Results = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                className="glass-card rounded-2xl p-7 bg-white shadow-xl border border-slate-200"
+                className="rounded-[2.5rem] p-8 md:p-10 bg-slate-900 shadow-2xl relative overflow-hidden group"
               >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 text-gold fill-gold" />)}
+                <div className="absolute -right-10 -top-10 text-[150px] text-white/5 font-serif leading-none select-none group-hover:text-gold/5 transition-colors duration-500">"</div>
+                <div className="flex gap-1 mb-6 relative z-10">
+                  {[...Array(5)].map((_, j) => <Star key={j} className="w-5 h-5 text-gold fill-gold" />)}
                 </div>
-                <p className="text-slate-500 italic font-body leading-relaxed mb-6 text-sm leading-relaxed">"{t.quote}"</p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-11 h-11 rounded-full ${t.color} flex items-center justify-center shrink-0 shadow-lg`}>
-                    <span className="text-white font-display font-bold">{t.initial}</span>
+                <p className="text-slate-300 italic font-body leading-relaxed mb-8 text-base md:text-lg relative z-10">"{t.quote}"</p>
+                <div className="flex items-center gap-4 relative z-10 pt-6 border-t border-slate-800">
+                  <div className={`w-14 h-14 rounded-full ${t.color} flex items-center justify-center shrink-0 shadow-lg border-2 border-slate-800`}>
+                    <span className="text-white font-display font-bold text-xl">{t.initial}</span>
                   </div>
                   <div>
-                    <div className="text-navy font-display font-semibold text-sm">{t.name}</div>
-                    <div className="text-gold-dark text-xs font-bold font-body">{t.rank}</div>
+                    <div className="text-white font-display font-bold text-base mb-0.5">{t.name}</div>
+                    <div className="text-gold font-bold font-body text-xs tracking-wider uppercase">{t.rank}</div>
                   </div>
                 </div>
               </motion.div>

@@ -36,15 +36,7 @@ const values = [
   },
 ];
 
-const team = [
-  { name: "Mr. Sandeep Yadav", role: "Maths Faculty", bio: "Expert in competitive mathematics with proven success strategies across SSC & Banking.", image: "/images/faculty_1.png", color: "bg-[#e2e8f0]" },
-  { name: "Mr. Irshad Mansoori", role: "Maths Faculty", bio: "Specialist in Quantitative Aptitude, simplifying complex topics for quick revision.", image: "/images/faculty_2.png", color: "bg-[#f1f5f9]" },
-  { name: "Mr. Shubham Patel", role: "MP / Current Affairs", bio: "Deep insights into Madhya Pradesh GK, current affairs and polity for state exams.", image: "/images/faculty_3.png", color: "bg-[#e2e8f0]" },
-  { name: "Mr. Abhishek Sengar", role: "English Faculty", bio: "Specialist in English grammar, comprehension and vocabulary for SSC/Banking/PSC.", image: "/images/faculty_4.png", color: "bg-[#f1f5f9]" },
-  { name: "Mr. Atul Rajpoot", role: "MP / English Faculty", bio: "Renowned mentor for English and MP state-specific subjects.", image: "/images/faculty_5.png", color: "bg-[#e2e8f0]" },
-  { name: "Mr. Yogesh Tiwari", role: "Science Faculty", bio: "Clarity-first approach to General Science for Railway, SSC & Police exams.", image: "/images/faculty_1.png", color: "bg-[#f1f5f9]" },
-  { name: "Mr. Pushparaj Kushwaha", role: "History & Polity", bio: "Expert in Indian History, Polity and Geography with engaging storytelling methods.", image: "/images/faculty_2.png", color: "bg-[#e2e8f0]" },
-];
+// Remove hardcoded team, it will be fetched dynamically from website settings
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -56,8 +48,12 @@ const fadeUp = {
 };
 
 import { useEffect } from "react";
+import { useAdminData } from "@/hooks/useAdminData";
 
 const About = () => {
+  const { websiteSettings } = useAdminData();
+  const team = websiteSettings?.faculty || [];
+
   useEffect(() => {
     if (!document.getElementById('google-translate-script')) {
       const script = document.createElement('script');
@@ -160,9 +156,8 @@ const About = () => {
       </section>
 
       {/* ══ FOUNDER DESK ═══════════════════════════════════════ */}
-      <section className="section-padding bg-navy relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy to-navy-light opacity-90" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full pointer-events-none" />
+      <section className="section-padding relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="container mx-auto max-w-6xl relative z-10 px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Founder Image */}
@@ -182,15 +177,9 @@ const About = () => {
                     alt="Dr. Imran Khan - Founder & Director" 
                     className="w-full h-full object-cover object-top"
                   />
-                  {/* Bottom fade so image blends into navy section */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
+                  {/* Bottom fade so image blends into section */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-background to-transparent" />
                 </div>
-              </div>
-              
-              {/* Floating Badge */}
-              <div className="absolute -bottom-6 right-0 md:-right-10 bg-white p-4 rounded-xl shadow-2xl border border-slate-100 max-w-[200px] animate-float">
-                <div className="text-gold-dark font-extrabold text-sm uppercase tracking-wider mb-0.5">Dr. Imran Khan</div>
-                <div className="text-slate-500 text-[10px] font-body">Founder, Director & GS Faculty</div>
               </div>
             </motion.div>
 
@@ -200,31 +189,31 @@ const About = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <div className="badge-gold mb-6 inline-flex border-none bg-gold/10 text-gold-light">
-                <Star className="w-3 h-3 fill-gold-light text-gold-light mr-2" /> From the Director's Desk
+              <div className="mb-6 inline-flex items-center text-slate-800 font-bold uppercase tracking-widest text-sm">
+                <Star className="w-4 h-4 mr-2 text-slate-800 fill-slate-800" /> From the Director's Desk
               </div>
-              <h2 className="heading-display text-4xl md:text-5xl text-gold-light mb-6">
-                Redefining Competitive Education in <span className="text-white">Jabalpur.</span>
+              <h2 className="heading-display text-4xl md:text-5xl text-slate-900 mb-6">
+                Redefining Competitive Education in Jabalpur.
               </h2>
-              <div className="space-y-4 text-slate-200 font-body text-lg leading-relaxed mb-8 relative">
-                <Quote className="absolute -top-4 -left-6 w-12 h-12 text-white/10" />
+              <div className="space-y-4 text-slate-800 font-body text-lg leading-relaxed mb-8 relative">
+                <Quote className="absolute -top-4 -left-6 w-12 h-12 text-slate-900/10" />
                 <p>
                   "When we started AIM Academy over a decade ago, our vision was simple: to ensure that no deserving student from Central India has to leave their hometown in search of quality all government exam coaching."
                 </p>
                 <p>
                   "Today, with hundreds of official selections proudly serving the nation, we stand as a testament that true dedication, high-quality mentorship, and an ethical educational ecosystem can produce top-tier results right here in Jabalpur."
                 </p>
-                <p className="text-gold font-medium text-2xl mt-6">
+                <p className="text-slate-900 font-medium text-2xl mt-6">
                   "आपकी तलाश का अंतिम पड़ाव"
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center p-2">
-                  <img src="/images/logo_main.png" alt="AIM Academy" className="w-full h-full object-contain brightness-0 invert" />
+                <div className="w-12 h-12 rounded-full border border-slate-900/30 flex items-center justify-center p-2">
+                  <img src="/images/logo_main.png" alt="AIM Academy" className="w-full h-full object-contain" />
                 </div>
                 <div>
-                  <div className="text-white font-bold font-display tracking-wider">AIM ACADEMY</div>
-                  <div className="text-gold-light text-[10px] uppercase tracking-[0.2em]">Est. 2014</div>
+                  <div className="text-slate-900 font-bold font-display tracking-wider">AIM ACADEMY</div>
+                  <div className="text-slate-600 text-[10px] uppercase tracking-[0.2em]">Est. 2014</div>
                 </div>
               </div>
             </motion.div>
@@ -288,27 +277,42 @@ const About = () => {
       </section>
 
       {/* ══ LEADERSHIP ════════════════════════════════════════ */}
-      <section className="section-padding bg-transparent border-y border-black/5 relative overflow-hidden">
-        <div className="absolute inset-0 dot-grid-sm opacity-30" />
+      <section className="section-padding bg-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 dot-grid-sm opacity-10 mix-blend-overlay" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/10 blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+
         <div className="container mx-auto relative z-10">
-          <SectionHeading label="Leadership" title="Guided by the Best" description="Meet the people who bridge the gap between your dreams and your name in the final merit list." />
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-5 justify-center">
+              <span className="bg-gold/10 border border-gold/20 text-gold-light text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold inline-block mr-1.5 animate-pulse" />
+                Leadership
+              </span>
+            </div>
+            <h2 className="heading-display text-4xl md:text-5xl lg:text-6xl text-white mb-5">
+              Guided by the <span className="text-gradient-gold">Best</span>
+            </h2>
+            <p className="text-slate-300 font-body text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+              Meet the people who bridge the gap between your dreams and your name in the final merit list.
+            </p>
+          </div>
           
           {/* Pillars Group Banner */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-16 relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-slate-50 mx-auto max-w-5xl"
+            className="mb-20 relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 mx-auto max-w-6xl group bg-slate-800"
           >
             <img 
               src="/images/pillars_group.jpg" 
               alt="Pillars of AIM Academy - Faculty and Directors" 
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-1000 ease-out opacity-90 group-hover:opacity-100"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent pointer-events-none" />
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((item, i) => (
                 <motion.div
                   key={item.name}
@@ -317,16 +321,31 @@ const About = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="bento-item p-8 bg-white shadow-xl group border-l-4 border-l-transparent hover:border-l-gold transition-all"
+                  className="group relative bg-slate-800 border border-slate-700 hover:border-gold/50 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(250,204,21,0.1)] flex flex-col h-full"
                 >
-                  <div className={`w-20 h-20 rounded-2xl ${item.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl border-2 border-white/20 overflow-hidden`}>
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
+                  <div className="relative aspect-square w-full overflow-hidden bg-slate-800">
+                    {/* Decorative Background for Image */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
+                    <img src={item.img} alt={item.name} className="relative w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
+                    
+                    {/* Floating Name Plate Over Image */}
+                    <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                       <h3 className="heading-display text-2xl text-white mb-1 drop-shadow-md">{item.name}</h3>
+                       <div className="text-gold font-bold font-body text-xs uppercase tracking-[0.2em]">{item.sub}</div>
+                    </div>
                   </div>
-                  <h3 className="heading-display text-xl text-navy mb-1 group-hover:text-gold-dark transition-colors">{item.name}</h3>
-                  <div className="text-gold-dark text-[10px] font-extrabold font-body mb-4 uppercase tracking-[0.2em]">{item.role}</div>
-                  <p className="text-slate-500 font-body text-sm leading-relaxed mb-6">{item.bio}</p>
-                  <div className="flex gap-1.5 opacity-30 group-hover:opacity-100 transition-opacity">
-                     {[...Array(5)].map((_, j) => <Star key={j} className="w-3 h-3 text-gold fill-gold" />)}
+
+                  <div className="p-6 flex flex-col flex-grow relative z-10">
+                    <p className="text-slate-300 font-body text-sm leading-relaxed mb-6 flex-grow">
+                      {item.bio || "A dedicated mentor committed to shaping the future of civil services aspirants through strategic and ethical guidance."}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
+                       <div className="flex gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
+                         {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 text-gold fill-gold" />)}
+                       </div>
+                       <span className="text-xs font-bold text-slate-500 uppercase tracking-widest group-hover:text-gold transition-colors">Faculty</span>
+                    </div>
                   </div>
                 </motion.div>
             ))}

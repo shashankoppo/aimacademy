@@ -45,7 +45,18 @@ const queryClient = new QueryClient();
 const AppRoutes = () => {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence 
+      mode="wait" 
+      onExitComplete={() => {
+        if (typeof window !== "undefined") {
+          if (window.lenis) {
+            window.lenis.scrollTo(0, { immediate: true });
+          } else {
+            window.scrollTo(0, 0);
+          }
+        }
+      }}
+    >
       <Routes location={location} key={location.pathname}>
         {/* Public Routes */}
         <Route path="/" element={<Index />} />

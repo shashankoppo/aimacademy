@@ -3,12 +3,19 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, Layout } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminData, type FacultyMember } from "@/hooks/useAdminData";
+import ImageCropperModal from "@/components/ImageCropperModal";
 
 const AdminWebsiteSettings = () => {
   const { websiteSettings, updateWebsiteSettings } = useAdminData();
   const [slides, setSlides] = useState<string[]>([]);
   const [bannerText, setBannerText] = useState("");
   const [faculty, setFaculty] = useState<FacultyMember[]>([]);
+
+  // Cropper states
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string>("");
+  const [cropTarget, setCropTarget] = useState<{ type: 'slide' | 'faculty', index: number } | null>(null);
+  const [cropAspectRatio, setCropAspectRatio] = useState<number>(16 / 9);
 
   useEffect(() => {
     if (!websiteSettings) return;
@@ -42,11 +49,17 @@ const AdminWebsiteSettings = () => {
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => updateSlide(index, reader.result as string);
+    reader.onloadend = () => {
+      setCropImageSrc(reader.result as string);
+      setCropTarget({ type: 'slide', index });
+      setCropAspectRatio(16 / 9); // Banner aspect ratio
+      setCropModalOpen(true);
+    };
     reader.readAsDataURL(file);
+    event.target.value = ''; // Reset input to allow selecting same file
   };
 
-  const addFaculty = () => setFaculty([...faculty, { name: "New Teacher", sub: "Subject Expert", img: "/images/faculty_1.png" }]);
+  const addFaculty = () => setFaculty([...faculty, { name: "New Teacher", sub: "Subject Expert", img: "/images/faculty_1.png", bio: "Brief biography for the About page." }]);
   const removeFaculty = (index: number) => setFaculty(faculty.filter((_, current) => current !== index));
   const updateFaculty = (index: number, field: keyof FacultyMember, value: string) => {
     const next = [...faculty];
@@ -62,8 +75,26 @@ const AdminWebsiteSettings = () => {
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => updateFaculty(index, "img", reader.result as string);
+    reader.onloadend = () => {
+      setCropImageSrc(reader.result as string);
+      setCropTarget({ type: 'faculty', index });
+      setCropAspectRatio(1); // Square aspect ratio for faculty
+      setCropModalOpen(true);
+    };
     reader.readAsDataURL(file);
+    event.target.value = ''; // Reset input
+  };
+
+  const handleCropComplete = (croppedImageBase64: string) => {
+    if (!cropTarget) return;
+    if (cropTarget.type === 'slide') {
+      updateSlide(cropTarget.index, croppedImageBase64);
+    } else if (cropTarget.type === 'faculty') {
+      updateFaculty(cropTarget.index, 'img', croppedImageBase64);
+    }
+    setCropModalOpen(false);
+    setCropTarget(null);
+    setCropImageSrc("");
   };
 
   return (
@@ -163,6 +194,10 @@ const AdminWebsiteSettings = () => {
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block text-left">Specialization / Subject</label>
                     <input type="text" value={member.sub} onChange={(event) => updateFaculty(index, "sub", event.target.value)} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
                   </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block text-left">Biography (For About Page)</label>
+                    <textarea value={member.bio || ""} onChange={(event) => updateFaculty(index, "bio", event.target.value)} rows={2} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm"></textarea>
+                  </div>
                 </div>
 
                 <button onClick={() => removeFaculty(index)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
@@ -173,6 +208,15 @@ const AdminWebsiteSettings = () => {
           </div>
         </div>
       </div>
+      
+      {cropModalOpen && (
+        <ImageCropperModal
+          imageSrc={cropImageSrc}
+          aspectRatio={cropAspectRatio}
+          onCropComplete={handleCropComplete}
+          onClose={() => setCropModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

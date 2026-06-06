@@ -19,6 +19,8 @@ const Index = () => {
    const { videos, websiteSettings } = useAdminData();
    const [currentSlide, setCurrentSlide] = useState(0);
    const [showPopup, setShowPopup] = useState(false);
+   const [isLeadSubmitting, setIsLeadSubmitting] = useState(false);
+   const [isLeadSuccess, setIsLeadSuccess] = useState(false);
    const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
    const [heroSlides, setHeroSlides] = useState([
       "/images/HEROMAIN 007.jpeg",
@@ -62,6 +64,20 @@ const Index = () => {
    const closePopup = () => {
       sessionStorage.setItem(POPUP_CLOSED_KEY, "true");
       setShowPopup(false);
+   };
+
+   const handleLeadSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLeadSubmitting(true);
+      // Simulate API call for sending PDF
+      setTimeout(() => {
+         setIsLeadSubmitting(false);
+         setIsLeadSuccess(true);
+         setTimeout(() => {
+            closePopup();
+            setIsLeadSuccess(false);
+         }, 3000);
+      }, 1500);
    };
 
    const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -443,16 +459,22 @@ const Index = () => {
                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
                         <CheckCircle2 className="w-5 h-5 text-emerald-500" /> High-Yield 'Sarkari' Target Material
                      </div>
-                     <form onSubmit={(e) => { e.preventDefault(); closePopup(); }} className="space-y-4">
+                     <form onSubmit={handleLeadSubmit} className="space-y-4">
                         <div>
                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">WhatsApp Number</label>
                            <div className="flex relative">
                               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-900 font-bold">+91</span>
-                              <input type="tel" required placeholder="Enter 10 digit number" className="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-900 transition-colors" />
+                              <input type="tel" required pattern="[0-9]{10}" placeholder="Enter 10 digit number" className="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-900 transition-colors" disabled={isLeadSubmitting || isLeadSuccess} />
                            </div>
                         </div>
-                        <button type="submit" className="w-full bg-slate-900 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.2)] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
-                           <Handshake className="w-5 h-5" /> Send PDF Now
+                        <button type="submit" disabled={isLeadSubmitting || isLeadSuccess} className="w-full bg-slate-900 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.2)] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+                           {isLeadSubmitting ? (
+                             <span className="animate-pulse">Processing...</span>
+                           ) : isLeadSuccess ? (
+                             <span className="text-emerald-400 flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> PDF Sent to WhatsApp!</span>
+                           ) : (
+                             <><Handshake className="w-5 h-5" /> Send PDF Now</>
+                           )}
                         </button>
                      </form>
                      <p className="text-[10px] text-center text-slate-400 font-medium mt-4">We respect your privacy. No spam, just pure value.</p>

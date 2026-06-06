@@ -3,7 +3,12 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { useLocation } from 'react-router-dom';
+
+declare global {
+  interface Window {
+    lenis: Lenis | null;
+  }
+}
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -16,7 +21,6 @@ let lenisInstance: Lenis | null = null;
 
 const GSAPWrapper: React.FC<GSAPWrapperProps> = ({ children }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { pathname } = useLocation();
 
   // ---------- Lenis smooth scroll init (once) ----------
   useEffect(() => {
@@ -32,6 +36,7 @@ const GSAPWrapper: React.FC<GSAPWrapperProps> = ({ children }) => {
     });
 
     lenisInstance = lenis;
+    window.lenis = lenis;
 
     // Synchronize Lenis with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
@@ -44,18 +49,10 @@ const GSAPWrapper: React.FC<GSAPWrapperProps> = ({ children }) => {
       lenis.destroy();
       gsap.ticker.remove(rafTick);
       lenisInstance = null;
+      window.lenis = null;
     };
   }, []);
 
-  // ---------- Scroll-to-top on every route change ----------
-  useEffect(() => {
-    if (lenisInstance) {
-      // Instant jump so the new page starts at top
-      lenisInstance.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname]);
 
   // ---------- GSAP reveal animations ----------
   // ---------- GSAP reveal animations (MutationObserver for Framer Motion compat) ----------
