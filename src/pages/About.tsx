@@ -51,8 +51,16 @@ import { useEffect } from "react";
 import { useAdminData } from "@/hooks/useAdminData";
 
 const About = () => {
-  const { websiteSettings } = useAdminData();
-  const team = websiteSettings?.faculty || [];
+  const team = [
+      { name: "Dr. Imran Khan", sub: "Founder, Director & GS Faculty", img: "/images/founder_solo.png", bio: "A dedicated mentor committed to shaping the future of civil services aspirants through strategic and ethical guidance." },
+      { name: "Mr. Sandeep Yadav", sub: "Maths Faculty", img: "/images/faculty_1.png", bio: "Expert in Quantitative Aptitude with over a decade of teaching experience." },
+      { name: "Mr. Irshad Mansoori", sub: "Maths Faculty", img: "/images/faculty_2.png", bio: "Renowned for simplifying complex mathematical concepts for competitive exams." },
+      { name: "Mr. Shubham Patel", sub: "MP / Current Affairs", img: "/images/faculty_3.png", bio: "Specialist in Current Affairs and Madhya Pradesh specific General Studies." },
+      { name: "Mr. Abhishek Sengar", sub: "English Faculty", img: "/images/faculty_4.png", bio: "Dedicated English educator focused on grammar and comprehension strategies." },
+      { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png", bio: "Versatile faculty guiding students in both English and Regional Studies." },
+      { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png", bio: "Expert in General Science and technology concepts for competitive exams." },
+      { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png", bio: "Bringing historical events and constitutional frameworks to life." },
+  ];
 
   useEffect(() => {
     if (!document.getElementById('google-translate-script')) {
@@ -75,7 +83,6 @@ const About = () => {
       {/* ══ HERO ══════════════════════════════════════════════ */}
       <section className="relative py-24 md:py-32 bg-transparent overflow-hidden border-b border-black/5">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-gold/5 blur-[120px]" />
         
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div 
@@ -157,7 +164,6 @@ const About = () => {
 
       {/* ══ FOUNDER DESK ═══════════════════════════════════════ */}
       <section className="section-padding relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/20 blur-[120px] rounded-full pointer-events-none" />
         <div className="container mx-auto max-w-6xl relative z-10 px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Founder Image */}
@@ -279,8 +285,6 @@ const About = () => {
       {/* ══ LEADERSHIP ════════════════════════════════════════ */}
       <section className="section-padding bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-10 mix-blend-overlay" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold/10 blur-[150px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -303,7 +307,7 @@ const About = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-20 relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 mx-auto max-w-6xl group bg-slate-800"
+            className="mb-20 relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-xl border border-white/10 mx-auto max-w-6xl group bg-slate-800"
           >
             <img 
               src="/images/pillars_group.jpg" 
@@ -358,7 +362,6 @@ const About = () => {
         <div className="absolute inset-0 dot-grid opacity-30" />
         <div className="container mx-auto relative z-10">
           <div className="glass-card rounded-[2.5rem] p-10 md:p-20 border border-slate-200 bg-white shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-gold/5 blur-[100px] -translate-y-1/2 translate-x-1/2" />
             <div className="badge-gold mb-8 shadow-sm">Jabalpur's Academic Landmark</div>
             <h2 className="heading-display text-4xl md:text-6xl text-navy mb-6">
               Empowering the Heart of <br />

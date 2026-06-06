@@ -58,7 +58,7 @@ const Index = () => {
 
    useEffect(() => {
       if (websiteSettings?.slides?.length) setHeroSlides(websiteSettings.slides);
-      if (websiteSettings?.faculty?.length) setFaculty(websiteSettings.faculty);
+      // Faculty is hardcoded until DB is properly seeded by user
    }, [websiteSettings]);
 
    const closePopup = () => {
@@ -278,7 +278,7 @@ const Index = () => {
                         <Youtube className="w-4 h-4" /> Watch All Videos
                      </Link>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                      {visibleVideos.map((video) => (
                         <button key={video.id} type="button" onClick={() => setActiveVideo(video)} className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg block text-left">
                            <img src={video.thumbnailUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt={video.title} />
