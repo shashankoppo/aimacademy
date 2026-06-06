@@ -317,30 +317,30 @@ const About = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   variants={fadeUp}
-                  className="group relative bg-slate-800 border border-slate-700 hover:border-gold/50 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(250,204,21,0.1)] flex flex-col h-full"
+                  className="group relative bg-white border border-slate-200 hover:border-gold/50 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(250,204,21,0.15)] flex flex-col h-full"
                 >
-                  <div className="relative aspect-square w-full overflow-hidden bg-slate-800">
+                  <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center p-4">
                     {/* Decorative Background for Image */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
-                    <img src={item.img} alt={item.name} className="relative w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100" />
+                    <img src={item.img} alt={item.name} className="relative w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
                     
                     {/* Floating Name Plate Over Image */}
                     <div className="absolute bottom-0 left-0 w-full p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                       <h3 className="heading-display text-2xl text-white mb-1 drop-shadow-md">{item.name}</h3>
-                       <div className="text-gold font-bold font-body text-xs uppercase tracking-[0.2em]">{item.sub}</div>
+                       <h3 className="heading-display text-2xl text-slate-900 mb-1 drop-shadow-sm">{item.name}</h3>
+                       <div className="text-amber-600 font-bold font-body text-xs uppercase tracking-[0.2em]">{item.sub}</div>
                     </div>
                   </div>
 
-                  <div className="p-6 flex flex-col flex-grow relative z-10">
-                    <p className="text-slate-300 font-body text-sm leading-relaxed mb-6 flex-grow">
+                  <div className="p-6 flex flex-col flex-grow relative z-10 bg-white">
+                    <p className="text-slate-500 font-body text-sm leading-relaxed mb-6 flex-grow">
                       {item.bio || "A dedicated mentor committed to shaping the future of civil services aspirants through strategic and ethical guidance."}
                     </p>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
-                       <div className="flex gap-1.5 opacity-50 group-hover:opacity-100 transition-opacity">
-                         {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 text-gold fill-gold" />)}
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                       <div className="flex gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                         {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />)}
                        </div>
-                       <span className="text-xs font-bold text-slate-500 uppercase tracking-widest group-hover:text-gold transition-colors">Faculty</span>
+                       <span className="text-xs font-bold text-slate-400 uppercase tracking-widest group-hover:text-amber-600 transition-colors">Faculty</span>
                     </div>
                   </div>
                 </motion.div>

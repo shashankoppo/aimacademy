@@ -372,7 +372,7 @@ const Index = () => {
                               src={member.img}
                               alt={member.name}
                               className={`
-                             transition-all duration-500
+                             transition-all duration-500 mix-blend-multiply
                              ${member.name === "Amit Sir" ? "w-full h-full object-cover" : "w-[95%] h-[95%] object-contain"}
                           `}
                               style={{
