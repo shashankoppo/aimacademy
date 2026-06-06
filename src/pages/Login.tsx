@@ -4,12 +4,7 @@ import { Shield, User, GraduationCap, Briefcase, ArrowRight, Lock, Mail, AlertCi
 import { motion, AnimatePresence } from "framer-motion";
 import { API_BASE_URL } from "@/lib/admin-api";
 
-const DEMO_CREDENTIALS: Record<string, { id: string; password: string; redirect: string; name: string }> = {
-  student:  { id: "student@aim.edu",  password: "student123",  redirect: "/student/dashboard", name: "Aarav Mehta" },
-  teacher:  { id: "teacher@aim.edu",  password: "teacher123",  redirect: "/teacher/dashboard", name: "Dr. Sandeep Kumar" },
-  staff:    { id: "staff@aim.edu",    password: "staff123",    redirect: "/staff/dashboard",   name: "Rajesh Varma" },
-  admin:    { id: "admin@aim.edu",    password: "admin@2026",  redirect: "/admin",             name: "Administrator" },
-};
+
 
 type RoleKey = "student" | "teacher" | "staff" | "admin";
 
@@ -19,7 +14,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showCredentials, setShowCredentials] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -83,21 +78,7 @@ const Login = () => {
               </p>
             </div>
 
-            {/* Demo Credentials Panel */}
-            <div className="mt-12 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/15">
-              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
-                <Info className="w-3.5 h-3.5" /> Demo Login Credentials
-              </h4>
-              <div className="space-y-3">
-                {Object.entries(DEMO_CREDENTIALS).map(([key, cred]) => (
-                  <div key={key} className="flex items-center justify-between text-white/80">
-                    <span className="text-[10px] font-bold uppercase tracking-widest w-16">{key}</span>
-                    <span className="text-xs font-mono">{cred.id}</span>
-                    <span className="text-xs font-mono text-white/50">{cred.password}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+
           </div>
           <div className="relative z-10 flex items-center gap-4 text-white/50 text-xs font-bold uppercase tracking-widest">
             <span>Powered by ELSxGlobal</span>
@@ -135,35 +116,7 @@ const Login = () => {
             ))}
           </div>
 
-          {/* Mobile: Show credentials toggle */}
-          <div className="lg:hidden mb-6">
-            <button 
-              onClick={() => setShowCredentials(!showCredentials)}
-              className="w-full text-xs font-bold text-primary uppercase tracking-widest flex items-center justify-center gap-2 py-3 bg-primary/5 rounded-xl"
-            >
-              <Info className="w-3.5 h-3.5" /> {showCredentials ? "Hide" : "Show"} Demo Credentials
-            </button>
-            <AnimatePresence>
-              {showCredentials && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }} 
-                  animate={{ height: "auto", opacity: 1 }} 
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="bg-slate-50 rounded-xl p-4 mt-3 space-y-2">
-                    {Object.entries(DEMO_CREDENTIALS).map(([key, cred]) => (
-                      <div key={key} className="flex items-center justify-between text-slate-600">
-                        <span className="text-[10px] font-bold uppercase tracking-widest w-16 text-slate-400">{key}</span>
-                        <span className="text-xs font-mono">{cred.id}</span>
-                        <span className="text-xs font-mono text-slate-400">{cred.password}</span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+
 
           {/* Error Message */}
           <AnimatePresence>
@@ -187,7 +140,7 @@ const Login = () => {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
                 <input 
                   type="text" 
-                  placeholder={DEMO_CREDENTIALS[role].id}
+                  placeholder="Enter your email or ID"
                   value={userId}
                   onChange={(e) => { setUserId(e.target.value); setError(""); }}
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none text-slate-900"
