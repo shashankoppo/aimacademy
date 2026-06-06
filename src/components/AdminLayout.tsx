@@ -29,25 +29,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-transparent">
+    <div className="flex min-h-screen bg-slate-50 font-sans">
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-white/80 backdrop-blur-md border-r border-black/5 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 shadow-2xl lg:shadow-none",
           !isSidebarOpen && "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-slate-100">
+          <div className="p-6 border-b border-white/5">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary text-white">
+              <div className="p-2 rounded-lg bg-[#FFFF00] text-slate-900 shadow-[0_0_15px_rgba(255,255,0,0.3)]">
                 <Shield className="w-5 h-5" />
               </div>
-              <span className="font-black text-slate-900 tracking-tight">ADMIN PANEL</span>
+              <span className="font-black text-white tracking-tight uppercase text-lg">AIM COMMAND</span>
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto admin-scrollbar">
             {menuItems.map((item) => {
               const isActive = location.pathname === item.link;
               return (
@@ -55,25 +55,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   key={item.link}
                   to={item.link}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all group",
+                    "flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-[13px] transition-all group tracking-wide",
                     isActive 
-                      ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                      : "text-slate-500 hover:bg-slate-50 hover:text-primary"
+                      ? "bg-[#FFFF00] text-slate-900 shadow-md" 
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   )}
                 >
-                  <item.icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-400 group-hover:text-primary")} />
+                  <item.icon className={cn("w-5 h-5", isActive ? "text-slate-900" : "text-slate-500 group-hover:text-white")} />
                   {item.title}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-100">
+          <div className="p-4 border-t border-white/5 bg-slate-900/50">
             <Link 
               to="/" 
-              className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-500 hover:bg-slate-50 hover:text-primary transition-all group"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-[13px] text-slate-400 hover:bg-slate-800 hover:text-white transition-all group"
             >
-              <ArrowLeft className="w-5 h-5 text-slate-400 group-hover:text-primary" />
+              <ArrowLeft className="w-5 h-5 text-slate-500 group-hover:text-white" />
               Back to Website
             </Link>
           </div>
@@ -82,26 +82,26 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white/40 backdrop-blur-sm border-b border-black/5 flex items-center justify-between px-6 sticky top-0 z-40">
+        <header className="h-16 bg-white border-b border-black/5 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-slate-50 text-slate-500"
+            className="lg:hidden p-2 rounded-lg hover:bg-slate-100 text-slate-600"
           >
             {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           
           <div className="flex items-center gap-4 ml-auto">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-900">Administrator</p>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Main Admin</p>
+              <p className="text-[13px] font-black text-slate-900 leading-tight">Dr. Imran Khan</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Super Admin</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold">
-              AD
+            <div className="w-10 h-10 rounded-full bg-slate-900 border-2 border-[#FFFF00] flex items-center justify-center text-[#FFFF00] font-black shadow-md">
+              IK
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

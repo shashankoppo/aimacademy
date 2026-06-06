@@ -32,7 +32,7 @@ const AdminDashboard = () => {
   const stats = [
     { label: "Total Students", value: students.length.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
     { label: "Total Courses", value: courses.length.toString(), icon: BookOpen, color: "text-indigo-600", bg: "bg-indigo-50" },
-    { label: "Revenue (MTD)", value: currency(revenue), icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
+    { label: "Revenue (MTD)", value: currency(revenue), icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
     {
       label: "Overdue Students",
       value: students.filter((student) => student.feeStatus === "Overdue").length.toString(),
@@ -54,95 +54,98 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="p-8">
+    <div>
       <div className="mb-10">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
-            <Shield className="w-6 h-6" />
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-3.5 rounded-2xl bg-slate-900 text-[#FFFF00] shadow-xl border border-slate-800">
+            <Shield className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">Admin Command Center</h1>
-            <p className="text-slate-500 font-medium">Welcome back, Administrator. Here's your institutional overview.</p>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 uppercase">Command Center</h1>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-[11px] mt-1">Institutional Overview & Analytics</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+          <div key={index} className="bg-white p-6 rounded-[1.25rem] border-2 border-slate-100 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1">
             <div className="flex items-center justify-between mb-4">
               <div className={`p-3 rounded-xl ${stat.bg}`}>
                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
               </div>
-              <CheckCircle2 className="w-5 h-5 text-slate-100" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-500/30" />
             </div>
-            <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">{stat.label}</h3>
-            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+            <h3 className="text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1">{stat.label}</h3>
+            <p className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-2 space-y-8">
-          <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-            <LayoutDashboard className="w-5 h-5 text-primary" /> Management Modules
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-10">
+        <div className="xl:col-span-2 space-y-8">
+          <h2 className="text-xl font-black text-slate-900 flex items-center gap-3 uppercase tracking-wide">
+            <LayoutDashboard className="w-6 h-6 text-slate-900" /> Management Modules
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quickActions.map((action, index) => (
-              <Link key={index} to={action.link} className="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-primary/40 hover:shadow-lg flex items-start gap-5 border-b-4 border-b-transparent hover:border-b-primary">
-                <div className="p-3 rounded-xl bg-slate-50 group-hover:bg-primary/5 transition-colors">
-                  <action.icon className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
+              <Link key={index} to={action.link} className="group bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-sm transition-all hover:border-slate-900 hover:shadow-lg flex items-start gap-5">
+                <div className="p-3 rounded-xl bg-slate-50 group-hover:bg-[#FFFF00] group-hover:text-slate-900 transition-colors">
+                  <action.icon className="w-6 h-6 text-slate-400 group-hover:text-slate-900 transition-colors" />
                 </div>
                 <div>
-                  <h3 className="font-black text-slate-900 mb-1 group-hover:text-primary transition-colors tracking-tight">{action.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed font-medium">{action.desc}</p>
+                  <h3 className="font-black text-slate-900 mb-1 tracking-tight text-[15px]">{action.title}</h3>
+                  <p className="text-[12px] text-slate-500 font-semibold leading-snug">{action.desc}</p>
                 </div>
               </Link>
             ))}
           </div>
         </div>
 
-        <div className="space-y-8">
-          <div className="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
+        <div className="space-y-6">
+          <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl border border-slate-800">
             <div className="relative z-10">
-              <h3 className="text-xl font-black mb-4">Financial Reports</h3>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed">Download the latest monthly financial summary for the board members.</p>
-              <button onClick={downloadReport} className="w-full bg-white text-slate-900 font-black py-3 rounded-xl transition-transform hover:scale-[1.02] text-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6">
+                <TrendingUp className="w-3 h-3 text-[#FFFF00]" /> Analytics
+              </div>
+              <h3 className="text-2xl font-black mb-3">Financial Reports</h3>
+              <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">Download the latest monthly financial summary for board members.</p>
+              <button onClick={downloadReport} className="w-full bg-[#FFFF00] text-slate-900 font-black py-4 rounded-xl transition-transform hover:scale-[1.02] text-sm shadow-[0_0_20px_rgba(255,255,0,0.2)] uppercase tracking-wider">
                 Generate PDF Report
               </button>
             </div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl -mr-16 -mt-16" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#FFFF00]/10 blur-3xl -mr-16 -mt-16 rounded-full pointer-events-none" />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-            <h3 className="font-black text-slate-900 mb-6 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-primary" /> System Health
+          <div className="bg-white rounded-3xl border-2 border-slate-100 shadow-sm p-8">
+            <h3 className="font-black text-slate-900 mb-6 flex items-center gap-2 uppercase tracking-wide text-sm">
+              <Shield className="w-5 h-5 text-slate-900" /> System Health
             </h3>
             <div className="space-y-6">
               <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
                   <span>Database Sync</span>
                   <span className="text-emerald-600">Healthy</span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full w-[95%] bg-emerald-500" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
                   <span>Payment Gateway</span>
                   <span className="text-blue-600">Active</span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full w-[100%] bg-primary" />
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full w-[100%] bg-blue-500" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
                   <span>Notification Engine</span>
                   <span className="text-emerald-600">Online</span>
                 </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                   <div className="h-full w-[88%] bg-emerald-500" />
                 </div>
               </div>
