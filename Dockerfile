@@ -8,7 +8,7 @@ RUN corepack enable
 
 # Install dependencies efficiently
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copy source and build
 COPY . .
