@@ -51,16 +51,8 @@ import { useEffect } from "react";
 import { useAdminData } from "@/hooks/useAdminData";
 
 const About = () => {
-  const team = [
-      { name: "Dr. Imran Khan", sub: "Founder, Director & GS Faculty", img: "/images/founder_solo.png", bio: "A dedicated mentor committed to shaping the future of civil services aspirants through strategic and ethical guidance." },
-      { name: "Mr. Sandeep Yadav", sub: "Maths Faculty", img: "/images/faculty_1.png", bio: "Expert in Quantitative Aptitude with over a decade of teaching experience." },
-      { name: "Mr. Irshad Mansoori", sub: "Maths Faculty", img: "/images/faculty_2.png", bio: "Renowned for simplifying complex mathematical concepts for competitive exams." },
-      { name: "Mr. Shubham Patel", sub: "MP / Current Affairs", img: "/images/faculty_3.png", bio: "Specialist in Current Affairs and Madhya Pradesh specific General Studies." },
-      { name: "Mr. Abhishek Sengar", sub: "English Faculty", img: "/images/faculty_4.png", bio: "Dedicated English educator focused on grammar and comprehension strategies." },
-      { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png", bio: "Versatile faculty guiding students in both English and Regional Studies." },
-      { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png", bio: "Expert in General Science and technology concepts for competitive exams." },
-      { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png", bio: "Bringing historical events and constitutional frameworks to life." },
-  ];
+  const { websiteSettings } = useAdminData();
+  const team = websiteSettings?.faculty || [];
 
   useEffect(() => {
     if (!document.getElementById('google-translate-script')) {

@@ -58,7 +58,7 @@ const Index = () => {
 
    useEffect(() => {
       if (websiteSettings?.slides?.length) setHeroSlides(websiteSettings.slides);
-      // Faculty is hardcoded until DB is properly seeded by user
+      if (websiteSettings?.faculty?.length) setFaculty(websiteSettings.faculty);
    }, [websiteSettings]);
 
    const closePopup = () => {
