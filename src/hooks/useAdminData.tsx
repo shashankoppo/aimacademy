@@ -137,7 +137,7 @@ interface AdminContextType extends DashboardData {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 const defaultSettings: WebsiteSettings = {
-  bannerText: "New Batch Admissions Open for MP PSC & UPSC Foundation 2026-27 | AIM Academy: Synonym of Success | Call: +91 70672 31189",
+  bannerText: "🎉 Happy Birthday to our Founder, Mr. Imran Khan! 🎂 | 🚀 AIM Academy is officially launching today! Admissions Open | Call: +91 70672 31189",
   slides: ["/images/HEROMAIN 007.jpeg", "/images/STUDENT BANNER 01.jpeg", "/images/STUDENT_BANNER.jpeg"],
   faculty: [
     { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },

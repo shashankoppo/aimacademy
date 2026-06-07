@@ -19,7 +19,7 @@ const Footer = () => {
                </div>
              </Link>
              <p className="text-sm leading-relaxed mb-6 text-slate-500">
-               AIM Academy is India's most trusted online education platform that provides affordable & comprehensive learning experience to students for various competitive exams.
+               AIM Academy is India's most trusted offline education platform that provides affordable & comprehensive learning experience to students for various competitive exams.
              </p>
              <div className="flex gap-4">
                 <a href="#" aria-label="Facebook" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Facebook className="w-5 h-5"/></a>

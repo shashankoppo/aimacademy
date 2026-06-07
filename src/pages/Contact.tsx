@@ -16,7 +16,7 @@ const contactInfo = [
   { icon: Phone, label: "Call Us",    value: "7067231189, 6232051184",     href: "tel:+917067231189",          desc: "Mon–Sat · 8:00 AM – 8:45 PM" },
   { icon: Mail,  label: "Email Us",   value: "info@aimacademy.in",          href: "mailto:info@aimacademy.in",  desc: "Reply within 24 hours" },
   { icon: MapPin,label: "Branch 1 (Ranjhi)", value: "Main Road Ranjhi, Adarsh Market", href: undefined, desc: "Beside Police Petrol Pump, Jabalpur" },
-  { icon: MapPin,label: "Branch 2 (Adhartal)", value: "Main Road Adhartal, Near Spring Day School", href: undefined, desc: "Opposite to HDFC Bank, Jabalpur" },
+  { icon: MapPin,label: "Branch 2 (Adhartal)", value: "Main road Adhartal. Beside Indore sweets, Kesri traders.", href: undefined, desc: "Opposite to Durga patr emporium." },
 ];
 
 const fadeUp = {
