@@ -224,15 +224,44 @@ const Index = () => {
                   {[
                      { img: "/images/hero_combo_top.jpeg", title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "Admissions Open", filled: 88, seatsLeft: 12 },
                      { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", filled: 94, seatsLeft: 5 },
-                     { img: "/images/hero_combo_bottom.jpeg", title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", filled: 98, seatsLeft: 2 },
+                     { customRender: true, title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", filled: 98, seatsLeft: 2 },
                   ].map((course, i) => (
                      <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full">
-                        <div className="relative aspect-video overflow-hidden bg-slate-100">
-                           <img src={course.img} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                           <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
+                        {course.customRender ? (
+                           <div className="relative aspect-video overflow-hidden bg-slate-900 p-3 pb-4 pt-10 flex gap-3 items-center justify-center border-b-[4px] border-[hsl(var(--primary))]">
+                              <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10">
+                                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
+                              </div>
+                              
+                              {/* Left Image */}
+                              <div className="flex-1 h-full rounded-lg overflow-hidden border border-slate-700 relative group-hover:border-gold transition-colors bg-white">
+                                 <img src="/images/founder_solo.png" className="w-full h-full object-contain mix-blend-multiply" style={{ objectPosition: "center 20%" }} alt="Mr. Imran Khan" />
+                                 <div className="absolute bottom-0 left-0 w-full bg-[#1e40af] py-1 px-1 text-center">
+                                    <p className="text-[9px] font-black text-white uppercase">Mr. Imran Khan</p>
+                                    <p className="text-[7px] font-bold text-blue-200 uppercase">Founder / Mentor</p>
+                                 </div>
+                              </div>
+
+                              {/* Separator */}
+                              <div className="w-1.5 h-14 bg-gold rounded-full opacity-90 shadow-[0_0_10px_rgba(250,204,21,0.5)]"></div>
+
+                              {/* Right Image */}
+                              <div className="flex-1 h-full rounded-lg overflow-hidden border border-slate-700 relative group-hover:border-gold transition-colors bg-white">
+                                 <img src="/images/faculty_1.png" className="w-[120%] h-[120%] object-contain -ml-[10%] mix-blend-multiply" style={{ objectPosition: "center 30%" }} alt="Mr. Sandeep Sir" />
+                                 <div className="absolute bottom-0 left-0 w-full bg-[#047857] py-1 px-1 text-center">
+                                    <p className="text-[9px] font-black text-white uppercase">Mr. Sandeep Sir</p>
+                                    <p className="text-[7px] font-bold text-emerald-200 uppercase">Expert Faculty</p>
+                                 </div>
+                              </div>
                            </div>
-                        </div>
+                        ) : (
+                           <div className="relative aspect-video overflow-hidden bg-slate-100">
+                              <img src={course.img} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                              <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10">
+                                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
+                              </div>
+                           </div>
+                        )}
                         <div className="p-6 flex-1 flex flex-col items-start bg-white/40">
                            <h3 className="font-extrabold text-slate-900 text-[17px] mb-3 leading-snug group-hover:text-blue-700 transition-colors">{course.title}</h3>
                            <p className="text-[13px] text-slate-600 mb-6 leading-relaxed flex-1 font-medium">{course.desc}</p>
