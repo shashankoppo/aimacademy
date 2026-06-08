@@ -247,7 +247,7 @@ const Index = () => {
 
                               {/* Right Image */}
                               <div className="flex-1 h-full rounded-lg overflow-hidden border border-slate-700 relative group-hover:border-gold transition-colors bg-white">
-                                 <img src="/images/faculty_1.png" className="w-[120%] h-[120%] object-contain -ml-[10%] mix-blend-multiply" style={{ objectPosition: "center 30%" }} alt="Mr. Sandeep Sir" />
+                                 <img src="/images/faculty_5.png" className="w-[120%] h-[120%] object-contain -ml-[10%] mix-blend-multiply" style={{ objectPosition: "center 30%" }} alt="Mr. Sandeep Sir" />
                                  <div className="absolute bottom-0 left-0 w-full bg-[#047857] py-1 px-1 text-center">
                                     <p className="text-[9px] font-black text-white uppercase">Mr. Sandeep Sir</p>
                                     <p className="text-[7px] font-bold text-emerald-200 uppercase">Expert Faculty</p>

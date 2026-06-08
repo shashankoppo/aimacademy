@@ -140,11 +140,14 @@ const defaultSettings: WebsiteSettings = {
   bannerText: "🎉 Happy Birthday to our Founder, Mr. Imran Khan! 🎂 | 🚀 AIM Academy is officially launching today! Admissions Open | Call: +91 70672 31189",
   slides: ["/images/HEROMAIN 007.jpeg", "/images/STUDENT BANNER 01.jpeg", "/images/STUDENT_BANNER.jpeg"],
   faculty: [
-    { name: "Rahul Sir", sub: "History Strategy Expert", img: "/images/faculty_1.png" },
-    { name: "Priya Ma'am", sub: "Science Specialist", img: "/images/faculty_2.png" },
-    { name: "Amit Sir", sub: "Maths Wizard", img: "/images/faculty_3.png" },
-    { name: "Vikas Sir", sub: "Geography Mentor", img: "/images/faculty_4.png" },
-    { name: "Neha Ma'am", sub: "Current Affairs Analysis", img: "/images/faculty_5.png" },
+    { name: "Dr. Imran Khan", sub: "Founder, Director & GS Faculty", img: "/images/founder_solo.png" },
+    { name: "Mr. Sandeep Yadav", sub: "Maths Faculty", img: "/images/faculty_5.png" },
+    { name: "Mr. Irshad Mansoori", sub: "Maths Faculty", img: "/images/faculty_2.png" },
+    { name: "Mr. Shubham Patel", sub: "MP / Current Affairs", img: "/images/faculty_3.png" },
+    { name: "Mr. Abhishek Sengar", sub: "English Faculty", img: "/images/faculty_4.png" },
+    { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png" },
+    { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png" },
+    { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png" },
   ],
 };
 
