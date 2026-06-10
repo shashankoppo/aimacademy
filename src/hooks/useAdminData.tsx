@@ -67,11 +67,22 @@ export interface FacultyMember {
   bio?: string;
 }
 
+export interface UpcomingBatch {
+  title: string;
+  desc: string;
+  status?: string;
+  seatsLeft?: number;
+  totalSeats?: number;
+  img?: string;
+  isCustomSplit?: boolean;
+}
+
 export interface WebsiteSettings {
   id?: number;
   bannerText: string;
   slides: string[];
   faculty: FacultyMember[];
+  upcomingBatches: UpcomingBatch[];
 }
 
 export interface NoteItem {
@@ -148,6 +159,11 @@ const defaultSettings: WebsiteSettings = {
     { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png" },
     { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png" },
     { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png" },
+  ],
+  upcomingBatches: [
+    { title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "ADMISSIONS OPEN", seatsLeft: 12, totalSeats: 100, img: "/images/HEROMAIN 007.jpeg" },
+    { title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "LIMITED SEATS", seatsLeft: 5, totalSeats: 80, img: "/images/STUDENT_BANNER.jpeg" },
+    { title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "NEXT SUNDAY", seatsLeft: 2, totalSeats: 100, isCustomSplit: true },
   ],
 };
 

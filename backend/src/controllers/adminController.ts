@@ -61,6 +61,17 @@ const websiteSettingsSchema = z.object({
       img: z.string().trim().min(1),
     }),
   ).min(1),
+  upcomingBatches: z.array(
+    z.object({
+      title: z.string().trim().min(2),
+      desc: z.string().trim().min(2),
+      status: z.string().trim().optional(),
+      seatsLeft: z.coerce.number().int().nonnegative().optional(),
+      totalSeats: z.coerce.number().int().positive().optional(),
+      img: z.string().trim().optional(),
+      isCustomSplit: z.boolean().optional(),
+    }),
+  ).optional(),
 });
 
 const noteSchema = z.object({
@@ -204,6 +215,11 @@ export const seedAdminData = async () => {
             { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png", bio: "Versatile faculty guiding students in both English and Regional Studies." },
             { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png", bio: "Expert in General Science and technology concepts for competitive exams." },
             { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png", bio: "Bringing historical events and constitutional frameworks to life." },
+          ]),
+          upcomingBatchesJson: JSON.stringify([
+            { title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "ADMISSIONS OPEN", seatsLeft: 12, totalSeats: 100, img: "/images/HEROMAIN 007.jpeg" },
+            { title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "LIMITED SEATS", seatsLeft: 5, totalSeats: 80, img: "/images/STUDENT_BANNER.jpeg" },
+            { title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "NEXT SUNDAY", seatsLeft: 2, totalSeats: 100, isCustomSplit: true },
           ])
         };
         if (existingSettings) {
@@ -250,6 +266,7 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
             bannerText: settings.bannerText,
             slides: JSON.parse(settings.slidesJson),
             faculty: JSON.parse(settings.facultyJson),
+            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
           }
         : null,
     });
@@ -282,6 +299,7 @@ export const getPublicContent = async (_req: Request, res: Response) => {
             bannerText: settings.bannerText,
             slides: JSON.parse(settings.slidesJson),
             faculty: JSON.parse(settings.facultyJson),
+            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
           }
         : null,
     });
@@ -481,7 +499,7 @@ export const getWebsiteSettings = async (_req: Request, res: Response) => {
   try {
     const settings = await prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } });
     if (!settings) return res.status(404).json({ error: "Settings not found" });
-    res.json({ id: settings.id, bannerText: settings.bannerText, slides: JSON.parse(settings.slidesJson), faculty: JSON.parse(settings.facultyJson) });
+    res.json({ id: settings.id, bannerText: settings.bannerText, slides: JSON.parse(settings.slidesJson), faculty: JSON.parse(settings.facultyJson), upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [] });
   } catch (error) {
     handleError(res, error, "Failed to fetch settings");
   }
@@ -491,9 +509,9 @@ export const updateWebsiteSettings = async (req: Request, res: Response) => {
   try {
     const payload = websiteSettingsSchema.parse(req.body);
     const existing = await prisma.websiteSettings.findFirst();
-    const data = { bannerText: payload.bannerText, slidesJson: JSON.stringify(payload.slides), facultyJson: JSON.stringify(payload.faculty) };
+    const data = { bannerText: payload.bannerText, slidesJson: JSON.stringify(payload.slides), facultyJson: JSON.stringify(payload.faculty), upcomingBatchesJson: payload.upcomingBatches ? JSON.stringify(payload.upcomingBatches) : null };
     const updated = existing ? await prisma.websiteSettings.update({ where: { id: existing.id }, data }) : await prisma.websiteSettings.create({ data });
-    res.json({ id: updated.id, bannerText: updated.bannerText, slides: JSON.parse(updated.slidesJson), faculty: JSON.parse(updated.facultyJson) });
+    res.json({ id: updated.id, bannerText: updated.bannerText, slides: JSON.parse(updated.slidesJson), faculty: JSON.parse(updated.facultyJson), upcomingBatches: updated.upcomingBatchesJson ? JSON.parse(updated.upcomingBatchesJson) : [] });
   } catch (error) {
     handleError(res, error, "Failed to update settings");
   }

@@ -40,7 +40,7 @@ const Index = () => {
    ]);
 
    useEffect(() => {
-      if (sessionStorage.getItem(POPUP_CLOSED_KEY) === "true") {
+      if (sessionStorage.getItem(POPUP_CLOSED_KEY) === "true" || localStorage.getItem("lead_submitted") === "true") {
          return;
       }
 
@@ -69,10 +69,11 @@ const Index = () => {
    const handleLeadSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setIsLeadSubmitting(true);
-      // Simulate API call for sending PDF
+      // Simulate API call for lead submission
       setTimeout(() => {
          setIsLeadSubmitting(false);
          setIsLeadSuccess(true);
+         localStorage.setItem("lead_submitted", "true");
          setTimeout(() => {
             closePopup();
             setIsLeadSuccess(false);
@@ -221,13 +222,13 @@ const Index = () => {
                </div>
 
                <div className="grid md:grid-cols-3 gap-8">
-                  {[
-                     { img: "/images/hero_combo_top.jpeg", title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "Admissions Open", filled: 88, seatsLeft: 12 },
-                     { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", filled: 94, seatsLeft: 5 },
-                     { customRender: true, title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", filled: 98, seatsLeft: 2 },
-                  ].map((course, i) => (
+                  {(websiteSettings?.upcomingBatches?.length ? websiteSettings.upcomingBatches : [
+                     { img: "/images/hero_combo_top.jpeg", title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "Admissions Open", totalSeats: 100, seatsLeft: 12 },
+                     { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", totalSeats: 80, seatsLeft: 5 },
+                     { isCustomSplit: true, title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", totalSeats: 100, seatsLeft: 2 },
+                  ]).map((course, i) => (
                      <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full">
-                        {course.customRender ? (
+                        {course.isCustomSplit ? (
                            <div className="relative aspect-video overflow-hidden bg-slate-900 p-3 pb-4 pt-10 flex gap-3 items-center justify-center border-b-[4px] border-[hsl(var(--primary))]">
                               <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10">
                                  <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse-fast"></span> {course.status}
@@ -272,9 +273,9 @@ const Index = () => {
                                  <span className="text-red-500 animate-pulse-fast">Only {course.seatsLeft} Left!</span>
                               </div>
                               <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                                 <div className="h-full bg-[hsl(var(--primary))] rounded-full" style={{ width: `${course.filled}%` }}></div>
+                                 <div className="h-full bg-[hsl(var(--primary))] rounded-full" style={{ width: `${Math.floor(((course.totalSeats || 100) - (course.seatsLeft || 0)) / (course.totalSeats || 100) * 100)}%` }}></div>
                               </div>
-                              <div className="text-[10px] text-right mt-1 font-bold text-slate-400">{course.filled}% Capacity</div>
+                              <div className="text-[10px] text-right mt-1 font-bold text-slate-400">{Math.floor(((course.totalSeats || 100) - (course.seatsLeft || 0)) / (course.totalSeats || 100) * 100)}% Capacity</div>
                            </div>
 
                            <div className="mt-auto w-full">
@@ -479,14 +480,14 @@ const Index = () => {
                   <div className="bg-gradient-to-br from-blue-600 to-indigo-800 p-8 text-center relative overflow-hidden">
                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full -mr-16 -mt-16"></div>
                      <div className="w-16 h-16 bg-white shadow-lg mx-auto rounded-2xl flex items-center justify-center mb-4 transform -rotate-12">
-                        <Download className="w-8 h-8 text-blue-600 transform rotate-12" />
+                        <Award className="w-8 h-8 text-blue-600 transform rotate-12" />
                      </div>
-                     <h2 className="text-2xl font-black text-white leading-tight mb-2">Wait! Do not leave empty handed.</h2>
-                     <p className="text-blue-100 text-xs font-semibold uppercase tracking-wider">Download 5 Years Solved Papers PDF Free</p>
+                     <h2 className="text-2xl font-black text-white leading-tight mb-2">Stay Tuned!</h2>
+                     <p className="text-blue-100 text-xs font-semibold uppercase tracking-wider">Get latest updates & announcements</p>
                   </div>
                   <div className="p-8">
                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> High-Yield 'Sarkari' Target Material
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Receive Exclusive Counseling Offers
                      </div>
                      <form onSubmit={handleLeadSubmit} className="space-y-4">
                         <div>

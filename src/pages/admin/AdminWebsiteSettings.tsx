@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, Layout } from "lucide-react";
 import { toast } from "sonner";
-import { useAdminData, type FacultyMember } from "@/hooks/useAdminData";
+import { useAdminData, type FacultyMember, type UpcomingBatch } from "@/hooks/useAdminData";
 import ImageCropperModal from "@/components/ImageCropperModal";
 
 const AdminWebsiteSettings = () => {
@@ -10,11 +10,12 @@ const AdminWebsiteSettings = () => {
   const [slides, setSlides] = useState<string[]>([]);
   const [bannerText, setBannerText] = useState("");
   const [faculty, setFaculty] = useState<FacultyMember[]>([]);
+  const [upcomingBatches, setUpcomingBatches] = useState<UpcomingBatch[]>([]);
 
   // Cropper states
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string>("");
-  const [cropTarget, setCropTarget] = useState<{ type: 'slide' | 'faculty', index: number } | null>(null);
+  const [cropTarget, setCropTarget] = useState<{ type: 'slide' | 'faculty' | 'batch', index: number } | null>(null);
   const [cropAspectRatio, setCropAspectRatio] = useState<number>(16 / 9);
 
   useEffect(() => {
@@ -22,11 +23,12 @@ const AdminWebsiteSettings = () => {
     setSlides(websiteSettings.slides);
     setBannerText(websiteSettings.bannerText);
     setFaculty(websiteSettings.faculty);
+    setUpcomingBatches(websiteSettings.upcomingBatches || []);
   }, [websiteSettings]);
 
   const handleSave = async () => {
     try {
-      await updateWebsiteSettings({ bannerText, slides, faculty });
+      await updateWebsiteSettings({ bannerText, slides, faculty, upcomingBatches });
       toast.success("Website settings updated successfully! View the homepage to see changes.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update website settings");
@@ -85,12 +87,40 @@ const AdminWebsiteSettings = () => {
     event.target.value = ''; // Reset input
   };
 
+  const addBatch = () => setUpcomingBatches([...upcomingBatches, { title: "New Batch", desc: "Batch description", status: "Admissions Open", seatsLeft: 10, totalSeats: 100, img: "/images/your_new_image.png", isCustomSplit: false }]);
+  const removeBatch = (index: number) => setUpcomingBatches(upcomingBatches.filter((_, current) => current !== index));
+  const updateBatch = (index: number, field: keyof UpcomingBatch, value: any) => {
+    const next = [...upcomingBatches];
+    next[index] = { ...next[index], [field]: value };
+    setUpcomingBatches(next);
+  };
+
+  const handleBatchUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File is too large! Please select an image under 2MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCropImageSrc(reader.result as string);
+      setCropTarget({ type: 'batch', index });
+      setCropAspectRatio(16 / 9);
+      setCropModalOpen(true);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
+
   const handleCropComplete = (croppedImageBase64: string) => {
     if (!cropTarget) return;
     if (cropTarget.type === 'slide') {
       updateSlide(cropTarget.index, croppedImageBase64);
     } else if (cropTarget.type === 'faculty') {
       updateFaculty(cropTarget.index, 'img', croppedImageBase64);
+    } else if (cropTarget.type === 'batch') {
+      updateBatch(cropTarget.index, 'img', croppedImageBase64);
     }
     setCropModalOpen(false);
     setCropTarget(null);
@@ -158,6 +188,75 @@ const AdminWebsiteSettings = () => {
 
                 <button onClick={() => removeSlide(index)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
                   <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Upcoming Batches</h2>
+              <p className="text-sm text-slate-500 font-medium mt-1">Manage the batches displayed on the homepage.</p>
+            </div>
+            <button onClick={addBatch} className="flex items-center gap-2 bg-primary text-slate-900 font-bold py-2 px-4 rounded-lg shadow hover:brightness-105 transition-all text-sm shrink-0">
+              <Plus className="w-4 h-4" /> Add Batch
+            </button>
+          </div>
+          <div className="p-6 space-y-6">
+            {upcomingBatches.map((batch, index) => (
+              <div key={index} className="flex flex-col lg:flex-row items-start lg:items-stretch gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100 relative group">
+                <div className="w-full lg:w-48 h-32 bg-slate-200 rounded-lg overflow-hidden shrink-0 flex items-center justify-center border border-slate-300 relative group/img">
+                  {batch.isCustomSplit ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 p-2 text-center text-white text-xs font-bold leading-tight">
+                      <span>Custom Split Layout</span>
+                      <span className="text-[10px] text-gold mt-1">(Imran Sir & Sandeep Sir)</span>
+                    </div>
+                  ) : (
+                    batch.img ? <img src={batch.img} alt={batch.title} className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-slate-400" />
+                  )}
+                  {!batch.isCustomSplit && (
+                    <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 cursor-pointer transition-opacity">
+                      <span className="text-white text-[10px] font-bold uppercase tracking-wider">Upload</span>
+                      <input type="file" accept="image/*" onChange={(event) => handleBatchUpload(index, event)} className="hidden" />
+                    </label>
+                  )}
+                </div>
+
+                <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Title</label>
+                    <input type="text" value={batch.title} onChange={(e) => updateBatch(index, "title", e.target.value)} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Description</label>
+                    <textarea value={batch.desc} onChange={(e) => updateBatch(index, "desc", e.target.value)} rows={2} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Status Badge (e.g. NEXT SUNDAY)</label>
+                    <input type="text" value={batch.status || ""} onChange={(e) => updateBatch(index, "status", e.target.value)} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Seats Left</label>
+                      <input type="number" value={batch.seatsLeft || 0} onChange={(e) => updateBatch(index, "seatsLeft", parseInt(e.target.value) || 0)} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Total Seats</label>
+                      <input type="number" value={batch.totalSeats || 100} onChange={(e) => updateBatch(index, "totalSeats", parseInt(e.target.value) || 0)} className="w-full font-medium text-slate-700 bg-white border border-slate-300 rounded-lg px-4 py-2 outline-none focus:border-primary transition-all text-sm" />
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 flex items-center mt-2">
+                    <label className="flex items-center gap-2 text-sm font-bold text-slate-700 cursor-pointer">
+                      <input type="checkbox" checked={batch.isCustomSplit || false} onChange={(e) => updateBatch(index, "isCustomSplit", e.target.checked)} className="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary" />
+                      Use Custom Split Photo Layout (For Counseling Seminar)
+                    </label>
+                  </div>
+                </div>
+
+                <button onClick={() => removeBatch(index)} className="absolute -top-3 -right-3 p-2 bg-white text-red-500 shadow-md border border-slate-100 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10">
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             ))}
