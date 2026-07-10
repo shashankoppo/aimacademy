@@ -1,7 +1,19 @@
 import { Link } from "react-router-dom";
-import { Youtube, Instagram, Facebook, Twitter, Mail } from "lucide-react";
+import { Youtube, Instagram, Facebook, Twitter, Mail, Globe } from "lucide-react";
+import { useAdminData } from "@/hooks/useAdminData";
 
 const Footer = () => {
+  const { websiteSettings } = useAdminData();
+  const socialLinks = websiteSettings?.socialLinks || [];
+
+  const getIconForPlatform = (platform: string) => {
+    const p = platform.toLowerCase();
+    if (p.includes('facebook')) return <Facebook className="w-5 h-5"/>;
+    if (p.includes('twitter') || p.includes('x')) return <Twitter className="w-5 h-5"/>;
+    if (p.includes('youtube')) return <Youtube className="w-5 h-5"/>;
+    if (p.includes('instagram')) return <Instagram className="w-5 h-5"/>;
+    return <Globe className="w-5 h-5"/>;
+  };
   return (
     <footer className="bg-white text-slate-600 pt-16 pb-4 border-t border-slate-100">
       <div className="container mx-auto px-4 lg:px-8">
@@ -22,10 +34,11 @@ const Footer = () => {
                AIM Academy is India's most trusted offline education platform that provides affordable & comprehensive learning experience to students for various competitive exams.
              </p>
              <div className="flex gap-4">
-                <a href="#" aria-label="Facebook" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Facebook className="w-5 h-5"/></a>
-                <a href="#" aria-label="Twitter" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Twitter className="w-5 h-5"/></a>
-                <a href="#" aria-label="YouTube" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Youtube className="w-5 h-5"/></a>
-                <a href="#" aria-label="Instagram" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all"><Instagram className="w-5 h-5"/></a>
+                {socialLinks.map((link, i) => (
+                  <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all">
+                    {getIconForPlatform(link.platform)}
+                  </a>
+                ))}
              </div>
           </div>
 
@@ -35,9 +48,9 @@ const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
-              <li><Link to="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link to="/gallery" className="hover:text-primary transition-colors">Gallery</Link></li>
-              <li><Link to="/faqs" className="hover:text-primary transition-colors">FAQS</Link></li>
+              <li><Link to="/courses" className="hover:text-primary transition-colors">Our Courses</Link></li>
+              <li><Link to="/results" className="hover:text-primary transition-colors">Results</Link></li>
+              <li><Link to="/resources" className="hover:text-primary transition-colors">Resources</Link></li>
             </ul>
           </div>
 
@@ -74,9 +87,9 @@ const Footer = () => {
             <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
           </div>
           <div className="flex flex-wrap gap-6">
-            <Link to="/privacy" className="hover:text-primary transition-colors">Privacy policy</Link>
+            <Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
             <span className="text-slate-200 hidden sm:inline">|</span>
-            <Link to="/terms" className="hover:text-primary transition-colors">Terms & Conditions</Link>
+            <Link to="/about" className="hover:text-primary transition-colors">About Us</Link>
           </div>
         </div>
 

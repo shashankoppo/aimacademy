@@ -59,19 +59,33 @@ const websiteSettingsSchema = z.object({
       name: z.string().trim().min(2),
       sub: z.string().trim().min(2),
       img: z.string().trim().min(1),
-    }),
+      bio: z.string().trim().optional(),
+    })
   ).min(1),
   upcomingBatches: z.array(
     z.object({
-      title: z.string().trim().min(2),
-      desc: z.string().trim().min(2),
-      status: z.string().trim().optional(),
-      seatsLeft: z.coerce.number().int().nonnegative().optional(),
-      totalSeats: z.coerce.number().int().positive().optional(),
+      title: z.string().trim().min(1),
+      desc: z.string().trim().min(1),
+      status: z.string().trim().min(1),
+      totalSeats: z.number().int().min(1),
+      seatsLeft: z.number().int().min(0),
       img: z.string().trim().optional(),
       isCustomSplit: z.boolean().optional(),
-    }),
+    })
   ).optional(),
+  socialLinks: z.array(
+    z.object({
+      platform: z.string().trim(),
+      url: z.string().trim()
+    })
+  ).optional(),
+  whatsappTemplates: z.array(
+    z.object({
+      id: z.string().trim(),
+      label: z.string().trim(),
+      message: z.string().trim()
+    })
+  ).optional()
 });
 
 const noteSchema = z.object({
@@ -219,7 +233,34 @@ export const seedAdminData = async () => {
           upcomingBatchesJson: JSON.stringify([
             { title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "ADMISSIONS OPEN", seatsLeft: 12, totalSeats: 100, img: "/images/HEROMAIN 007.jpeg" },
             { title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "LIMITED SEATS", seatsLeft: 5, totalSeats: 80, img: "/images/STUDENT_BANNER.jpeg" },
-            { title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "NEXT SUNDAY", seatsLeft: 2, totalSeats: 100, isCustomSplit: true },
+            { title: "Free Career Counselling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "NEXT SUNDAY", seatsLeft: 2, totalSeats: 100, isCustomSplit: true },
+          ]),
+          socialLinksJson: JSON.stringify([
+            { platform: "Facebook", url: "https://facebook.com/aimacademyjbp" },
+            { platform: "Instagram", url: "https://instagram.com/aimacademyjbp" },
+            { platform: "YouTube", url: "https://youtube.com/aimacademyjbp" }
+          ]),
+          whatsappTemplatesJson: JSON.stringify([
+            {
+              id: "admission",
+              label: "Admission Confirmation",
+              message: "Dear {name},\n\nYour admission to *AIM Academy* has been confirmed for the course: *{course}*.\n\nWelcome to the family! We wish you the very best on your journey to success. 🎓\n\nFor any queries, call us: +91 70672 31189\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_"
+            },
+            {
+              id: "fee",
+              label: "Fee Payment Reminder",
+              message: "Dear {name},\n\nThis is a gentle reminder that your fee installment for *{course}* at *AIM Academy* is due.\n\nKindly clear the dues at the earliest to continue your studies uninterrupted. 📋\n\nContact: +91 70672 31189\n\n– *AIM Academy, Jabalpur*"
+            },
+            {
+              id: "batch",
+              label: "Batch Start Notification",
+              message: "Dear {name},\n\nYour new batch for *{course}* at *AIM Academy* is starting soon! 🚀\n\nPlease report to the institute on time and bring your study materials.\n\nFor schedule details: +91 70672 31189\n\n– *AIM Academy, Jabalpur*"
+            },
+            {
+              id: "result",
+              label: "Result / Selection Update",
+              message: "🎉 Heartiest Congratulations, *{name}*!\n\nYou have successfully cleared your exam and brought glory to *AIM Academy*, Jabalpur.\n\nYour hard work and dedication have paid off. The entire AIM family is proud of you! 🏆\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_"
+            }
           ])
         };
         if (existingSettings) {
@@ -254,22 +295,23 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
     ]);
 
     res.json({
-      students,
-      courses,
-      announcements,
-      staff,
-      notes,
-      videos,
-      websiteSettings: settings
-        ? {
-            id: settings.id,
-            bannerText: settings.bannerText,
-            slides: JSON.parse(settings.slidesJson),
-            faculty: JSON.parse(settings.facultyJson),
-            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
-          }
-        : null,
-    });
+        courses,
+        announcements,
+        staff,
+        notes,
+        videos,
+        websiteSettings: settings
+          ? {
+              id: settings.id,
+              bannerText: settings.bannerText,
+              slides: JSON.parse(settings.slidesJson),
+              faculty: JSON.parse(settings.facultyJson),
+              upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+              socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+              whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+            }
+          : null,
+      });
   } catch (error) {
     handleError(res, error, "Failed to load admin data");
   }
@@ -291,18 +333,20 @@ export const getPublicContent = async (_req: Request, res: Response) => {
     ]);
 
     res.json({
-      notes,
-      videos,
-      websiteSettings: settings
-        ? {
-            id: settings.id,
-            bannerText: settings.bannerText,
-            slides: JSON.parse(settings.slidesJson),
-            faculty: JSON.parse(settings.facultyJson),
-            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
-          }
-        : null,
-    });
+        notes,
+        videos,
+        websiteSettings: settings
+          ? {
+              id: settings.id,
+              bannerText: settings.bannerText,
+              slides: JSON.parse(settings.slidesJson),
+              faculty: JSON.parse(settings.facultyJson),
+              upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+              socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+              whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+            }
+          : null,
+      });
   } catch (error) {
     handleError(res, error, "Failed to load public content");
   }
@@ -499,7 +543,15 @@ export const getWebsiteSettings = async (_req: Request, res: Response) => {
   try {
     const settings = await prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } });
     if (!settings) return res.status(404).json({ error: "Settings not found" });
-    res.json({ id: settings.id, bannerText: settings.bannerText, slides: JSON.parse(settings.slidesJson), faculty: JSON.parse(settings.facultyJson), upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [] });
+    res.json({ 
+      id: settings.id, 
+      bannerText: settings.bannerText, 
+      slides: JSON.parse(settings.slidesJson), 
+      faculty: JSON.parse(settings.facultyJson), 
+      upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+      socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+      whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+    });
   } catch (error) {
     handleError(res, error, "Failed to fetch settings");
   }
@@ -509,9 +561,24 @@ export const updateWebsiteSettings = async (req: Request, res: Response) => {
   try {
     const payload = websiteSettingsSchema.parse(req.body);
     const existing = await prisma.websiteSettings.findFirst();
-    const data = { bannerText: payload.bannerText, slidesJson: JSON.stringify(payload.slides), facultyJson: JSON.stringify(payload.faculty), upcomingBatchesJson: payload.upcomingBatches ? JSON.stringify(payload.upcomingBatches) : null };
+    const data = { 
+      bannerText: payload.bannerText, 
+      slidesJson: JSON.stringify(payload.slides), 
+      facultyJson: JSON.stringify(payload.faculty), 
+      upcomingBatchesJson: payload.upcomingBatches ? JSON.stringify(payload.upcomingBatches) : null,
+      socialLinksJson: payload.socialLinks ? JSON.stringify(payload.socialLinks) : null,
+      whatsappTemplatesJson: payload.whatsappTemplates ? JSON.stringify(payload.whatsappTemplates) : null
+    };
     const updated = existing ? await prisma.websiteSettings.update({ where: { id: existing.id }, data }) : await prisma.websiteSettings.create({ data });
-    res.json({ id: updated.id, bannerText: updated.bannerText, slides: JSON.parse(updated.slidesJson), faculty: JSON.parse(updated.facultyJson), upcomingBatches: updated.upcomingBatchesJson ? JSON.parse(updated.upcomingBatchesJson) : [] });
+    res.json({ 
+      id: updated.id, 
+      bannerText: updated.bannerText, 
+      slides: JSON.parse(updated.slidesJson), 
+      faculty: JSON.parse(updated.facultyJson), 
+      upcomingBatches: updated.upcomingBatchesJson ? JSON.parse(updated.upcomingBatchesJson) : [],
+      socialLinks: updated.socialLinksJson ? JSON.parse(updated.socialLinksJson) : [],
+      whatsappTemplates: updated.whatsappTemplatesJson ? JSON.parse(updated.whatsappTemplatesJson) : []
+    });
   } catch (error) {
     handleError(res, error, "Failed to update settings");
   }

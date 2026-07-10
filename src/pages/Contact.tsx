@@ -9,7 +9,7 @@ const courseOptions = [
   "SSC CGL / CHSL",
   "Banking / IBPS / SBI / RBI",
   "Railways / Defence / Teaching",
-  "Not sure — need counseling",
+  "Not sure — need Counselling",
 ];
 
 const contactInfo = [
@@ -55,7 +55,7 @@ const Contact = () => {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }}
             className="badge-gold inline-flex items-center gap-2 mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" /> Free Counseling Available
+            <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" /> Free Counselling Available
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
             className="heading-display text-5xl md:text-6xl lg:text-7xl text-navy mb-5">
@@ -95,7 +95,7 @@ const Contact = () => {
                   </motion.div>
                   <h2 className="font-display font-bold text-2xl text-navy mb-3">Inquiry Received!</h2>
                   <p className="text-slate-500 font-body mb-2 max-w-xs leading-relaxed text-sm">
-                    Thank you, <span className="text-navy font-semibold">{form.name}</span>! Our counseling team will call you within 24 hours on your registered number.
+                    Thank you, <span className="text-navy font-semibold">{form.name}</span>! Our Counselling team will call you within 24 hours on your registered number.
                   </p>
                   <p className="text-gold-dark text-sm font-bold font-body mb-8">7067231189</p>
                   <button
@@ -196,7 +196,7 @@ const Contact = () => {
 
                     <p className="text-center text-xs text-slate-400 font-body">
                       <CheckCircle2 className="w-3 h-3 inline mr-1 text-gold-dark" />
-                      No spam · Your data is 100% secure · Free counseling · No enrollment fee
+                      No spam · Your data is 100% secure · Free Counselling · No enrollment fee
                     </p>
                   </form>
                 </>
@@ -270,19 +270,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Map */}
-              <div className="glass-card rounded-2xl overflow-hidden flex-1 min-h-[200px] border border-slate-200 shadow-sm">
-                <iframe
-                  title="AIM Academy Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2348.653634085443!2d79.99951111623194!3d23.167098416625442!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3981aea8b3555555%3A0xe5a5a5a5a5a5a5a5!2sAIM%20ACADEMY!5e0!3m2!1sen!2sin!4v1710500000000!5m2!1sen!2sin"
-                  width="100%"
-                  height="220"
 
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
             </motion.div>
           </div>
         </div>

@@ -116,7 +116,7 @@ const Index = () => {
                {/* Floating "Admissions Open" or "Free Consultation" overlay on banner to avoid pricing */}
                <div className="absolute bottom-8 left-8 hidden md:block z-20">
                   <Link to="/contact" className="inline-flex items-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-black text-sm px-6 py-3 rounded-md uppercase tracking-wider shadow-lg hover:brightness-105 transition-all">
-                     <Handshake className="w-4 h-4" /> Book Free Counseling To Secure Seat
+                     <Handshake className="w-4 h-4" /> Book Free Counselling To Secure Seat
                   </Link>
                </div>
             </div>
@@ -178,7 +178,7 @@ const Index = () => {
 
                   <div className="flex-none w-full lg:w-auto">
                      <a href="tel:+917067231189" className="w-full lg:w-auto inline-flex items-center justify-center gap-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] font-black px-8 py-3.5 rounded-full hover:brightness-105 transition-all shadow-[0_4px_15px_rgba(251,225,34,0.3)] uppercase tracking-wide text-[13px]">
-                        <PhoneCall className="w-4 h-4" /> Book Free Counseling
+                        <PhoneCall className="w-4 h-4" /> Book Free Counselling
                      </a>
                   </div>
                </div>
@@ -225,7 +225,7 @@ const Index = () => {
                   {(websiteSettings?.upcomingBatches?.length ? websiteSettings.upcomingBatches : [
                      { img: "/images/hero_combo_top.jpeg", title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "Admissions Open", totalSeats: 100, seatsLeft: 12 },
                      { img: "/images/hero_combo_mid.png", title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "Limited Seats", totalSeats: 80, seatsLeft: 5 },
-                     { isCustomSplit: true, title: "Free Career Counseling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", totalSeats: 100, seatsLeft: 2 },
+                     { isCustomSplit: true, title: "Free Career Counselling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "Next Sunday", totalSeats: 100, seatsLeft: 2 },
                   ]).map((course, i) => (
                      <div key={i} className="card-kgs overflow-hidden flex flex-col group h-full">
                         {course.isCustomSplit ? (
@@ -280,7 +280,7 @@ const Index = () => {
 
                            <div className="mt-auto w-full">
                               <Link to="/contact" className="w-full inline-flex items-center justify-center gap-2 text-[13px] font-black text-slate-800 bg-[hsl(var(--primary))]/20 border border-[hsl(var(--primary))]/30 px-4 py-3 rounded-xl hover:bg-[hsl(var(--primary))] hover:border-[hsl(var(--primary))] transition-all">
-                                 <Handshake className="w-4 h-4" /> SECURE SEAT (FREE COUNSELING)
+                                 <Handshake className="w-4 h-4" /> SECURE SEAT (FREE Counselling)
                               </Link>
                            </div>
                         </div>
@@ -397,23 +397,18 @@ const Index = () => {
                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                   {faculty.map((member, i) => (
                      <div key={i} className="flex flex-col items-center bg-white p-5 rounded-3xl border-2 border-slate-200 shadow-[0_0_15px_rgba(0,0,0,0.15)] hover:shadow-[0_0_25px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300">
-                        <div className="w-28 h-28 sm:w-32 sm:h-32 bg-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-black/10 shadow-inner flex items-center justify-center">
+                        <div className="w-28 h-28 sm:w-32 sm:h-32 bg-gradient-to-br from-slate-100 to-slate-50 rounded-full overflow-hidden mb-4 border-[4px] border-primary/30 shadow-lg flex items-center justify-center">
                            <img
                               src={member.img}
                               alt={member.name}
-                              className={`
-                             transition-all duration-500 mix-blend-multiply
-                             ${member.name === "Amit Sir" ? "w-full h-full object-cover" : "w-[95%] h-[95%] object-contain"}
-                          `}
-                              style={{
-                                 objectPosition:
-                                    member.name === "Rahul Sir" ? "65% center" :
-                                       member.name === "Amit Sir" ? "center 10%" :
-                                          "center",
-                                 transform:
-                                    member.name === "Rahul Sir" ? "scale(1.15)" :
-                                       member.name === "Neha Ma'am" ? "scale(1.1)" :
-                                          "scale(1.0)"
+                              className="w-full h-full object-cover transition-all duration-500"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = `<span class="text-4xl font-black text-slate-300">${member.name.charAt(0)}</span>`;
+                                }
                               }}
                            />
                         </div>
@@ -431,7 +426,7 @@ const Index = () => {
                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
                   <div className="border-l-4 border-blue-600 pl-4 py-1">
                      <h2 className="text-3xl font-black text-slate-900 mb-2 leading-none">Visit Our Offline Centers</h2>
-                     <p className="text-slate-500 font-medium">Walk in for free counseling and demo classes.</p>
+                     <p className="text-slate-500 font-medium">Walk in for free Counselling and demo classes.</p>
                   </div>
                   <a href="tel:+917067231189" className="text-slate-900 font-black text-[13px] uppercase tracking-wide bg-[hsl(var(--primary))] px-8 py-3.5 rounded-full hover:brightness-105 flex items-center gap-2 shadow-sm transition-all">
                      <PhoneCall className="w-4 h-4" /> Helpdesk
@@ -463,9 +458,9 @@ const Index = () => {
                <a href="tel:+917067231189" className="flex-1 py-4 flex items-center justify-center gap-2 border-r border-[hsl(var(--primary-foreground))]/10 active:bg-white/20 transition-colors">
                   <PhoneCall className="w-4 h-4" /> Call Helpdesk
                </a>
-               <a href="/contact" className="flex-1 py-4 flex items-center justify-center gap-2 active:bg-white/20 transition-colors">
+               <Link to="/contact" className="flex-1 py-4 flex items-center justify-center gap-2 active:bg-white/20 transition-colors">
                   <Handshake className="w-4 h-4" /> Secure Seat
-               </a>
+               </Link>
             </div>
          </div>
 
@@ -487,7 +482,7 @@ const Index = () => {
                   </div>
                   <div className="p-8">
                      <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Receive Exclusive Counseling Offers
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Receive Exclusive Counselling Offers
                      </div>
                      <form onSubmit={handleLeadSubmit} className="space-y-4">
                         <div>
@@ -501,9 +496,9 @@ const Index = () => {
                            {isLeadSubmitting ? (
                              <span className="animate-pulse">Processing...</span>
                            ) : isLeadSuccess ? (
-                             <span className="text-emerald-400 flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> PDF Sent to WhatsApp!</span>
+                             <span className="text-emerald-400 flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Submitted Successfully!</span>
                            ) : (
-                             <><Handshake className="w-5 h-5" /> Send PDF Now</>
+                             <><Handshake className="w-5 h-5" /> Submit Details</>
                            )}
                         </button>
                      </form>

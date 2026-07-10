@@ -11,6 +11,7 @@ const AdminWebsiteSettings = () => {
   const [bannerText, setBannerText] = useState("");
   const [faculty, setFaculty] = useState<FacultyMember[]>([]);
   const [upcomingBatches, setUpcomingBatches] = useState<UpcomingBatch[]>([]);
+  const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
 
   // Cropper states
   const [cropModalOpen, setCropModalOpen] = useState(false);
@@ -24,11 +25,12 @@ const AdminWebsiteSettings = () => {
     setBannerText(websiteSettings.bannerText);
     setFaculty(websiteSettings.faculty);
     setUpcomingBatches(websiteSettings.upcomingBatches || []);
+    setSocialLinks(websiteSettings.socialLinks || []);
   }, [websiteSettings]);
 
   const handleSave = async () => {
     try {
-      await updateWebsiteSettings({ bannerText, slides, faculty, upcomingBatches });
+      await updateWebsiteSettings({ ...websiteSettings!, bannerText, slides, faculty, upcomingBatches, socialLinks });
       toast.success("Website settings updated successfully! View the homepage to see changes.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update website settings");
@@ -46,8 +48,8 @@ const AdminWebsiteSettings = () => {
   const handleFileUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("File is too large! Please select an image under 2MB.");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File is too large! Please select an image under 5MB.");
       return;
     }
     const reader = new FileReader();
@@ -72,8 +74,8 @@ const AdminWebsiteSettings = () => {
   const handleFacultyUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 1024 * 1024) {
-      toast.error("File too large! Max 1MB for faculty photos.");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large! Max 5MB for faculty photos.");
       return;
     }
     const reader = new FileReader();
@@ -98,8 +100,8 @@ const AdminWebsiteSettings = () => {
   const handleBatchUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("File is too large! Please select an image under 2MB.");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File is too large! Please select an image under 5MB.");
       return;
     }
     const reader = new FileReader();
@@ -177,7 +179,7 @@ const AdminWebsiteSettings = () => {
                   {slide ? <img src={slide} alt="Preview" className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-slate-400" />}
                   <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
                     <span className="text-white text-[10px] font-bold uppercase tracking-wider">Upload</span>
-                    <input type="file" accept="image/*" onChange={(event) => handleFileUpload(index, event)} className="hidden" />
+                    <input type="file" accept=".png, .svg, .jpg, .jpeg, image/*" onChange={(event) => handleFileUpload(index, event)} className="hidden" />
                   </label>
                 </div>
 
@@ -219,7 +221,7 @@ const AdminWebsiteSettings = () => {
                   {!batch.isCustomSplit && (
                     <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 cursor-pointer transition-opacity">
                       <span className="text-white text-[10px] font-bold uppercase tracking-wider">Upload</span>
-                      <input type="file" accept="image/*" onChange={(event) => handleBatchUpload(index, event)} className="hidden" />
+                      <input type="file" accept=".png, .svg, .jpg, .jpeg, image/*" onChange={(event) => handleBatchUpload(index, event)} className="hidden" />
                     </label>
                   )}
                 </div>
@@ -250,7 +252,7 @@ const AdminWebsiteSettings = () => {
                   <div className="md:col-span-2 flex items-center mt-2">
                     <label className="flex items-center gap-2 text-sm font-bold text-slate-700 cursor-pointer">
                       <input type="checkbox" checked={batch.isCustomSplit || false} onChange={(e) => updateBatch(index, "isCustomSplit", e.target.checked)} className="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary" />
-                      Use Custom Split Photo Layout (For Counseling Seminar)
+                      Use Custom Split Photo Layout (For Counselling Seminar)
                     </label>
                   </div>
                 </div>
@@ -280,7 +282,7 @@ const AdminWebsiteSettings = () => {
                   {member.img ? <img src={member.img} alt={member.name} className="w-full h-full object-cover" /> : <ImageIcon className="w-6 h-6 text-slate-400" />}
                   <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 cursor-pointer transition-opacity">
                     <span className="text-white text-[8px] font-bold uppercase tracking-wider">Change</span>
-                    <input type="file" accept="image/*" onChange={(event) => handleFacultyUpload(index, event)} className="hidden" />
+                    <input type="file" accept=".png, .svg, .jpg, .jpeg, image/*" onChange={(event) => handleFacultyUpload(index, event)} className="hidden" />
                   </label>
                 </div>
 

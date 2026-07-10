@@ -255,6 +255,8 @@ model WebsiteSettings {
   slidesJson String
   facultyJson String
   upcomingBatchesJson String?
+  socialLinksJson String?
+  whatsappTemplatesJson String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now()) @updatedAt
 }

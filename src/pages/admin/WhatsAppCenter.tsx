@@ -1,67 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAdminData } from "@/hooks/useAdminData";
 import { toast } from "sonner";
 import {
   MessageSquare, Send, Users, BookOpen, Bell, CheckCircle2,
-  ExternalLink, Phone, CreditCard, ChevronRight, Clipboard, Edit3
+  ExternalLink, Phone, CreditCard, ChevronRight, Clipboard, Edit3, X, Save
 } from "lucide-react";
 
-const WA_NUMBER = "917067231189"; // Institute WhatsApp number (no + or dashes)
+const WA_NUMBER = "917067231189";
 
-const TEMPLATES = [
-  {
-    id: "admission",
-    label: "Admission Confirmation",
-    icon: CheckCircle2,
-    color: "bg-emerald-50 border-emerald-200 text-emerald-700",
-    iconColor: "text-emerald-500",
-    getMessage: (name: string, course: string) =>
-      `Dear ${name},\n\nYour admission to *AIM Academy* has been confirmed for the course: *${course}*.\n\nWelcome to the family! We wish you the very best on your journey to success. 🎓\n\nFor any queries, call us: +91 70672 31189\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_`,
-  },
-  {
-    id: "fee",
-    label: "Fee Payment Reminder",
-    icon: CreditCard,
-    color: "bg-amber-50 border-amber-200 text-amber-700",
-    iconColor: "text-amber-500",
-    getMessage: (name: string, course: string) =>
-      `Dear ${name},\n\nThis is a gentle reminder that your fee installment for *${course}* at *AIM Academy* is due.\n\nKindly clear the dues at the earliest to continue your studies uninterrupted. 📋\n\nContact: +91 70672 31189\n\n– *AIM Academy, Jabalpur*`,
-  },
-  {
-    id: "batch",
-    label: "Batch Start Notification",
-    icon: BookOpen,
-    color: "bg-blue-50 border-blue-200 text-blue-700",
-    iconColor: "text-blue-500",
-    getMessage: (name: string, course: string) =>
-      `Dear ${name},\n\nYour new batch for *${course}* at *AIM Academy* is starting soon! 🚀\n\nPlease report to the institute on time and bring your study materials.\n\nFor schedule details: +91 70672 31189\n\n– *AIM Academy, Jabalpur*`,
-  },
-  {
-    id: "result",
-    label: "Result / Selection Update",
-    icon: CheckCircle2,
-    color: "bg-purple-50 border-purple-200 text-purple-700",
-    iconColor: "text-purple-500",
-    getMessage: (name: string, _course: string) =>
-      `🎉 Heartiest Congratulations, *${name}*!\n\nYou have successfully cleared your exam and brought glory to *AIM Academy*, Jabalpur.\n\nYour hard work and dedication have paid off. The entire AIM family is proud of you! 🏆\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_`,
-  },
-  {
-    id: "custom",
-    label: "Custom Message",
-    icon: Edit3,
-    color: "bg-slate-50 border-slate-200 text-slate-700",
-    iconColor: "text-slate-500",
-    getMessage: (_name: string, _course: string) => "",
-  },
-];
+const TEMPLATE_ICONS: Record<string, any> = {
+  "admission": { icon: CheckCircle2, color: "bg-emerald-50 border-emerald-200 text-emerald-700", iconColor: "text-emerald-500" },
+  "fee": { icon: CreditCard, color: "bg-amber-50 border-amber-200 text-amber-700", iconColor: "text-amber-500" },
+  "batch": { icon: BookOpen, color: "bg-blue-50 border-blue-200 text-blue-700", iconColor: "text-blue-500" },
+  "result": { icon: CheckCircle2, color: "bg-purple-50 border-purple-200 text-purple-700", iconColor: "text-purple-500" }
+};
 
 const WhatsAppCenter = () => {
-  const { students } = useAdminData();
-  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[0]);
+  const { students, websiteSettings, updateWebsiteSettings } = useAdminData();
+  const [selectedTemplateId, setSelectedTemplateId] = useState("admission");
   const [customMessage, setCustomMessage] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState<number | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingTemplates, setEditingTemplates] = useState<{id: string, label: string, message: string}[]>([]);
+
+  const dbTemplates = websiteSettings?.whatsappTemplates || [];
+  
+  const templates = [
+    ...dbTemplates.map(t => ({
+      ...t,
+      icon: TEMPLATE_ICONS[t.id]?.icon || MessageSquare,
+      color: TEMPLATE_ICONS[t.id]?.color || "bg-slate-50 border-slate-200 text-slate-700",
+      iconColor: TEMPLATE_ICONS[t.id]?.iconColor || "text-slate-500",
+      getMessage: (name: string, course: string) => t.message.replace("{name}", name).replace("{course}", course)
+    })),
+    {
+      id: "custom",
+      label: "Custom Message",
+      icon: Edit3,
+      color: "bg-slate-50 border-slate-200 text-slate-700",
+      iconColor: "text-slate-500",
+      getMessage: (_name: string, _course: string) => "",
+      message: ""
+    }
+  ];
+
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
 
   const filtered = students.filter(
     (s) =>
@@ -107,9 +92,24 @@ const WhatsAppCenter = () => {
       return;
     }
     const selected = students.filter((s) => selectedStudentIds.has(s.id));
-    // Open first student's WhatsApp; rest are queued for individual action
     openWhatsApp(selected[0]);
     toast.info(`Opening WhatsApp for ${selected.length} students. Send individually.`, { duration: 4000 });
+  };
+
+  const handleEditClick = () => {
+    setEditingTemplates(dbTemplates);
+    setIsEditing(true);
+  };
+
+  const saveTemplates = async () => {
+    if (!websiteSettings) return;
+    try {
+      await updateWebsiteSettings({ ...websiteSettings, whatsappTemplates: editingTemplates });
+      toast.success("Templates updated successfully!");
+      setIsEditing(false);
+    } catch (e) {
+      toast.error("Failed to save templates.");
+    }
   };
 
   return (
@@ -139,14 +139,17 @@ const WhatsAppCenter = () => {
         {/* LEFT: Template Chooser */}
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
-            <div className="p-5 border-b border-slate-100 bg-slate-50">
+            <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
               <h2 className="font-black text-slate-900 text-sm uppercase tracking-widest">Message Templates</h2>
+              <button onClick={handleEditClick} className="text-emerald-500 hover:text-emerald-700 font-bold text-xs flex items-center gap-1">
+                <Edit3 className="w-3 h-3"/> Edit
+              </button>
             </div>
             <div className="p-4 space-y-3">
-              {TEMPLATES.map((t) => (
+              {templates.map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setSelectedTemplate(t)}
+                  onClick={() => setSelectedTemplateId(t.id)}
                   className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
                     selectedTemplate.id === t.id
                       ? t.color + " ring-2 ring-offset-1 ring-emerald-400"
@@ -205,7 +208,7 @@ const WhatsAppCenter = () => {
               />
             </div>
 
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-50 max-h-[600px] overflow-y-auto">
               {filtered.map((student) => {
                 const isSelected = selectedStudentIds.has(student.id);
                 const previewMsg = selectedTemplate.id === "custom"
@@ -270,6 +273,46 @@ const WhatsAppCenter = () => {
           </div>
         </div>
       </div>
+
+      {isEditing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">Edit Message Templates</h2>
+                <p className="text-xs font-medium text-slate-500 mt-1">Use {"{name}"} and {"{course}"} as placeholders.</p>
+              </div>
+              <button onClick={() => setIsEditing(false)} className="p-2 bg-white hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-6">
+              {editingTemplates.map((t, index) => (
+                <div key={t.id} className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                  <div className="font-bold text-sm text-slate-700">{t.label}</div>
+                  <textarea
+                    rows={4}
+                    value={t.message}
+                    onChange={(e) => {
+                      const next = [...editingTemplates];
+                      next[index].message = e.target.value;
+                      setEditingTemplates(next);
+                    }}
+                    className="w-full text-sm text-slate-700 bg-white border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-emerald-400 resize-none transition-all"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="p-6 border-t border-slate-100 bg-white flex justify-end">
+              <button onClick={saveTemplates} className="flex items-center gap-2 bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/20">
+                <Save className="w-4 h-4" /> Save Templates
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

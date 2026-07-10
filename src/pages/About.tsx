@@ -54,21 +54,6 @@ const About = () => {
   const { websiteSettings } = useAdminData();
   const team = websiteSettings?.faculty || [];
 
-  useEffect(() => {
-    if (!document.getElementById('google-translate-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.body.appendChild(script);
-      
-      // @ts-ignore
-      window.googleTranslateElementInit = () => {
-        // @ts-ignore
-        new window.google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
-      };
-    }
-  }, []);
 
   return (
     <div className="pt-[3.75rem] page-enter bg-background">
@@ -113,9 +98,7 @@ const About = () => {
       <section className="section-padding bg-transparent border-y border-black/5 relative overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="flex justify-end mb-6">
-            <div id="google_translate_element" className="bg-white/50 p-2 rounded-lg backdrop-blur-sm border border-slate-200"></div>
-          </div>
+
           <div className="grid md:grid-cols-2 gap-10">
             <motion.div 
               initial={{ opacity: 0, x: -30 }} 
@@ -319,10 +302,10 @@ const About = () => {
                   variants={fadeUp}
                   className="group relative bg-white border border-slate-200 hover:border-gold/50 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(250,204,21,0.15)] flex flex-col h-full"
                 >
-                  <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center p-4">
+                  <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center">
                     {/* Decorative Background for Image */}
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100" />
-                    <img src={item.img} alt={item.name} className="relative w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700 ease-out opacity-90 group-hover:opacity-100" />
+                    <img src={item.img} alt={item.name} className="relative w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
                     <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
                     
                     {/* Floating Name Plate Over Image */}

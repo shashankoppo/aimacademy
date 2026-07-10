@@ -116,3 +116,8 @@
 
 #lovable-badge { display: none !important; }
 .lovable-badge { display: none !important; }
+
+/* Google Translate overrides */
+body { top: 0 !important; }
+.goog-te-banner-frame { display: none !important; }
+#goog-gt-tt { display: none !important; }

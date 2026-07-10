@@ -42,6 +42,20 @@ import RequireAuth from "@/auth/RequireAuth";
 
 const queryClient = new QueryClient();
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ((window as any).lenis) {
+        (window as any).lenis.scrollTo(0, { immediate: true });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+  }, [pathname]);
+  return null;
+};
+
 const AppRoutes = () => {
   const location = useLocation();
   return (
@@ -256,16 +270,19 @@ const AppContent = () => {
                       location.pathname.startsWith('/teacher') || 
                       location.pathname.startsWith('/staff');
 
-  return (
-    <GSAPWrapper>
+  const content = (
+    <>
+      <ScrollToTop />
       {!isDashboard && <Navbar />}
       <main className={isDashboard ? "" : "min-h-screen"}>
         <AppRoutes />
       </main>
       {!isDashboard && <Footer />}
       {!isDashboard && <FloatingButtons />}
-    </GSAPWrapper>
+    </>
   );
+
+  return isDashboard ? content : <GSAPWrapper>{content}</GSAPWrapper>;
 };
 
 const App = () => (

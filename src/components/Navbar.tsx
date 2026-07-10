@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Globe, ChevronRight } from "lucide-react";
+import { Globe, Menu, X, ChevronRight } from "lucide-react";
 import { apiRequest } from "@/lib/admin-api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showTranslate, setShowTranslate] = useState(false);
   const [bannerText, setBannerText] = useState(
-    "🚀 Admissions Open for MP PSC & UPSC Foundation Batch 2025-26 | Call +91 70672 31189  •  🏆 AIM Academy: Jabalpur's #1 Selection Hub for 14+ Years  •  🌟 Free Career Counseling with Expert Faculty | Book Now  •  🎓 Exclusive Merit-based Scholarships Available for 2025 Sessions  •  📚 New Batches for SSC, Banking & All Govt Exams Starting Soon  •  📍 Visit our Jabalpur Campus for a Demo Class & Mentorship  •  ✨ 7,000+ Students Already Transformed Their Careers  •  ✅ Join the Legacy of Success | Join AIM Academy - The Synonym of Success"
+    "🚀 Admissions Open for MP PSC & UPSC Foundation Batch 2025-26 | Call +91 70672 31189  •  🏆 AIM Academy: Jabalpur's #1 Selection Hub for 14+ Years  •  🌟 Free Career Counselling with Expert Faculty | Book Now  •  🎓 Exclusive Merit-based Scholarships Available for 2025 Sessions  •  📚 New Batches for SSC, Banking & All Govt Exams Starting Soon  •  📍 Visit our Jabalpur Campus for a Demo Class & Mentorship  •  ✨ 7,000+ Students Already Transformed Their Careers  •  ✅ Join the Legacy of Success | Join AIM Academy - The Synonym of Success"
   );
   const translateRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +63,7 @@ const Navbar = () => {
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "Courses", path: "/courses" },
+    { name: "Results", path: "/results" },
     { name: "Resources", path: "/resources" },
     { name: "Contact", path: "/contact" },
   ];
@@ -97,17 +98,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Search - Hidden on Small Screens */}
-          <div className="hidden xl:flex items-center flex-1 max-w-md mx-8 relative">
-            <div className="absolute left-4 text-slate-400">
-              <Search className="w-4 h-4" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search courses, results, faculty..."
-              className="w-full bg-white/80 border border-slate-300 rounded-full py-2.5 px-10 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all placeholder:text-slate-400"
-            />
-          </div>
+
 
           {/* Desktop Links & Actions */}
           <div className="hidden lg:flex items-center gap-6">
