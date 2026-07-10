@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Edit, Eye, EyeOff, PlayCircle, Plus, Star, Trash2, Youtube } from "lucide-react";
+import { Edit, Eye, EyeOff, PlayCircle, Plus, Star, Trash2, Youtube, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminData, type VideoItem } from "@/hooks/useAdminData";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ const VideoManagement = () => {
   const { videos, addVideo, updateVideo, deleteVideo } = useAdminData();
   const [form, setForm] = useState<VideoForm>(emptyVideo);
   const [editing, setEditing] = useState<VideoItem | null>(null);
+  const [isFetchingInfo, setIsFetchingInfo] = useState(false);
 
   const sortedVideos = useMemo(() => [...videos].sort((a, b) => a.displayOrder - b.displayOrder), [videos]);
 
@@ -73,6 +74,29 @@ const VideoManagement = () => {
     }
   };
 
+  const fetchYoutubeMetadata = async (url: string, isEditing: boolean = false) => {
+    if (!url.trim()) return toast.error("Please enter a YouTube link first");
+    setIsFetchingInfo(true);
+    try {
+      const response = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+      const data = await response.json();
+      if (data.title) {
+        if (isEditing && editing) {
+          setEditing({ ...editing, title: data.title, thumbnailUrl: data.thumbnail_url || editing.thumbnailUrl });
+        } else {
+          setForm({ ...form, title: data.title, thumbnailUrl: data.thumbnail_url || form.thumbnailUrl });
+        }
+        toast.success("YouTube info fetched successfully!");
+      } else {
+        toast.error("Could not fetch YouTube info. Check the URL.");
+      }
+    } catch (err) {
+      toast.error("Failed to fetch YouTube info.");
+    } finally {
+      setIsFetchingInfo(false);
+    }
+  };
+
   return (
     <div className="p-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
@@ -101,7 +125,12 @@ const VideoManagement = () => {
               </div>
               <div className="grid gap-2">
                 <Label>YouTube Link</Label>
-                <Input value={form.youtubeUrl} onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })} />
+                <div className="flex gap-2">
+                  <Input value={form.youtubeUrl} onChange={(e) => setForm({ ...form, youtubeUrl: e.target.value })} placeholder="https://www.youtube.com/watch?v=..." />
+                  <button onClick={() => fetchYoutubeMetadata(form.youtubeUrl)} disabled={isFetchingInfo} type="button" className="flex items-center gap-2 px-4 py-2 font-bold text-sm bg-blue-50 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-all disabled:opacity-50">
+                    <RefreshCw className={`w-4 h-4 ${isFetchingInfo ? "animate-spin" : ""}`} /> Fetch Info
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
@@ -164,12 +193,32 @@ const VideoManagement = () => {
           {editing && (
             <>
               <div className="grid gap-4 py-4">
-                <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
-                <textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} className="min-h-24 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
-                <Input value={editing.youtubeUrl} onChange={(e) => setEditing({ ...editing, youtubeUrl: e.target.value })} />
+                <div className="grid gap-2">
+                  <Label>Title</Label>
+                  <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Description</Label>
+                  <textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} className="min-h-24 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div className="grid gap-2">
+                  <Label>YouTube Link</Label>
+                  <div className="flex gap-2">
+                    <Input value={editing.youtubeUrl} onChange={(e) => setEditing({ ...editing, youtubeUrl: e.target.value })} />
+                    <button onClick={() => fetchYoutubeMetadata(editing.youtubeUrl, true)} disabled={isFetchingInfo} type="button" className="flex items-center gap-2 px-4 py-2 font-bold text-sm bg-blue-50 text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-all disabled:opacity-50">
+                      <RefreshCw className={`w-4 h-4 ${isFetchingInfo ? "animate-spin" : ""}`} /> Fetch Info
+                    </button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <Input type="number" value={editing.displayOrder} onChange={(e) => setEditing({ ...editing, displayOrder: Number(e.target.value) })} />
-                  <Input value={editing.thumbnailUrl} onChange={(e) => setEditing({ ...editing, thumbnailUrl: e.target.value })} />
+                  <div className="grid gap-2">
+                    <Label>Display Order</Label>
+                    <Input type="number" value={editing.displayOrder} onChange={(e) => setEditing({ ...editing, displayOrder: Number(e.target.value) })} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Thumbnail URL</Label>
+                    <Input value={editing.thumbnailUrl} onChange={(e) => setEditing({ ...editing, thumbnailUrl: e.target.value })} />
+                  </div>
                 </div>
               </div>
               <DialogFooter>
