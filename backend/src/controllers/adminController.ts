@@ -295,6 +295,7 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
     ]);
 
     res.json({
+        students,
         courses,
         announcements,
         staff,
