@@ -28,12 +28,14 @@ import AttendanceManagement from "./pages/admin/AttendanceManagement";
 import FeeReminders from "./pages/admin/FeeReminders";
 import StudentManagement from "./pages/admin/StudentManagement";
 import Announcements from "./pages/admin/Announcements";
+import LeadManagement from "./pages/admin/LeadManagement";
 import CourseManagement from "./pages/admin/CourseManagement";
 import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
 import WhatsAppCenter from "./pages/admin/WhatsAppCenter";
 import NotesManagement from "./pages/admin/NotesManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import MockTestManagement from "./pages/admin/MockTestManagement";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
 import { AdminProvider } from "@/hooks/useAdminData";
@@ -221,6 +223,26 @@ const AppRoutes = () => {
             <RequireAuth allowedRoles={["ADMIN"]}>
               <AdminLayout>
                 <CourseManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/mock-tests"
+          element={
+            <RequireAuth allowedRoles={["ADMIN", "TEACHER"]}>
+              <AdminLayout>
+                <MockTestManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/leads"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <LeadManagement />
               </AdminLayout>
             </RequireAuth>
           }

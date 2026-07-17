@@ -82,4 +82,17 @@ router.post("/videos", requirePermission("admin:manage_videos"), addAdminVideo);
 router.put("/videos/:id", requirePermission("admin:manage_videos"), updateAdminVideo);
 router.delete("/videos/:id", requirePermission("admin:manage_videos"), deleteAdminVideo);
 
+import { getMockTests, createMockTest, updateMockTest, deleteMockTest } from '../controllers/mockTestController';
+
+router.get("/mock-tests", requirePermission("teacher:manage_tests"), getMockTests);
+router.post("/mock-tests", requirePermission("teacher:manage_tests"), createMockTest);
+router.put("/mock-tests/:id", requirePermission("teacher:manage_tests"), updateMockTest);
+router.delete("/mock-tests/:id", requirePermission("teacher:manage_tests"), deleteMockTest);
+
+import { getLeads, updateLeadStatus, deleteLead } from '../controllers/leadController';
+
+router.get("/leads", authenticate, getLeads);
+router.put("/leads/:id", authenticate, updateLeadStatus);
+router.delete("/leads/:id", authenticate, deleteLead);
+
 export default router;

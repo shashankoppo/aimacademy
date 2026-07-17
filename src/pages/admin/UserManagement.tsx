@@ -84,7 +84,7 @@ const UserManagement = () => {
         email: form.email.trim() || undefined,
         phone: form.phone.trim() || undefined,
         role: form.role,
-        password: form.password.trim() || undefined,
+        password: form.password || undefined,
         isActive: form.isActive,
       };
       const data = await apiRequest<{ success: true; user: IamUser; tempPassword: string }>("/admin/iam/users", {
@@ -113,8 +113,8 @@ const UserManagement = () => {
       setUpdating(true);
       const payload = {
         name: form.name,
-        email: form.email.trim() || null,
-        phone: form.phone.trim() || null,
+        email: form.email.trim() || undefined,
+        phone: form.phone.trim() || undefined,
         role: form.role,
         isActive: form.isActive,
       };
@@ -259,7 +259,7 @@ const UserManagement = () => {
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create User</DialogTitle>
           </DialogHeader>

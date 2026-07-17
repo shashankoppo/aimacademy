@@ -32,18 +32,29 @@ const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       toast({ title: "Please fill required fields", variant: "destructive" });
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/public/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Failed to submit");
+      
       setSubmitted(true);
       toast({ title: "🎉 Inquiry Submitted!", description: "Our team will contact you within 24 hours." });
-    }, 1200);
+    } catch (err) {
+      toast({ title: "Submission Failed", description: err instanceof Error ? err.message : "Try again later", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

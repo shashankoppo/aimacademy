@@ -24,33 +24,9 @@ const GSAPWrapper: React.FC<GSAPWrapperProps> = ({ children }) => {
 
   // ---------- Lenis smooth scroll init (once) ----------
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
-    });
-
-    lenisInstance = lenis;
-    window.lenis = lenis;
-
-    // Synchronize Lenis with GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-
-    const rafTick = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(rafTick);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      lenis.destroy();
-      gsap.ticker.remove(rafTick);
-      lenisInstance = null;
-      window.lenis = null;
-    };
+    // Lenis removed due to scrolling issues across the site
+    // We now rely on native browser smooth scrolling
+    window.lenis = null;
   }, []);
 
 

@@ -374,3 +374,16 @@ model TeacherResource {
   @@index([courseId])
   @@index([createdByUserId])
 }
+
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  course    String?
+  message   String?
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}

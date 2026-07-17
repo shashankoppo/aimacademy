@@ -46,6 +46,8 @@ app.use(attachRequestId);
 
 // Routes
 app.use('/api/auth', authRoutes);
+import { createLead } from "./controllers/leadController";
+app.post("/api/public/leads", createLead);
 app.get("/api/public/content", getPublicContent);
 app.use('/api/admin', adminRoutes);
 app.use("/api/admin/iam", authenticate, requirePermission("admin:access"), iamRoutes);
