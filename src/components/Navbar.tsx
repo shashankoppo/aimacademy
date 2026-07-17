@@ -68,17 +68,51 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
+  const changeFontSize = (size: number) => {
+    document.documentElement.style.fontSize = `${size}px`;
+  };
+
+  const handleTranslate = (lang: string) => {
+    const selectField = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (selectField) {
+      selectField.value = lang;
+      selectField.dispatchEvent(new Event('change'));
+    }
+    setShowTranslate(false);
+  };
+
   return (
     <header className="w-full z-50 sticky top-0 shadow-md">
-      {/* ── TOP RUNNING NOTIFICATION BANNER ── */}
-      <div className="bg-blue-600 text-white overflow-hidden py-1 relative border-b border-white/10 flex items-center">
-        <div className="animate-marquee whitespace-nowrap flex">
-          <span className="text-[11px] font-bold uppercase tracking-[0.15em] px-24 text-white">
-            {bannerText}
-          </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.15em] px-24 text-white">
-            {bannerText}
-          </span>
+      {/* ── HEADER UTILITY BAR ── */}
+      <div className="bg-blue-600 text-white border-b border-white/10 flex items-center justify-between px-4 lg:px-8 py-1.5 text-xs">
+        <div className="flex items-center gap-4 hidden sm:flex">
+           <span className="font-semibold text-blue-200">Accessibility:</span>
+           <div className="flex items-center gap-2">
+             <button onClick={() => changeFontSize(14)} className="hover:text-[#FFFF00] font-bold" title="Decrease text size">A-</button>
+             <button onClick={() => changeFontSize(16)} className="hover:text-[#FFFF00] font-bold" title="Normal text size">A</button>
+             <button onClick={() => changeFontSize(18)} className="hover:text-[#FFFF00] font-bold" title="Increase text size">A+</button>
+           </div>
+           <div className="h-3 w-px bg-white/20 mx-2"></div>
+           <div className="flex items-center gap-3">
+              <button onClick={() => handleTranslate('en')} className="hover:text-[#FFFF00] font-bold">English</button>
+              <span className="text-white/40">|</span>
+              <button onClick={() => handleTranslate('hi')} className="hover:text-[#FFFF00] font-bold">हिंदी</button>
+           </div>
+        </div>
+
+        {/* Sarkari Naukri Notification Feed (Ticker) */}
+        <div className="flex-1 sm:ml-8 overflow-hidden relative flex items-center">
+           <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider mr-3 shrink-0 z-10 relative shadow-sm">
+             Important
+           </div>
+           <div className="animate-marquee whitespace-nowrap flex w-full">
+            <span className="text-[11px] font-semibold tracking-wide px-8 text-white">
+              {bannerText}
+            </span>
+            <span className="text-[11px] font-semibold tracking-wide px-8 text-white">
+              {bannerText}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -90,7 +124,6 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-3 shrink-0">
             <div className="relative">
               <img src="/images/logo_main.png" alt="Logo" className="w-14 h-14 object-contain" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border-2 border-[#FFFF00]" />
             </div>
             <div className="flex flex-col">
               <span className="font-black text-xl leading-none text-slate-900 tracking-tighter">AIM ACADEMY</span>
@@ -194,7 +227,7 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className="text-xl font-black text-slate-900 p-3 hover:bg-[#FFFF00] rounded-xl flex items-center justify-between group transition-all"
+                  className="text-xl font-black text-slate-900 p-3 hover:bg-slate-100 rounded-xl flex items-center justify-between group transition-all"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}

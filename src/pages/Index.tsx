@@ -94,6 +94,28 @@ const Index = () => {
 
    return (
       <div className="min-h-screen bg-[#FFFF00] font-sans text-slate-800">
+         <h1 className="sr-only">AIM Academy Jabalpur - Best MPPSC & UPSC Coaching in Central India</h1>
+         
+         {/* JSON-LD Structured Data for Local SEO */}
+         <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "AIM Academy",
+              "url": "https://aimacademix.in",
+              "logo": "https://aimacademix.in/images/logo_main.png",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "3rd Floor, Manas Bhawan Extension, Wright Town",
+                "addressLocality": "Jabalpur",
+                "addressRegion": "Madhya Pradesh",
+                "postalCode": "482002",
+                "addressCountry": "IN"
+              },
+              "description": "Best MPPSC, UPSC, SSC and Banking coaching institute in Jabalpur with 14+ years of legacy.",
+              "telephone": "+91-7067231189"
+            })}
+         </script>
 
          {/* ── KGS-STYLE HERO (FULL WIDTH SLIDER) ── */}
          <section className="w-full relative group bg-transparent border-b border-black/5">
@@ -308,19 +330,22 @@ const Index = () => {
                         <Youtube className="w-4 h-4" /> Watch All Videos
                      </Link>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
                      {visibleVideos.map((video) => (
-                        <button key={video.id} type="button" onClick={() => setActiveVideo(video)} className="bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden group cursor-pointer border border-slate-800 shadow-lg block text-left">
-                           <img src={video.thumbnailUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt={video.title} />
-                           <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-10 h-12 bg-red-600 text-white rounded flex items-center justify-center group-hover:bg-red-500 transition-colors">
-                                 <Play className="w-5 h-5 ml-0.5" />
+                        <figure key={video.id} className="m-0 relative group">
+                           <button type="button" onClick={() => setActiveVideo(video)} className="w-full bg-slate-900 rounded-xl aspect-[4/3] relative overflow-hidden cursor-pointer border border-slate-800 shadow-lg block text-left">
+                              <img src={video.thumbnailUrl} loading="lazy" className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" alt={video.title} />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                 <div className="w-10 h-12 bg-red-600 text-white rounded flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                                    <Play className="w-5 h-5 ml-0.5" />
+                                 </div>
                               </div>
-                           </div>
-                           <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                              <p className="text-white text-[11px] font-bold leading-snug">{video.title}</p>
-                           </div>
-                        </button>
+                              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
+                                 <p className="text-white text-[11px] font-bold leading-snug">{video.title}</p>
+                              </div>
+                           </button>
+                           <figcaption className="sr-only">Success testimonial from an AIM Academy student ranking top from the Jabalpur batch. {video.title}</figcaption>
+                        </figure>
                      ))}
                   </div>
                   {visibleVideos.length === 0 && (
@@ -464,45 +489,36 @@ const Index = () => {
             </div>
          </div>
 
-         {/* ── LEAD MAGNET EXIT-INTENT POPUP ── */}
+         {/* ── NON-INTRUSIVE FLOATING WIDGET ── */}
          {showPopup && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center">
-               <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closePopup}></div>
-               <div className="bg-white max-w-md w-[90%] mx-auto rounded-3xl overflow-hidden shadow-2xl relative z-10 animate-in zoom-in duration-300">
-                  <button onClick={closePopup} className="absolute top-4 right-4 w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-200 transition-colors z-20">
-                     <X className="w-4 h-4" />
+            <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[100] max-w-sm w-[calc(100%-2rem)] md:w-80 animate-in slide-in-from-bottom-8 duration-300">
+               <div className="bg-white rounded-2xl overflow-hidden shadow-2xl relative border border-slate-200">
+                  <button onClick={closePopup} className="absolute top-3 right-3 w-7 h-7 bg-white text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors z-20 shadow-sm border border-slate-200">
+                     <X className="w-3.5 h-3.5" />
                   </button>
-                  <div className="bg-gradient-to-br from-blue-600 to-indigo-800 p-8 text-center relative overflow-hidden">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-2xl rounded-full -mr-16 -mt-16"></div>
-                     <div className="w-16 h-16 bg-white shadow-lg mx-auto rounded-2xl flex items-center justify-center mb-4 transform -rotate-12">
-                        <Award className="w-8 h-8 text-blue-600 transform rotate-12" />
-                     </div>
-                     <h2 className="text-2xl font-black text-white leading-tight mb-2">Stay Tuned!</h2>
-                     <p className="text-blue-100 text-xs font-semibold uppercase tracking-wider">Get latest updates & announcements</p>
+                  <div className="bg-blue-600 p-4 pr-10 relative overflow-hidden">
+                     <h2 className="text-lg font-black text-white leading-tight">Request Free Roadmap</h2>
+                     <p className="text-white/80 text-[10px] font-semibold uppercase tracking-wider mt-1">Get Expert Career Guidance</p>
                   </div>
-                  <div className="p-8">
-                     <div className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Receive Exclusive Counselling Offers
-                     </div>
-                     <form onSubmit={handleLeadSubmit} className="space-y-4">
+                  <div className="p-4">
+                     <form onSubmit={handleLeadSubmit} className="space-y-3">
                         <div>
                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">WhatsApp Number</label>
                            <div className="flex relative">
-                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-900 font-bold">+91</span>
-                              <input type="tel" required pattern="[0-9]{10}" placeholder="Enter 10 digit number" className="w-full bg-slate-50 border border-slate-200 pl-12 pr-4 py-3.5 rounded-xl outline-none focus:border-blue-500 font-bold text-slate-900 transition-colors" disabled={isLeadSubmitting || isLeadSuccess} />
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-900 font-bold text-sm">+91</span>
+                              <input type="tel" required pattern="[0-9]{10}" placeholder="10 digit number" className="w-full bg-slate-50 border border-slate-200 pl-12 pr-3 py-2.5 rounded-lg outline-none focus:border-blue-500 text-sm font-bold text-slate-900 transition-colors" disabled={isLeadSubmitting || isLeadSuccess} />
                            </div>
                         </div>
-                        <button type="submit" disabled={isLeadSubmitting || isLeadSuccess} className="w-full bg-slate-900 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.2)] hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-70">
+                        <button type="submit" disabled={isLeadSubmitting || isLeadSuccess} className="w-full bg-blue-700 text-white font-black uppercase tracking-wider py-2.5 rounded-lg shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-sm disabled:opacity-70">
                            {isLeadSubmitting ? (
                              <span className="animate-pulse">Processing...</span>
                            ) : isLeadSuccess ? (
-                             <span className="text-emerald-400 flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> Submitted Successfully!</span>
+                             <span className="text-emerald-300 flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Success!</span>
                            ) : (
-                             <><Handshake className="w-5 h-5" /> Submit Details</>
+                             <><Handshake className="w-4 h-4" /> Submit Request</>
                            )}
                         </button>
                      </form>
-                     <p className="text-[10px] text-center text-slate-400 font-medium mt-4">We respect your privacy. No spam, just pure value.</p>
                   </div>
                </div>
             </div>

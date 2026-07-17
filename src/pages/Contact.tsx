@@ -15,8 +15,8 @@ const courseOptions = [
 const contactInfo = [
   { icon: Phone, label: "Call Us",    value: "7067231189, 6232051184",     href: "tel:+917067231189",          desc: "Mon–Sat · 8:00 AM – 8:45 PM" },
   { icon: Mail,  label: "Email Us",   value: "info@aimacademy.in",          href: "mailto:info@aimacademy.in",  desc: "Reply within 24 hours" },
-  { icon: MapPin,label: "Branch 1 (Ranjhi)", value: "Main Road Ranjhi, Adarsh Market", href: undefined, desc: "Beside Police Petrol Pump, Jabalpur" },
-  { icon: MapPin,label: "Branch 2 (Adhartal)", value: "Main road Adhartal. Beside Indore sweets, Kesri traders.", href: undefined, desc: "Opposite to Durga patr emporium." },
+  { icon: MapPin,label: "Branch 1 (Ranjhi, Jabalpur)", value: "Main Road Ranjhi, Adarsh Market", href: undefined, desc: "Beside Police Petrol Pump, Jabalpur, Madhya Pradesh 482005" },
+  { icon: MapPin,label: "Branch 2 (Adhartal, Jabalpur)", value: "Main road Adhartal. Beside Indore sweets, Kesri traders.", href: undefined, desc: "Opposite to Durga patr emporium, Jabalpur, Madhya Pradesh 482004" },
 ];
 
 const fadeUp = {
@@ -138,13 +138,17 @@ const Contact = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="text-xs font-bold text-navy/40 mb-2 block font-body uppercase tracking-wider">Phone <span className="text-ember">*</span></label>
-                        <input
-                          value={form.phone}
-                          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                          placeholder="+91 XXXXX XXXXX"
-                          maxLength={15}
-                          className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-white text-sm font-body text-navy placeholder-slate-300 focus:outline-none focus:border-gold/40 focus:ring-4 focus:ring-gold/5 transition-all shadow-sm"
-                        />
+                        <div className="relative flex items-center">
+                          <span className="absolute left-4 text-slate-900 font-bold">+91</span>
+                          <input
+                            value={form.phone}
+                            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                            placeholder="Enter 10 digit number"
+                            maxLength={10}
+                            pattern="[0-9]{10}"
+                            className="w-full pl-14 pr-4 py-3.5 rounded-xl border border-slate-200 bg-white text-sm font-body text-navy placeholder-slate-400 focus:outline-none focus:border-gold/40 focus:ring-4 focus:ring-gold/5 transition-all shadow-sm"
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="text-xs font-bold text-navy/40 mb-2 block font-body uppercase tracking-wider">Email</label>
