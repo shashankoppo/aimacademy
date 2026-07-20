@@ -6,15 +6,35 @@
 
 @layer base {
   :root {
-    --background: 60 100% 50%; /* #FFFF00 */
-    --foreground: 222.2 84% 4.9%; /* slate-900 */
-    /* Light Yellow Focus - Clean, professional but vibrant like top edtechs */
-    --primary: 48 96% 58%; /* Clean lighter yellow (#FBE122 approx) */
-    --primary-foreground: 222 47% 11%;  /* Dark text on yellow for contrast */
-    --secondary: 219 73% 36%; /* Deep blue for accents */
+    --background: 210 20% 98%; /* #F8F9FA Off-White */
+    --foreground: 222.2 84% 4.9%; /* Slate-900 */
+    
+    --card: 0 0% 100%; /* Pure White */
+    --card-foreground: 222.2 84% 4.9%;
+    
+    --popover: 0 0% 100%; /* Pure White */
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    --primary: 213 71% 15%; /* #0B2240 Navy */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 224 76% 48%; /* #1D4ED8 Blue */
     --secondary-foreground: 0 0% 100%;
-    --accent: 13 94% 54%; 
+    
+    --accent: 22 84% 55%; /* #EA580C Saffron */
     --accent-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 213 71% 15%;
+    
+    --radius: 0.5rem;
   }
 }
 
