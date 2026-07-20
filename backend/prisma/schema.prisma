@@ -230,6 +230,7 @@ model AdminStudent {
   updatedAt            DateTime     @default(now()) @updatedAt
   courseId             Int?
   courseRef            AdminCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  customFeesJson       String       @default("[]")
 
   courseAccesses StudentCourseAccess[]
   mockAttempts   MockTestAttempt[]

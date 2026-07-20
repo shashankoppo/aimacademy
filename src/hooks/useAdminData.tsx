@@ -25,6 +25,7 @@ export interface Student {
   remindersSent: number;
   lastReminderAt?: string | null;
   courseId?: number | null;
+  customFeesJson?: string;
 }
 
 export interface Course {

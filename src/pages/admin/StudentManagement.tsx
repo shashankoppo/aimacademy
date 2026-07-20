@@ -24,7 +24,61 @@ const initialForm = (): StudentForm => ({
   nextInstallmentLabel: "Installment 1",
   nextInstallmentAmount: 0,
   nextDueDate: new Date().toISOString().slice(0, 10),
+  customFeesJson: "[]",
 });
+
+const CustomFeeManager = ({ student, onChange }: { student: any, onChange: (val: string) => void }) => {
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+
+  let fees: { title: string; amount: number; isPaid: boolean }[] = [];
+  try { fees = JSON.parse(student.customFeesJson || "[]"); } catch (e) {}
+
+  const handleAdd = () => {
+    if (!title || !amount) return;
+    const newFees = [...fees, { title, amount: Number(amount), isPaid: false }];
+    onChange(JSON.stringify(newFees));
+    setTitle("");
+    setAmount("");
+  };
+
+  const handleRemove = (index: number) => {
+    const newFees = [...fees];
+    newFees.splice(index, 1);
+    onChange(JSON.stringify(newFees));
+  };
+
+  const togglePaid = (index: number) => {
+    const newFees = [...fees];
+    newFees[index].isPaid = !newFees[index].isPaid;
+    onChange(JSON.stringify(newFees));
+  };
+
+  return (
+    <div className="grid gap-2 col-span-2 border border-slate-200 rounded-lg p-3 bg-slate-50">
+      <Label className="text-sm font-bold text-slate-700">Custom Fees & Charges</Label>
+      {fees.length > 0 && (
+        <div className="flex flex-col gap-2 mb-2">
+          {fees.map((f, i) => (
+            <div key={i} className="flex items-center justify-between bg-white p-2 border border-slate-200 rounded-md">
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked={f.isPaid} onChange={() => togglePaid(i)} className="w-4 h-4 accent-primary" />
+                <span className={`text-sm font-medium ${f.isPaid ? 'line-through text-slate-400' : 'text-slate-700'}`}>{f.title}</span>
+                <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Rs. {f.amount}</span>
+              </div>
+              <button onClick={() => handleRemove(i)} className="text-red-500 hover:bg-red-50 p-1 rounded-md"><Trash2 className="w-4 h-4" /></button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <Input placeholder="Fee title (e.g. Late Fine)" value={title} onChange={e => setTitle(e.target.value)} className="flex-1 bg-white" />
+        <Input type="number" placeholder="Amount" value={amount} onChange={e => setAmount(e.target.value)} className="w-24 bg-white" />
+        <button onClick={handleAdd} type="button" className="bg-slate-900 text-white px-3 rounded-lg hover:bg-slate-800"><Plus className="w-4 h-4" /></button>
+      </div>
+    </div>
+  );
+};
 
 const StudentManagement = () => {
   const { students, courses, addStudent, updateStudent, deleteStudent, loading } = useAdminData();
@@ -238,6 +292,7 @@ const StudentManagement = () => {
                     <Label htmlFor="phone">Phone</Label>
                     <Input id="phone" value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} />
                   </div>
+                  <CustomFeeManager student={newStudent} onChange={(val) => setNewStudent({ ...newStudent, customFeesJson: val })} />
                 </div>
               </div>
               <DialogFooter>
@@ -414,6 +469,32 @@ const StudentManagement = () => {
                 <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Next Due Date</p>
                 <p className="font-bold text-slate-800">{viewingStudent.nextDueDate}</p>
               </div>
+              
+              {viewingStudent.customFeesJson && viewingStudent.customFeesJson !== "[]" && (
+                <div className="col-span-2 mt-2 pt-4 border-t border-slate-100">
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Custom Fees & Charges</p>
+                  <div className="flex flex-col gap-2">
+                    {(() => {
+                      try {
+                        const fees = JSON.parse(viewingStudent.customFeesJson);
+                        return fees.map((f: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-100">
+                            <span className={`text-sm font-medium ${f.isPaid ? 'line-through text-slate-400' : 'text-slate-700'}`}>{f.title}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-bold text-slate-500">Rs. {f.amount}</span>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${f.isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                {f.isPaid ? 'Paid' : 'Unpaid'}
+                              </span>
+                            </div>
+                          </div>
+                        ));
+                      } catch (e) {
+                        return null;
+                      }
+                    })()}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -496,6 +577,7 @@ const StudentManagement = () => {
                     <Label>Phone</Label>
                     <Input value={editingStudent.phone} onChange={(e) => setEditingStudent({ ...editingStudent, phone: e.target.value })} />
                   </div>
+                  <CustomFeeManager student={editingStudent} onChange={(val) => setEditingStudent({ ...editingStudent, customFeesJson: val })} />
                 </div>
               </div>
               <DialogFooter>

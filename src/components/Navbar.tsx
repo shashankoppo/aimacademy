@@ -162,36 +162,6 @@ const Navbar = () => {
                 <Globe className={`w-4 h-4 ${showTranslate ? "animate-spin-slow" : ""}`} />
                 <span>LAN / हिंदी</span>
               </button>
-
-              <div 
-                className={`absolute right-0 top-[calc(100%+12px)] bg-white border-2 border-slate-900 rounded-2xl shadow-[8px_8px_0px_rgba(0,0,0,0.1)] p-5 min-w-[260px] z-[500] transition-all duration-300 ${
-                  showTranslate ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible"
-                }`}
-              >
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[11px] text-slate-500 font-black uppercase tracking-widest">
-                      Translate Page
-                    </p>
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  </div>
-                  
-                  {/* GOOGLE TRANSLATE TARGET ID - ALWAYS PRESENT FOR SCRIPT */}
-                  <div
-                    id="google_translate_element"
-                    className="
-                      [&_.goog-te-gadget]:font-sans [&_.goog-te-gadget]:!text-[0px]
-                      [&_select]:w-full [&_select]:rounded-xl [&_select]:border-2 [&_select]:border-slate-200
-                      [&_select]:px-4 [&_select]:py-3 [&_select]:text-sm [&_select]:outline-none
-                      [&_select]:bg-slate-50 [&_select]:cursor-pointer [&_select]:font-bold
-                      [&_select:hover]:border-slate-900
-                      [&_.goog-logo-link]:hidden [&_.goog-te-gadget-simple]:border-none
-                      [&_.goog-te-gadget-icon]:hidden
-                    "
-                  />
-                  <p className="text-[10px] text-slate-400 mt-4 italic text-center">
-                    Select your preferred language
-                  </p>
-              </div>
             </div>
 
             <Link 
@@ -248,6 +218,38 @@ const Navbar = () => {
           </div>
         )}
       </nav>
+
+      {/* Global Translate Dropdown - Works for both Desktop and Mobile toggles */}
+      <div 
+        className={`absolute right-4 lg:right-8 top-[110px] lg:top-[90px] bg-white border-2 border-slate-900 rounded-2xl shadow-[8px_8px_0px_rgba(0,0,0,0.1)] p-5 min-w-[260px] z-[500] transition-all duration-300 ${
+          showTranslate ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible"
+        }`}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[11px] text-slate-500 font-black uppercase tracking-widest">
+            Translate Page
+          </p>
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+        </div>
+        
+        {/* GOOGLE TRANSLATE TARGET ID - ALWAYS PRESENT FOR SCRIPT */}
+        <div
+          id="google_translate_element"
+          className="
+            [&_.goog-te-gadget]:font-sans [&_.goog-te-gadget]:!text-[0px]
+            [&_select]:w-full [&_select]:rounded-xl [&_select]:border-2 [&_select]:border-slate-200
+            [&_select]:px-4 [&_select]:py-3 [&_select]:text-sm [&_select]:outline-none
+            [&_select]:bg-slate-50 [&_select]:cursor-pointer [&_select]:font-bold
+            [&_select:hover]:border-slate-900
+            [&_.goog-logo-link]:hidden [&_.goog-te-gadget-simple]:border-none
+            [&_.goog-te-gadget-icon]:hidden
+          "
+        />
+        <p className="text-[10px] text-slate-400 mt-4 italic text-center">
+          Select your preferred language
+        </p>
+      </div>
+
     </header>
   );
 };
