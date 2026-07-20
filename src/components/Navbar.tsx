@@ -10,6 +10,8 @@ const Navbar = () => {
     "🚀 Admissions Open for MP PSC & UPSC Foundation Batch 2025-26 | Call +91 70672 31189  •  🏆 AIM Academy: Jabalpur's #1 Selection Hub for 14+ Years  •  🌟 Free Career Counselling with Expert Faculty | Book Now  •  🎓 Exclusive Merit-based Scholarships Available for 2025 Sessions  •  📚 New Batches for SSC, Banking & All Govt Exams Starting Soon  •  📍 Visit our Jabalpur Campus for a Demo Class & Mentorship  •  ✨ 7,000+ Students Already Transformed Their Careers  •  ✅ Join the Legacy of Success | Join AIM Academy - The Synonym of Success"
   );
   const translateRef = useRef<HTMLDivElement>(null);
+  const mobileTranslateRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadBanner = async () => {
@@ -51,9 +53,15 @@ const Navbar = () => {
   // Close translate dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (translateRef.current && !translateRef.current.contains(e.target as Node)) {
-        setShowTranslate(false);
+      const target = e.target as Node;
+      if (
+        (translateRef.current && translateRef.current.contains(target)) ||
+        (mobileTranslateRef.current && mobileTranslateRef.current.contains(target)) ||
+        (dropdownRef.current && dropdownRef.current.contains(target))
+      ) {
+        return;
       }
+      setShowTranslate(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -175,6 +183,7 @@ const Navbar = () => {
           {/* Mobile Actions */}
           <div className="flex lg:hidden items-center gap-3">
              <button 
+               ref={mobileTranslateRef}
                onClick={() => setShowTranslate(!showTranslate)}
                className={`p-2 rounded-full border-2 transition-all ${showTranslate ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-900 border-slate-200"}`}
              >
@@ -221,6 +230,7 @@ const Navbar = () => {
 
       {/* Global Translate Dropdown - Works for both Desktop and Mobile toggles */}
       <div 
+        ref={dropdownRef}
         className={`absolute right-4 lg:right-8 top-[110px] lg:top-[90px] bg-white border-2 border-slate-900 rounded-2xl shadow-[8px_8px_0px_rgba(0,0,0,0.1)] p-5 min-w-[260px] z-[500] transition-all duration-300 ${
           showTranslate ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-2 invisible"
         }`}
