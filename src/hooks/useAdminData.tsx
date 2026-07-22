@@ -26,6 +26,8 @@ export interface Student {
   lastReminderAt?: string | null;
   courseId?: number | null;
   customFeesJson?: string;
+  photoUrl?: string;
+  applicationFormUrl?: string;
 }
 
 export interface Course {

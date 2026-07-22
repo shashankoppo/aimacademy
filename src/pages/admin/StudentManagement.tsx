@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Search, Plus, Download, Edit, Trash2, Eye, Users, BookOpen, Calendar, BarChart3 } from "lucide-react";
 import { useAdminData, type Student, type FeeStatus } from "@/hooks/useAdminData";
+import { uploadFile, API_BASE_URL } from "@/lib/admin-api";
 import { getAttendanceColor } from "@/lib/academic-logic";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -91,6 +92,11 @@ const StudentManagement = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [formFile, setFormFile] = useState<File | null>(null);
+  const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
+  const [editFormFile, setEditFormFile] = useState<File | null>(null);
+
   const courseTitles = courses.map((course) => course.title);
 
   const filteredStudents = students.filter((student) => {
@@ -177,9 +183,23 @@ const StudentManagement = () => {
 
     setIsCreating(true);
     try {
-      const payload = populateFees(newStudent.course, newStudent) as StudentForm;
+      let photoUrl = newStudent.photoUrl;
+      let applicationFormUrl = newStudent.applicationFormUrl;
+
+      if (photoFile) {
+        const res = await uploadFile(photoFile);
+        photoUrl = res.url;
+      }
+      if (formFile) {
+        const res = await uploadFile(formFile);
+        applicationFormUrl = res.url;
+      }
+
+      const payload = populateFees(newStudent.course, { ...newStudent, photoUrl, applicationFormUrl }) as StudentForm;
       await addStudent(payload);
       setNewStudent(initialForm());
+      setPhotoFile(null);
+      setFormFile(null);
       toast.success("Student added successfully");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to add student");
@@ -198,9 +218,23 @@ const StudentManagement = () => {
 
     setIsUpdating(true);
     try {
-      const payload = populateFees(editingStudent.course, editingStudent) as Student;
+      let photoUrl = editingStudent.photoUrl;
+      let applicationFormUrl = editingStudent.applicationFormUrl;
+
+      if (editPhotoFile) {
+        const res = await uploadFile(editPhotoFile);
+        photoUrl = res.url;
+      }
+      if (editFormFile) {
+        const res = await uploadFile(editFormFile);
+        applicationFormUrl = res.url;
+      }
+
+      const payload = populateFees(editingStudent.course, { ...editingStudent, photoUrl, applicationFormUrl }) as Student;
       await updateStudent(editingStudent.id, payload);
       setEditingStudent(null);
+      setEditPhotoFile(null);
+      setEditFormFile(null);
       toast.success("Student updated successfully");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update student");
@@ -291,6 +325,14 @@ const StudentManagement = () => {
                   <div className="grid gap-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input id="phone" value={newStudent.phone} onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Student Photo</Label>
+                    <Input type="file" accept="image/*" onChange={(e) => setPhotoFile(e.target.files?.[0] || null)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Application Form Image</Label>
+                    <Input type="file" accept="image/*" onChange={(e) => setFormFile(e.target.files?.[0] || null)} />
                   </div>
                   <CustomFeeManager student={newStudent} onChange={(val) => setNewStudent({ ...newStudent, customFeesJson: val })} />
                 </div>
@@ -445,6 +487,11 @@ const StudentManagement = () => {
           </DialogHeader>
           {viewingStudent && (
             <div className="grid grid-cols-2 gap-4 text-sm py-4">
+              {viewingStudent.photoUrl && (
+                <div className="col-span-2 flex justify-center mb-4">
+                  <img src={`${API_BASE_URL.replace('/api', '')}${viewingStudent.photoUrl}`} alt="Student Photo" className="w-24 h-24 object-cover rounded-full border-4 border-slate-100 shadow-md" />
+                </div>
+              )}
               <div>
                 <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Name</p>
                 <p className="font-bold text-slate-800">{viewingStudent.name}</p>
@@ -469,6 +516,15 @@ const StudentManagement = () => {
                 <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Next Due Date</p>
                 <p className="font-bold text-slate-800">{viewingStudent.nextDueDate}</p>
               </div>
+
+              {viewingStudent.applicationFormUrl && (
+                <div className="col-span-2 mt-2 pt-4 border-t border-slate-100">
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Application Form</p>
+                  <a href={`${API_BASE_URL.replace('/api', '')}${viewingStudent.applicationFormUrl}`} target="_blank" rel="noreferrer" className="text-primary font-bold hover:underline">
+                    View Uploaded Form
+                  </a>
+                </div>
+              )}
               
               {viewingStudent.customFeesJson && viewingStudent.customFeesJson !== "[]" && (
                 <div className="col-span-2 mt-2 pt-4 border-t border-slate-100">
@@ -576,6 +632,14 @@ const StudentManagement = () => {
                   <div className="grid gap-2">
                     <Label>Phone</Label>
                     <Input value={editingStudent.phone} onChange={(e) => setEditingStudent({ ...editingStudent, phone: e.target.value })} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Student Photo (Update)</Label>
+                    <Input type="file" accept="image/*" onChange={(e) => setEditPhotoFile(e.target.files?.[0] || null)} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Application Form (Update)</Label>
+                    <Input type="file" accept="image/*" onChange={(e) => setEditFormFile(e.target.files?.[0] || null)} />
                   </div>
                   <CustomFeeManager student={editingStudent} onChange={(val) => setEditingStudent({ ...editingStudent, customFeesJson: val })} />
                 </div>

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteResource = exports.updateResource = exports.createResource = exports.listResources = exports.getTeacherAnalytics = exports.publishResults = exports.deleteMockTest = exports.updateMockTest = exports.createMockTest = exports.listMockTests = exports.assignCourseAccess = exports.listStudentsForTeacher = exports.getTeacherDashboard = void 0;
+exports.updateMockTestQuestions = exports.getMockTestQuestions = exports.deleteResource = exports.updateResource = exports.createResource = exports.listResources = exports.getTeacherAnalytics = exports.publishResults = exports.deleteMockTest = exports.updateMockTest = exports.createMockTest = exports.listMockTests = exports.assignCourseAccess = exports.listStudentsForTeacher = exports.getTeacherDashboard = void 0;
 const zod_1 = require("zod");
 const prisma_1 = require("../prisma");
 function parseIntParam(value) {
@@ -336,3 +336,56 @@ const deleteResource = async (req, res) => {
     res.json({ success: true });
 };
 exports.deleteResource = deleteResource;
+const getMockTestQuestions = async (req, res) => {
+    const userId = req.authUser.id;
+    const testId = req.params.id;
+    const test = await prisma_1.prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+    if (!test)
+        return res.status(404).json({ success: false, message: "Mock test not found." });
+    const questions = await prisma_1.prisma.mockQuestion.findMany({
+        where: { mockTestId: test.id },
+        orderBy: { order: "asc" },
+    });
+    res.json({
+        success: true,
+        testTitle: test.title,
+        questions: questions.map((q) => ({
+            id: q.id,
+            order: q.order,
+            question: q.question,
+            options: JSON.parse(q.optionsJson),
+            correctIndex: q.correctIndex,
+        })),
+    });
+};
+exports.getMockTestQuestions = getMockTestQuestions;
+const questionsSchema = zod_1.z.object({
+    questions: zod_1.z.array(zod_1.z.object({
+        id: zod_1.z.string(),
+        question: zod_1.z.string().trim().min(3),
+        options: zod_1.z.array(zod_1.z.string().trim().min(1)).min(2),
+        correctIndex: zod_1.z.number().int().nonnegative(),
+    })),
+});
+const updateMockTestQuestions = async (req, res) => {
+    const userId = req.authUser.id;
+    const testId = req.params.id;
+    const payload = questionsSchema.parse(req.body);
+    const test = await prisma_1.prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+    if (!test)
+        return res.status(404).json({ success: false, message: "Mock test not found." });
+    await prisma_1.prisma.$transaction(async (tx) => {
+        for (const q of payload.questions) {
+            await tx.mockQuestion.update({
+                where: { id: q.id, mockTestId: test.id },
+                data: {
+                    question: q.question,
+                    optionsJson: JSON.stringify(q.options),
+                    correctIndex: q.correctIndex,
+                },
+            });
+        }
+    });
+    res.json({ success: true, message: "Questions updated successfully." });
+};
+exports.updateMockTestQuestions = updateMockTestQuestions;

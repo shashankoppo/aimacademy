@@ -54,7 +54,26 @@ const websiteSettingsSchema = zod_1.z.object({
         name: zod_1.z.string().trim().min(2),
         sub: zod_1.z.string().trim().min(2),
         img: zod_1.z.string().trim().min(1),
+        bio: zod_1.z.string().trim().optional(),
     })).min(1),
+    upcomingBatches: zod_1.z.array(zod_1.z.object({
+        title: zod_1.z.string().trim().min(1),
+        desc: zod_1.z.string().trim().min(1),
+        status: zod_1.z.string().trim().min(1),
+        totalSeats: zod_1.z.number().int().min(1),
+        seatsLeft: zod_1.z.number().int().min(0),
+        img: zod_1.z.string().trim().optional(),
+        isCustomSplit: zod_1.z.boolean().optional(),
+    })).optional(),
+    socialLinks: zod_1.z.array(zod_1.z.object({
+        platform: zod_1.z.string().trim(),
+        url: zod_1.z.string().trim()
+    })).optional(),
+    whatsappTemplates: zod_1.z.array(zod_1.z.object({
+        id: zod_1.z.string().trim(),
+        label: zod_1.z.string().trim(),
+        message: zod_1.z.string().trim()
+    })).optional()
 });
 const noteSchema = zod_1.z.object({
     title: zod_1.z.string().trim().min(2),
@@ -165,6 +184,65 @@ const seedAdminData = async () => {
                     create: data,
                 });
             }
+            const existingSettings = await prisma_1.prisma.websiteSettings.findFirst();
+            if (!existingSettings || existingSettings.facultyJson.includes("Rahul Sir")) {
+                const defaultSettings = {
+                    bannerText: "🎉 Happy Birthday to our Founder, Mr. Imran Khan! 🎂 | 🚀 AIM Academy is officially launching today! Admissions Open | Call: +91 70672 31189",
+                    slidesJson: JSON.stringify([
+                        "/images/HEROMAIN 007.jpeg",
+                        "/images/STUDENT BANNER 01.jpeg",
+                        "/images/STUDENT_BANNER.jpeg",
+                    ]),
+                    facultyJson: JSON.stringify([
+                        { name: "Dr. Imran Khan", sub: "Founder, Director & GS Faculty", img: "/images/founder_solo.png", bio: "A dedicated mentor committed to shaping the future of civil services aspirants through strategic and ethical guidance." },
+                        { name: "Mr. Sandeep Yadav", sub: "Maths Faculty", img: "/images/faculty_5.png", bio: "Expert in Quantitative Aptitude with over a decade of teaching experience." },
+                        { name: "Mr. Irshad Mansoori", sub: "Maths Faculty", img: "/images/faculty_2.png", bio: "Renowned for simplifying complex mathematical concepts for competitive exams." },
+                        { name: "Mr. Shubham Patel", sub: "MP / Current Affairs", img: "/images/faculty_3.png", bio: "Specialist in Current Affairs and Madhya Pradesh specific General Studies." },
+                        { name: "Mr. Abhishek Sengar", sub: "English Faculty", img: "/images/faculty_4.png", bio: "Dedicated English educator focused on grammar and comprehension strategies." },
+                        { name: "Mr. Atul Rajpoot", sub: "MP / English Faculty", img: "/images/faculty_5.png", bio: "Versatile faculty guiding students in both English and Regional Studies." },
+                        { name: "Mr. Yogesh Tiwari", sub: "Science Faculty", img: "/images/faculty_1.png", bio: "Expert in General Science and technology concepts for competitive exams." },
+                        { name: "Mr. Pushparaj Kushwaha", sub: "History & Polity", img: "/images/faculty_2.png", bio: "Bringing historical events and constitutional frameworks to life." },
+                    ]),
+                    upcomingBatchesJson: JSON.stringify([
+                        { title: "Comprehensive Foundation Batch 2026", desc: "A definitive classroom batch covering complete General Studies from absolute basics to advanced level.", status: "ADMISSIONS OPEN", seatsLeft: 12, totalSeats: 100, img: "/images/HEROMAIN 007.jpeg" },
+                        { title: "SSC Intensive Target Program", desc: "Rigorous daily practice and mock test-driven preparation for secure selections across CGL and CHSL.", status: "LIMITED SEATS", seatsLeft: 5, totalSeats: 80, img: "/images/STUDENT_BANNER.jpeg" },
+                        { title: "Free Career Counselling Seminar", desc: "Guidance directly from toppers and expert mentors to completely roadmap your preparation journey.", status: "NEXT SUNDAY", seatsLeft: 2, totalSeats: 100, isCustomSplit: true },
+                    ]),
+                    socialLinksJson: JSON.stringify([
+                        { platform: "Facebook", url: "https://facebook.com/aimacademyjbp" },
+                        { platform: "Instagram", url: "https://instagram.com/aimacademyjbp" },
+                        { platform: "YouTube", url: "https://youtube.com/aimacademyjbp" }
+                    ]),
+                    whatsappTemplatesJson: JSON.stringify([
+                        {
+                            id: "admission",
+                            label: "Admission Confirmation",
+                            message: "Dear {name},\n\nYour admission to *AIM Academy* has been confirmed for the course: *{course}*.\n\nWelcome to the family! We wish you the very best on your journey to success. 🎓\n\nFor any queries, call us: +91 70672 31189\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_"
+                        },
+                        {
+                            id: "fee",
+                            label: "Fee Payment Reminder",
+                            message: "Dear {name},\n\nThis is a gentle reminder that your fee installment for *{course}* at *AIM Academy* is due.\n\nKindly clear the dues at the earliest to continue your studies uninterrupted. 📋\n\nContact: +91 70672 31189\n\n– *AIM Academy, Jabalpur*"
+                        },
+                        {
+                            id: "batch",
+                            label: "Batch Start Notification",
+                            message: "Dear {name},\n\nYour new batch for *{course}* at *AIM Academy* is starting soon! 🚀\n\nPlease report to the institute on time and bring your study materials.\n\nFor schedule details: +91 70672 31189\n\n– *AIM Academy, Jabalpur*"
+                        },
+                        {
+                            id: "result",
+                            label: "Result / Selection Update",
+                            message: "🎉 Heartiest Congratulations, *{name}*!\n\nYou have successfully cleared your exam and brought glory to *AIM Academy*, Jabalpur.\n\nYour hard work and dedication have paid off. The entire AIM family is proud of you! 🏆\n\n– *AIM Academy, Jabalpur*\n_Synonym of Success_"
+                        }
+                    ])
+                };
+                if (existingSettings) {
+                    await prisma_1.prisma.websiteSettings.update({ where: { id: existingSettings.id }, data: defaultSettings });
+                }
+                else {
+                    await prisma_1.prisma.websiteSettings.create({ data: defaultSettings });
+                }
+            }
             console.log("[Seed] Admin data synchronization successful.");
         }
         catch (err) {
@@ -201,6 +279,9 @@ const getAdminOverview = async (_req, res) => {
                     bannerText: settings.bannerText,
                     slides: JSON.parse(settings.slidesJson),
                     faculty: JSON.parse(settings.facultyJson),
+                    upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+                    socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+                    whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
                 }
                 : null,
         });
@@ -233,6 +314,9 @@ const getPublicContent = async (_req, res) => {
                     bannerText: settings.bannerText,
                     slides: JSON.parse(settings.slidesJson),
                     faculty: JSON.parse(settings.facultyJson),
+                    upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+                    socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+                    whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
                 }
                 : null,
         });
@@ -451,7 +535,15 @@ const getWebsiteSettings = async (_req, res) => {
         const settings = await prisma_1.prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } });
         if (!settings)
             return res.status(404).json({ error: "Settings not found" });
-        res.json({ id: settings.id, bannerText: settings.bannerText, slides: JSON.parse(settings.slidesJson), faculty: JSON.parse(settings.facultyJson) });
+        res.json({
+            id: settings.id,
+            bannerText: settings.bannerText,
+            slides: JSON.parse(settings.slidesJson),
+            faculty: JSON.parse(settings.facultyJson),
+            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
+            socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
+            whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+        });
     }
     catch (error) {
         handleError(res, error, "Failed to fetch settings");
@@ -462,9 +554,24 @@ const updateWebsiteSettings = async (req, res) => {
     try {
         const payload = websiteSettingsSchema.parse(req.body);
         const existing = await prisma_1.prisma.websiteSettings.findFirst();
-        const data = { bannerText: payload.bannerText, slidesJson: JSON.stringify(payload.slides), facultyJson: JSON.stringify(payload.faculty) };
+        const data = {
+            bannerText: payload.bannerText,
+            slidesJson: JSON.stringify(payload.slides),
+            facultyJson: JSON.stringify(payload.faculty),
+            upcomingBatchesJson: payload.upcomingBatches ? JSON.stringify(payload.upcomingBatches) : null,
+            socialLinksJson: payload.socialLinks ? JSON.stringify(payload.socialLinks) : null,
+            whatsappTemplatesJson: payload.whatsappTemplates ? JSON.stringify(payload.whatsappTemplates) : null
+        };
         const updated = existing ? await prisma_1.prisma.websiteSettings.update({ where: { id: existing.id }, data }) : await prisma_1.prisma.websiteSettings.create({ data });
-        res.json({ id: updated.id, bannerText: updated.bannerText, slides: JSON.parse(updated.slidesJson), faculty: JSON.parse(updated.facultyJson) });
+        res.json({
+            id: updated.id,
+            bannerText: updated.bannerText,
+            slides: JSON.parse(updated.slidesJson),
+            faculty: JSON.parse(updated.facultyJson),
+            upcomingBatches: updated.upcomingBatchesJson ? JSON.parse(updated.upcomingBatchesJson) : [],
+            socialLinks: updated.socialLinksJson ? JSON.parse(updated.socialLinksJson) : [],
+            whatsappTemplates: updated.whatsappTemplatesJson ? JSON.parse(updated.whatsappTemplatesJson) : []
+        });
     }
     catch (error) {
         handleError(res, error, "Failed to update settings");

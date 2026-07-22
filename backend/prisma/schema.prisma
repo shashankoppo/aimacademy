@@ -231,6 +231,8 @@ model AdminStudent {
   courseId             Int?
   courseRef            AdminCourse? @relation(fields: [courseId], references: [id], onDelete: SetNull)
   customFeesJson       String       @default("[]")
+  photoUrl             String?
+  applicationFormUrl   String?
 
   courseAccesses StudentCourseAccess[]
   mockAttempts   MockTestAttempt[]

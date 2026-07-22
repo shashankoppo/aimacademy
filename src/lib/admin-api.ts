@@ -113,3 +113,38 @@ export async function blobRequest(path: string, init?: RequestInit): Promise<Blo
 
   return response.blob();
 }
+
+export async function uploadFile(file: File): Promise<{ url: string }> {
+  const token = getAccessToken();
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const doFetch = async () =>
+    fetch(`${API_BASE_URL}/admin/upload`, {
+      method: "POST",
+      credentials: "include",
+      headers,
+      body: formData,
+    });
+
+  let response = await doFetch();
+  if (response.status === 401 && token) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      headers.Authorization = `Bearer ${refreshed}`;
+      response = await doFetch();
+    } else {
+      clearStoredAuth();
+    }
+  }
+
+  const data = await response.json();
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Failed to upload file");
+  }
+
+  return { url: data.url };
+}

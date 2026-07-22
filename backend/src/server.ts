@@ -2,12 +2,14 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import path from "path";
 import authRoutes from "./routes/authRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import iamRoutes from "./routes/iamRoutes";
 import teacherRoutes from "./routes/teacherRoutes";
 import studentRoutes from "./routes/studentRoutes";
 import staffRoutes from "./routes/staffRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
 import { getPublicContent, seedAdminData } from "./controllers/adminController";
 import { ensureIamSeeded } from "./seed/iamSeed";
 import { ensureDemoUsers } from "./seed/demoUsers";
@@ -43,6 +45,7 @@ app.use(
 
 app.use(express.json({ limit: "5mb" }));
 app.use(attachRequestId);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -50,6 +53,7 @@ import { createLead } from "./controllers/leadController";
 app.post("/api/public/leads", createLead);
 app.get("/api/public/content", getPublicContent);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/upload', uploadRoutes);
 app.use("/api/admin/iam", authenticate, requirePermission("admin:access"), iamRoutes);
 app.use("/api/teacher", teacherRoutes);
 app.use("/api/student", studentRoutes);

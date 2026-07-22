@@ -11,6 +11,8 @@ router.get("/students", (0, auth_1.requirePermission)("teacher:assign_courses"),
 router.post("/assign", (0, auth_1.requirePermission)("teacher:assign_courses"), teacherController_1.assignCourseAccess);
 router.get("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.listMockTests);
 router.post("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.createMockTest);
+router.get("/mock-tests/:id/questions", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.getMockTestQuestions);
+router.put("/mock-tests/:id/questions", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.updateMockTestQuestions);
 router.put("/mock-tests/:id", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.updateMockTest);
 router.delete("/mock-tests/:id", (0, auth_1.requirePermission)("teacher:manage_tests"), teacherController_1.deleteMockTest);
 router.post("/publish-results", (0, auth_1.requirePermission)("teacher:publish_results"), teacherController_1.publishResults);

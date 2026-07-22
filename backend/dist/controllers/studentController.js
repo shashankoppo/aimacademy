@@ -150,7 +150,6 @@ const getStudentMockTestCurrent = async (req, res) => {
                 id: q.id,
                 question: q.question,
                 options: JSON.parse(q.optionsJson),
-                correct: q.correctIndex,
             })),
         },
     });
@@ -188,7 +187,6 @@ const getStudentMockTestById = async (req, res) => {
                 id: q.id,
                 question: q.question,
                 options: JSON.parse(q.optionsJson),
-                correct: q.correctIndex,
             })),
         },
     });

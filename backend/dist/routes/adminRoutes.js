@@ -45,4 +45,13 @@ router.get("/videos", (0, auth_1.requirePermission)("admin:manage_videos"), admi
 router.post("/videos", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.addAdminVideo);
 router.put("/videos/:id", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.updateAdminVideo);
 router.delete("/videos/:id", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.deleteAdminVideo);
+const mockTestController_1 = require("../controllers/mockTestController");
+router.get("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.getMockTests);
+router.post("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.createMockTest);
+router.put("/mock-tests/:id", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.updateMockTest);
+router.delete("/mock-tests/:id", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.deleteMockTest);
+const leadController_1 = require("../controllers/leadController");
+router.get("/leads", auth_1.authenticate, leadController_1.getLeads);
+router.put("/leads/:id", auth_1.authenticate, leadController_1.updateLeadStatus);
+router.delete("/leads/:id", auth_1.authenticate, leadController_1.deleteLead);
 exports.default = router;
