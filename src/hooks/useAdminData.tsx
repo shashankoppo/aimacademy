@@ -139,6 +139,7 @@ interface AdminContextType extends DashboardData {
   updateAnnouncement: (id: string, announcement: Partial<Announcement>) => Promise<Announcement>;
   deleteAnnouncement: (id: string) => Promise<void>;
   processPayroll: () => Promise<void>;
+  updateStaff: (id: number, data: Partial<StaffMember>) => Promise<StaffMember>;
   markAttendance: () => Promise<void>;
   sendFeeReminders: (studentIds: number[]) => Promise<void>;
   updateWebsiteSettings: (settings: WebsiteSettings) => Promise<WebsiteSettings>;
@@ -342,6 +343,15 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setStaff(updated);
   };
 
+  const updateStaff = async (id: number, data: Partial<StaffMember>) => {
+    const updated = await apiRequest<StaffMember>(`/admin/staff/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    setStaff(prev => prev.map(entry => (entry.id === id ? updated : entry)));
+    return updated;
+  };
+
   const markAttendance = async () => {
     const updated = await apiRequest<Student[]>("/admin/attendance/mark-today", { method: "POST" });
     setStudents(updated);
@@ -437,6 +447,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updateAnnouncement,
       deleteAnnouncement,
       processPayroll,
+      updateStaff,
       markAttendance,
       sendFeeReminders,
       updateWebsiteSettings: updateWebsiteSettingsAction,

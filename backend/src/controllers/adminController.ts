@@ -518,6 +518,29 @@ export const processPayroll = async (_req: Request, res: Response) => {
   }
 };
 
+export const updateAdminStaff = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { salary, payrollStatus, attendanceStatus, clockIn, clockOut } = req.body as {
+      salary?: number; payrollStatus?: string; attendanceStatus?: string; clockIn?: string; clockOut?: string;
+    };
+    const updated = await prisma.adminStaff.update({
+      where: { id },
+      data: {
+        ...(salary !== undefined && { salary }),
+        ...(payrollStatus && { payrollStatus }),
+        ...(attendanceStatus && { attendanceStatus }),
+        ...(clockIn && { clockIn }),
+        ...(clockOut && { clockOut }),
+        ...(payrollStatus === "Paid" && { payrollDate: new Date().toISOString().slice(0, 10) }),
+      },
+    });
+    res.json(updated);
+  } catch (error) {
+    handleError(res, error, "Failed to update staff member");
+  }
+};
+
 export const markAttendance = async (_req: Request, res: Response) => {
   try {
     // Basic mock logic for demonstrative attendance update

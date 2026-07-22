@@ -16,6 +16,7 @@ import {
   updateAnnouncement,
   deleteAnnouncement,
   getAdminStaff,
+  updateAdminStaff,
   processPayroll,
   markAttendance,
   sendFeeReminders,
@@ -65,6 +66,7 @@ router.put("/announcements/:id", requirePermission("admin:manage_announcements")
 router.delete("/announcements/:id", requirePermission("admin:manage_announcements"), deleteAnnouncement);
 
 router.get("/staff", requirePermission("admin:manage_payroll"), getAdminStaff);
+router.put("/staff/:id", requirePermission("admin:manage_payroll"), updateAdminStaff);
 router.post("/payroll/process", requirePermission("admin:manage_payroll"), processPayroll);
 router.post("/attendance/mark-today", requirePermission("admin:manage_attendance"), markAttendance);
 router.post("/fee-reminders/send", requirePermission("admin:manage_fees"), sendFeeReminders);
