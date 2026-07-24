@@ -108,7 +108,7 @@ const Contact = () => {
                   <p className="text-slate-500 font-body mb-2 max-w-xs leading-relaxed text-sm">
                     Thank you, <span className="text-navy font-semibold">{form.name}</span>! Our Counselling team will call you within 24 hours on your registered number.
                   </p>
-                  <p className="text-gold-dark text-sm font-bold font-body mb-8">7067231189</p>
+                  <p className="text-gold-dark text-sm font-bold font-body mb-8">+91 {form.phone}</p>
                   <button
                     onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", course: "", message: "" }); }}
                     className="btn-outline-gold px-8 py-2.5 rounded-xl font-body text-sm"
