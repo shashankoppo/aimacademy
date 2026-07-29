@@ -25,10 +25,16 @@ const Footer = () => {
           <div className="lg:col-span-4">
              <Link to="/" className="flex items-center gap-2 mb-6">
                <img src="/images/logo_main.png" alt="Logo" className="w-14" />
-               <div className="flex flex-col">
-                 <span className="font-black text-xl leading-none text-slate-800 tracking-tighter">AIM ACADEMY</span>
-                 <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
-               </div>
+                <div className="flex flex-col">
+                  <span className="font-black text-xl leading-none text-slate-800 tracking-tighter">
+                    <span className="lang-en-only">AIM ACADEMY</span>
+                    <span className="lang-hi-only notranslate" translate="no">ए आई एम एकेडमी</span>
+                  </span>
+                  <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">
+                    <span className="lang-en-only">Synonym of Success</span>
+                    <span className="lang-hi-only notranslate" translate="no">सफलता का पर्याय</span>
+                  </span>
+                </div>
              </Link>
              <p className="text-sm leading-relaxed mb-6 text-slate-500">
                AIM Academy is India's most trusted offline education platform that provides affordable & comprehensive learning experience to students for various competitive exams.
@@ -83,7 +89,12 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium uppercase tracking-wider">
           <div className="text-center md:text-left space-y-2">
-            <p className="text-slate-900">© {new Date().getFullYear()} AIM Academy. All Rights Reserved.</p>
+            <p className="text-slate-900">
+              © {new Date().getFullYear()}{" "}
+              <span className="lang-en-only">AIM Academy</span>
+              <span className="lang-hi-only notranslate" translate="no">ए आई एम एकेडमी</span>
+              . All Rights Reserved.
+            </p>
             <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
           </div>
           <div className="flex flex-wrap gap-6">

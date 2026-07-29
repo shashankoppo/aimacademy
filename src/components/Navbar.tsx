@@ -134,8 +134,14 @@ const Navbar = () => {
               <img src="/images/logo_main.png" alt="Logo" className="w-14 h-14 object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl leading-none text-slate-900 tracking-tighter">AIM ACADEMY</span>
-              <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">Synonym of Success</span>
+              <span className="font-black text-xl leading-none text-slate-900 tracking-tighter">
+                <span className="lang-en-only">AIM ACADEMY</span>
+                <span className="lang-hi-only notranslate" translate="no">ए आई एम एकेडमी</span>
+              </span>
+              <span className="text-[7px] text-slate-500 font-black uppercase tracking-[0.2em] -mt-0.5 self-end pr-1">
+                <span className="lang-en-only">Synonym of Success</span>
+                <span className="lang-hi-only notranslate" translate="no">सफलता का पर्याय</span>
+              </span>
             </div>
           </Link>
 

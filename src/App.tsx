@@ -287,6 +287,67 @@ const AppRoutes = () => {
 
 const AppContent = () => {
   const location = useLocation();
+  
+  React.useEffect(() => {
+    const simplifiedHindiReplacements: [RegExp, string][] = [
+      [/लक्ष्य अकादमी/gi, "ए आई एम एकेडमी"],
+      [/लक्ष्य एकेडमी/gi, "ए आई एम एकेडमी"],
+      [/एआईएम अकादमी/gi, "ए आई एम एकेडमी"],
+      [/एआईएम एकेडमी/gi, "ए आई एम एकेडमी"],
+      [/ए आई एम अकादमी/gi, "ए आई एम एकेडमी"],
+      [/ए\.आई\.एम\./gi, "ए आई एम"],
+      [/एआईएम/gi, "ए आई एम"],
+      [/परामर्श/gi, "काउंसलिंग"],
+      [/शुल्क/gi, "फीस"],
+      [/प्रवेश/gi, "एडमिशन"],
+      [/पाठ्यक्रम/gi, "सिलेबस/कोर्सेस"],
+      [/वेतनपत्रक/gi, "पेरोल (सैलरी)"]
+    ];
+
+    const simplifyText = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        let val = node.nodeValue || "";
+        let modified = false;
+        simplifiedHindiReplacements.forEach(([regex, replacement]) => {
+          if (regex.test(val)) {
+            val = val.replace(regex, replacement);
+            modified = true;
+          }
+        });
+        if (modified) {
+          node.nodeValue = val;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        if (el.classList?.contains("notranslate") || el.getAttribute("translate") === "no") {
+          return;
+        }
+        el.childNodes.forEach(simplifyText);
+      }
+    };
+
+    const observer = new MutationObserver(() => {
+      const isHindi = document.documentElement.lang === "hi";
+      if (isHindi) {
+        observer.disconnect();
+        simplifyText(document.body);
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const isDashboard = location.pathname.startsWith('/admin') || 
                       location.pathname.startsWith('/student') || 
                       location.pathname.startsWith('/teacher') || 

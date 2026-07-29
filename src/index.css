@@ -121,3 +121,14 @@
 body { top: 0 !important; }
 .goog-te-banner-frame { display: none !important; }
 #goog-gt-tt { display: none !important; }
+
+/* Language-specific visibility toggles */
+.lang-hi-only {
+  display: none !important;
+}
+html[lang="hi"] .lang-en-only {
+  display: none !important;
+}
+html[lang="hi"] .lang-hi-only {
+  display: unset !important;
+}
