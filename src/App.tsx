@@ -230,7 +230,7 @@ const AppRoutes = () => {
         <Route
           path="/admin/mock-tests"
           element={
-            <RequireAuth allowedRoles={["ADMIN", "TEACHER"]}>
+            <RequireAuth allowedRoles={["ADMIN"]}>
               <AdminLayout>
                 <MockTestManagement />
               </AdminLayout>
