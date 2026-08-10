@@ -9,8 +9,9 @@ import { apiRequest, getStoredUser } from "@/lib/admin-api";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
-type TeacherTab = "assign" | "tests" | "performance";
+type TeacherTab = "assign" | "tests" | "performance" | "resources";
 
 type AdminCourse = { id: number; title: string };
 type AdminStudent = { id: number; name: string; email: string; phone: string; batch: string; course: string; courseId?: number | null };
@@ -38,6 +39,7 @@ const TeacherDashboard = () => {
   const [batches, setBatches] = useState<string[]>([]);
   const [students, setStudents] = useState<AdminStudent[]>([]);
   const [tests, setTests] = useState<TeacherMockTest[]>([]);
+  const [resources, setResources] = useState<TeacherResource[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
 
   const [assignMode, setAssignMode] = useState<AssignMode>("batch");
@@ -93,6 +95,9 @@ const TeacherDashboard = () => {
 
     const testResp = await apiRequest<{ success: true; tests: TeacherMockTest[] }>("/teacher/mock-tests");
     setTests(testResp.tests);
+
+    const resResp = await apiRequest<{ success: true; resources: TeacherResource[] }>("/teacher/resources");
+    setResources(resResp.resources);
 
     const lbResp = await apiRequest<{ success: true; leaderboard: LeaderboardRow[] }>("/teacher/analytics");
     setLeaderboard(lbResp.leaderboard);
@@ -272,16 +277,29 @@ const TeacherDashboard = () => {
       });
       setResourceDialogOpen(false);
       toast.success("Resource created and published to students.");
+      void loadAll();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to create resource");
     }
   };
 
-  const tabs: { id: TeacherTab; label: string; icon: typeof BookOpen }[] = [
-    { id: "assign", label: "Assign Courses", icon: BookOpen },
-    { id: "tests", label: "Mock Test Manager", icon: FileText },
-    { id: "performance", label: "Student Analytics", icon: BarChart3 },
-  ];
+  const deleteResource = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this resource?")) return;
+    try {
+      await apiRequest(`/teacher/resources/${id}`, { method: "DELETE" });
+      setResources((prev) => prev.filter((r) => r.id !== id));
+      toast.success("Resource deleted.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to delete resource");
+    }
+  };
+
+    const tabs: { id: TeacherTab; label: string; icon: typeof BookOpen }[] = [
+      { id: "assign", label: "Assign Courses", icon: BookOpen },
+      { id: "tests", label: "Mock Test Manager", icon: FileText },
+      { id: "resources", label: "Resources", icon: FileText },
+      { id: "performance", label: "Student Analytics", icon: BarChart3 },
+    ];
 
   return (
     <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
@@ -298,8 +316,11 @@ const TeacherDashboard = () => {
               <h1 className="heading-display text-3xl text-slate-900 leading-tight">
                 Academic Panel, <span className="text-emerald-600">{displayName}.</span>
               </h1>
-              <p className="text-slate-500 font-medium">Head of History & Ethics Department</p>
+              <p className="text-slate-500 font-medium">Faculty Member</p>
             </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <ProfileDropdown profilePath="/teacher/profile" />
           </div>
           <div className="flex gap-4">
              <button onClick={openCreateResource} className="flex items-center gap-2 bg-slate-900 text-white font-bold py-3 px-6 rounded hover:bg-slate-800 transition-all">
@@ -452,6 +473,49 @@ const TeacherDashboard = () => {
                           <button className="mt-6 w-full py-2 bg-slate-50 text-slate-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-primary hover:text-white transition-all">Live Evaluation</button>
                        </div>
                      ))}
+                  </div>
+               </div>
+             )}
+
+             {activeTab === "resources" && (
+               <div className="bg-white rounded-xl border border-slate-100 p-8">
+                  <div className="flex justify-between items-center mb-8">
+                     <h2 className="heading-display text-xl">Study Materials</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     {resources.map((r) => (
+                        <div key={r.id} className="p-6 border border-slate-100 rounded-xl hover:shadow-lg transition-all">
+                           <div className="flex justify-between items-start mb-4">
+                              <h3 className="font-bold text-lg text-slate-800">{r.title}</h3>
+                              <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${
+                                 r.isPublished ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                              }`}>
+                                 {r.isPublished ? 'Published' : 'Draft'}
+                              </span>
+                           </div>
+                           <p className="text-sm text-slate-500 mb-4 line-clamp-2">{r.description}</p>
+                           <div className="text-xs text-slate-400 space-y-1 mb-4">
+                              {r.courseId && <p>Course: {courses.find(c => c.id === r.courseId)?.title}</p>}
+                              {r.batch && <p>Batch: {r.batch}</p>}
+                           </div>
+                           <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+                              <a href={r.url} target="_blank" rel="noreferrer" className="text-primary text-sm font-bold hover:underline">
+                                 View Material
+                              </a>
+                              <button onClick={() => deleteResource(r.id)} className="text-slate-400 hover:text-red-500">
+                                 <Trash2 className="w-4 h-4" />
+                              </button>
+                           </div>
+                        </div>
+                     ))}
+                     {resources.length === 0 && (
+                        <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-xl">
+                           <p className="text-slate-500 mb-2">No study materials uploaded yet</p>
+                           <button onClick={openCreateResource} className="text-primary font-bold text-sm">
+                              Create your first resource
+                           </button>
+                        </div>
+                     )}
                   </div>
                </div>
              )}

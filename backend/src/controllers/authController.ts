@@ -274,3 +274,44 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     res.status(500).json({ success: false, message: "Backend Server Error" });
   }
 };
+
+import { z } from "zod";
+
+const updateProfileSchema = z.object({
+  name: z.string().trim().min(2).optional(),
+  email: z.string().trim().email().optional().nullable(),
+  phone: z.string().trim().optional().nullable(),
+});
+
+export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const actorId = req.authUser?.id;
+    if (!actorId) {
+      res.status(401).json({ success: false, message: "Unauthorized." });
+      return;
+    }
+
+    const payload = updateProfileSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({ where: { id: actorId } });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found." });
+      return;
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: actorId },
+      data: {
+        name: payload.name ?? undefined,
+        email: payload.email === null ? null : payload.email?.toLowerCase(),
+        phone: payload.phone === null ? null : payload.phone,
+      },
+    });
+
+    await auditLog({ req, action: "auth.profile_updated", targetType: "user", targetId: user.id });
+    res.json({ success: true, user: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone } });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ success: false, message: "Backend Server Error" });
+  }
+};

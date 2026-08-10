@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listPermissions = exports.listRoles = exports.resetUserPassword = exports.updateUser = exports.createUser = exports.listUsers = void 0;
+exports.updateRolePermissions = exports.createRole = exports.listPermissions = exports.listRoles = exports.resetUserPassword = exports.updateUser = exports.createUser = exports.listUsers = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const prisma_1 = require("../prisma");
 const zod_1 = require("zod");
@@ -40,6 +40,21 @@ const createUser = async (req, res) => {
         },
         select: { id: true, name: true, email: true, phone: true, role: true, isActive: true, createdAt: true },
     });
+    if (payload.role === "TEACHER") {
+        await prisma_1.prisma.teacherProfile.create({
+            data: {
+                userId: user.id,
+                subjects: "",
+            },
+        });
+    }
+    else if (payload.role === "STUDENT") {
+        await prisma_1.prisma.studentProfile.create({
+            data: {
+                userId: user.id,
+            },
+        });
+    }
     await (0, audit_1.auditLog)({ req, action: "pam.user_created", targetType: "user", targetId: user.id, metadata: { role: user.role } });
     res.status(201).json({ success: true, user, tempPassword });
 };
@@ -50,6 +65,7 @@ const updateUserSchema = zod_1.z.object({
     phone: zod_1.z.string().trim().min(8).optional().nullable(),
     role: roleKeySchema.optional(),
     isActive: zod_1.z.boolean().optional(),
+    password: zod_1.z.string().min(8).optional(),
 });
 const updateUser = async (req, res) => {
     const userId = req.params.id;
@@ -83,6 +99,7 @@ const updateUser = async (req, res) => {
             phone: payload.phone === null ? null : payload.phone,
             role: payload.role ?? undefined,
             isActive: payload.isActive ?? undefined,
+            ...(payload.password ? { password: await (0, password_1.hashPassword)(payload.password) } : {}),
         },
         select: { id: true, name: true, email: true, phone: true, role: true, isActive: true, updatedAt: true },
     });
@@ -120,3 +137,66 @@ const listPermissions = async (_req, res) => {
     res.json({ success: true, permissions });
 };
 exports.listPermissions = listPermissions;
+const createRoleSchema = zod_1.z.object({
+    name: zod_1.z.string().trim().min(2),
+    key: zod_1.z.string().trim().min(2),
+    permissions: zod_1.z.array(zod_1.z.string()).optional(),
+});
+const createRole = async (req, res) => {
+    const payload = createRoleSchema.parse(req.body);
+    const existing = await prisma_1.prisma.role.findUnique({ where: { key: payload.key } });
+    if (existing) {
+        return res.status(400).json({ success: false, message: "Role key already exists." });
+    }
+    const role = await prisma_1.prisma.$transaction(async (tx) => {
+        const r = await tx.role.create({
+            data: {
+                key: payload.key.toUpperCase(),
+                name: payload.name,
+                isSystem: false,
+            },
+        });
+        if (payload.permissions && payload.permissions.length > 0) {
+            const perms = await tx.permission.findMany({ where: { key: { in: payload.permissions } } });
+            for (const p of perms) {
+                await tx.rolePermission.create({
+                    data: { roleId: r.id, permissionId: p.id },
+                });
+            }
+        }
+        return r;
+    });
+    await (0, audit_1.auditLog)({ req, action: "pam.role_created", targetType: "role", targetId: role.id });
+    res.status(201).json({ success: true, role });
+};
+exports.createRole = createRole;
+const updateRoleSchema = zod_1.z.object({
+    name: zod_1.z.string().trim().min(2).optional(),
+    permissions: zod_1.z.array(zod_1.z.string()),
+});
+const updateRolePermissions = async (req, res) => {
+    const roleId = req.params.id;
+    const payload = updateRoleSchema.parse(req.body);
+    const existing = await prisma_1.prisma.role.findUnique({ where: { id: roleId } });
+    if (!existing)
+        return res.status(404).json({ success: false, message: "Role not found." });
+    await prisma_1.prisma.$transaction(async (tx) => {
+        if (payload.name) {
+            await tx.role.update({ where: { id: roleId }, data: { name: payload.name } });
+        }
+        // Delete old role permissions
+        await tx.rolePermission.deleteMany({ where: { roleId } });
+        // Insert new role permissions
+        if (payload.permissions.length > 0) {
+            const perms = await tx.permission.findMany({ where: { key: { in: payload.permissions } } });
+            for (const p of perms) {
+                await tx.rolePermission.create({
+                    data: { roleId, permissionId: p.id },
+                });
+            }
+        }
+    });
+    await (0, audit_1.auditLog)({ req, action: "pam.role_updated", targetType: "role", targetId: roleId });
+    res.json({ success: true });
+};
+exports.updateRolePermissions = updateRolePermissions;

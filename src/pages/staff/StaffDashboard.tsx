@@ -10,6 +10,7 @@ import { apiRequest, blobRequest, getStoredUser } from "@/lib/admin-api";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const StaffDashboard = () => {
@@ -127,8 +128,11 @@ const StaffDashboard = () => {
               <h1 className="heading-display text-3xl text-slate-900 leading-tight">
                 Staff Command, <span className="text-amber-600">{displayName}.</span>
               </h1>
-              <p className="text-slate-500 font-medium">Sr. Administrator — Operations Department</p>
+              <p className="text-slate-500 font-medium">Administrator</p>
             </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <ProfileDropdown profilePath="/staff/profile" />
           </div>
           <div className="flex gap-4">
             <button onClick={() => setBroadcastOpen(true)} className="flex items-center gap-2 bg-slate-900 text-white font-bold py-3 px-6 rounded hover:bg-slate-800 transition-all">

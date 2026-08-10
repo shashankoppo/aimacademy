@@ -36,6 +36,8 @@ import NotesManagement from "./pages/admin/NotesManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import MockTestManagement from "./pages/admin/MockTestManagement";
+import { RoleManagement } from "./pages/admin/RoleManagement";
+import { ProfileSettings } from "./components/ProfileSettings";
 
 import GSAPWrapper from "@/components/GSAPWrapper";
 import { AdminProvider } from "@/hooks/useAdminData";
@@ -98,6 +100,16 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/student/profile"
+          element={
+            <RequireAuth allowedRoles={["STUDENT"]}>
+              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+                <ProfileSettings />
+              </div>
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/student/mock-test"
           element={
             <RequireAuth allowedRoles={["STUDENT"]}>
@@ -115,6 +127,16 @@ const AppRoutes = () => {
             </RequireAuth>
           }
         />
+        <Route
+          path="/teacher/profile"
+          element={
+            <RequireAuth allowedRoles={["TEACHER"]}>
+              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+                <ProfileSettings />
+              </div>
+            </RequireAuth>
+          }
+        />
 
         {/* Staff Portal */}
         <Route
@@ -122,6 +144,16 @@ const AppRoutes = () => {
           element={
             <RequireAuth allowedRoles={["STAFF"]}>
               <StaffDashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/staff/profile"
+          element={
+            <RequireAuth allowedRoles={["STAFF"]}>
+              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+                <ProfileSettings />
+              </div>
             </RequireAuth>
           }
         />
@@ -263,6 +295,28 @@ const AppRoutes = () => {
             <RequireAuth allowedRoles={["ADMIN"]}>
               <AdminLayout>
                 <UserManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/roles"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <RoleManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <div className="py-6">
+                  <ProfileSettings />
+                </div>
               </AdminLayout>
             </RequireAuth>
           }

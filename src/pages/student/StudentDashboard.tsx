@@ -16,6 +16,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { apiRequest, getStoredUser } from "@/lib/admin-api";
+import { ProfileDropdown } from "@/components/ProfileDropdown";
 
 type StudentDashboardResponse = {
   success: true;
@@ -101,6 +102,9 @@ const StudentDashboard = () => {
               </h1>
               <p className="text-slate-500 font-medium">{studentBatch}</p>
             </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <ProfileDropdown profilePath="/student/profile" />
           </div>
           <div className="flex gap-4">
             <button onClick={() => void downloadReportCard()} className="btn-outline-coursera py-3">

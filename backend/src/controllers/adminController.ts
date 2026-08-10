@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { prisma } from "../prisma";
+import { hashPassword } from "../security/password";
 
 const feeStatusSchema = z.enum(["Paid", "Part Paid", "Overdue"]);
 const courseStatusSchema = z.enum(["Active", "Upcoming", "Completed"]);
@@ -21,6 +22,9 @@ const studentSchema = z.object({
   nextInstallmentLabel: z.string().trim().min(2).optional(),
   nextInstallmentAmount: z.coerce.number().int().nonnegative().optional(),
   nextDueDate: z.string().trim().min(1).optional(),
+  customFeesJson: z.string().optional(),
+  photoUrl: z.string().nullable().optional(),
+  applicationFormUrl: z.string().nullable().optional(),
 });
 
 const courseSchema = z.object({
@@ -385,6 +389,26 @@ export const addAdminStudent = async (req: Request, res: Response) => {
         courseId: course.id,
       },
     });
+
+    const userEmail = payload.email.toLowerCase();
+    const existingUser = await prisma.user.findUnique({ where: { email: userEmail } });
+    if (!existingUser) {
+      const user = await prisma.user.create({
+        data: {
+          name: payload.name,
+          email: userEmail,
+          phone: payload.phone || null,
+          role: "STUDENT",
+          password: await hashPassword("aim123"),
+          isActive: true,
+        },
+      });
+      await prisma.studentProfile.create({
+        data: {
+          userId: user.id,
+        },
+      });
+    }
 
     await syncCourseStudentCount(payload.course);
     res.status(201).json(student);

@@ -20,6 +20,10 @@ export function getStoredUser(): AuthUser | null {
   }
 }
 
+export function setStoredUser(user: AuthUser) {
+  localStorage.setItem("user", JSON.stringify(user));
+}
+
 export function clearStoredAuth() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");

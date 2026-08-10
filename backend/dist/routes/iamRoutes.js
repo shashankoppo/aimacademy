@@ -10,5 +10,7 @@ router.post("/users", iamController_1.createUser);
 router.put("/users/:id", iamController_1.updateUser);
 router.post("/users/:id/reset-password", iamController_1.resetUserPassword);
 router.get("/roles", iamController_1.listRoles);
+router.post("/roles", iamController_1.createRole);
+router.put("/roles/:id", iamController_1.updateRolePermissions);
 router.get("/permissions", iamController_1.listPermissions);
 exports.default = router;

@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePassword = exports.me = exports.logout = exports.refresh = exports.login = void 0;
+exports.updateProfile = exports.changePassword = exports.me = exports.logout = exports.refresh = exports.login = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const prisma_1 = require("../prisma");
 const jwt_1 = require("../security/jwt");
@@ -284,3 +284,39 @@ const changePassword = async (req, res) => {
     }
 };
 exports.changePassword = changePassword;
+const zod_1 = require("zod");
+const updateProfileSchema = zod_1.z.object({
+    name: zod_1.z.string().trim().min(2).optional(),
+    email: zod_1.z.string().trim().email().optional().nullable(),
+    phone: zod_1.z.string().trim().optional().nullable(),
+});
+const updateProfile = async (req, res) => {
+    try {
+        const actorId = req.authUser?.id;
+        if (!actorId) {
+            res.status(401).json({ success: false, message: "Unauthorized." });
+            return;
+        }
+        const payload = updateProfileSchema.parse(req.body);
+        const user = await prisma_1.prisma.user.findUnique({ where: { id: actorId } });
+        if (!user) {
+            res.status(404).json({ success: false, message: "User not found." });
+            return;
+        }
+        const updated = await prisma_1.prisma.user.update({
+            where: { id: actorId },
+            data: {
+                name: payload.name ?? undefined,
+                email: payload.email === null ? null : payload.email?.toLowerCase(),
+                phone: payload.phone === null ? null : payload.phone,
+            },
+        });
+        await (0, audit_1.auditLog)({ req, action: "auth.profile_updated", targetType: "user", targetId: user.id });
+        res.json({ success: true, user: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone } });
+    }
+    catch (error) {
+        console.error("Update profile error:", error);
+        res.status(500).json({ success: false, message: "Backend Server Error" });
+    }
+};
+exports.updateProfile = updateProfile;

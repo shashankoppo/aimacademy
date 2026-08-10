@@ -40,6 +40,21 @@ export const createUser = async (req: Request, res: Response) => {
     select: { id: true, name: true, email: true, phone: true, role: true, isActive: true, createdAt: true },
   });
 
+  if (payload.role === "TEACHER") {
+    await prisma.teacherProfile.create({
+      data: {
+        userId: user.id,
+        subjects: "",
+      },
+    });
+  } else if (payload.role === "STUDENT") {
+    await prisma.studentProfile.create({
+      data: {
+        userId: user.id,
+      },
+    });
+  }
+
   await auditLog({ req, action: "pam.user_created", targetType: "user", targetId: user.id, metadata: { role: user.role } });
   res.status(201).json({ success: true, user, tempPassword });
 };
@@ -50,6 +65,7 @@ const updateUserSchema = z.object({
   phone: z.string().trim().min(8).optional().nullable(),
   role: roleKeySchema.optional(),
   isActive: z.boolean().optional(),
+  password: z.string().min(8).optional(),
 });
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -89,6 +105,7 @@ export const updateUser = async (req: Request, res: Response) => {
       phone: payload.phone === null ? null : payload.phone,
       role: payload.role ?? undefined,
       isActive: payload.isActive ?? undefined,
+      ...(payload.password ? { password: await hashPassword(payload.password) } : {}),
     },
     select: { id: true, name: true, email: true, phone: true, role: true, isActive: true, updatedAt: true },
   });
@@ -127,4 +144,76 @@ export const listRoles = async (_req: Request, res: Response) => {
 export const listPermissions = async (_req: Request, res: Response) => {
   const permissions = await prisma.permission.findMany({ orderBy: { key: "asc" } });
   res.json({ success: true, permissions });
+};
+
+const createRoleSchema = z.object({
+  name: z.string().trim().min(2),
+  key: z.string().trim().min(2),
+  permissions: z.array(z.string()).optional(),
+});
+
+export const createRole = async (req: Request, res: Response) => {
+  const payload = createRoleSchema.parse(req.body);
+  const existing = await prisma.role.findUnique({ where: { key: payload.key } });
+  if (existing) {
+    return res.status(400).json({ success: false, message: "Role key already exists." });
+  }
+
+  const role = await prisma.$transaction(async (tx: any) => {
+    const r = await tx.role.create({
+      data: {
+        key: payload.key.toUpperCase(),
+        name: payload.name,
+        isSystem: false,
+      },
+    });
+
+    if (payload.permissions && payload.permissions.length > 0) {
+      const perms = await tx.permission.findMany({ where: { key: { in: payload.permissions } } });
+      for (const p of perms) {
+        await tx.rolePermission.create({
+          data: { roleId: r.id, permissionId: p.id },
+        });
+      }
+    }
+    return r;
+  });
+
+  await auditLog({ req, action: "pam.role_created", targetType: "role", targetId: role.id });
+  res.status(201).json({ success: true, role });
+};
+
+const updateRoleSchema = z.object({
+  name: z.string().trim().min(2).optional(),
+  permissions: z.array(z.string()),
+});
+
+export const updateRolePermissions = async (req: Request, res: Response) => {
+  const roleId = req.params.id;
+  const payload = updateRoleSchema.parse(req.body);
+
+  const existing = await prisma.role.findUnique({ where: { id: roleId } });
+  if (!existing) return res.status(404).json({ success: false, message: "Role not found." });
+
+  await prisma.$transaction(async (tx: any) => {
+    if (payload.name) {
+      await tx.role.update({ where: { id: roleId }, data: { name: payload.name } });
+    }
+
+    // Delete old role permissions
+    await tx.rolePermission.deleteMany({ where: { roleId } });
+
+    // Insert new role permissions
+    if (payload.permissions.length > 0) {
+      const perms = await tx.permission.findMany({ where: { key: { in: payload.permissions } } });
+      for (const p of perms) {
+        await tx.rolePermission.create({
+          data: { roleId, permissionId: p.id },
+        });
+      }
+    }
+  });
+
+  await auditLog({ req, action: "pam.role_updated", targetType: "role", targetId: roleId });
+  res.json({ success: true });
 };

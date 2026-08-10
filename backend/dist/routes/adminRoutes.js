@@ -32,6 +32,7 @@ router.post("/announcements", (0, auth_1.requirePermission)("admin:manage_announ
 router.put("/announcements/:id", (0, auth_1.requirePermission)("admin:manage_announcements"), adminController_1.updateAnnouncement);
 router.delete("/announcements/:id", (0, auth_1.requirePermission)("admin:manage_announcements"), adminController_1.deleteAnnouncement);
 router.get("/staff", (0, auth_1.requirePermission)("admin:manage_payroll"), adminController_1.getAdminStaff);
+router.put("/staff/:id", (0, auth_1.requirePermission)("admin:manage_payroll"), adminController_1.updateAdminStaff);
 router.post("/payroll/process", (0, auth_1.requirePermission)("admin:manage_payroll"), adminController_1.processPayroll);
 router.post("/attendance/mark-today", (0, auth_1.requirePermission)("admin:manage_attendance"), adminController_1.markAttendance);
 router.post("/fee-reminders/send", (0, auth_1.requirePermission)("admin:manage_fees"), adminController_1.sendFeeReminders);

@@ -185,10 +185,9 @@ const updateMockTestSchema = z.object({
 });
 
 export const updateMockTest = async (req: Request, res: Response) => {
-  const userId = req.authUser!.id;
   const testId = req.params.id;
   const payload = updateMockTestSchema.parse(req.body);
-  const existing = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  const existing = await prisma.mockTest.findUnique({ where: { id: testId } });
   if (!existing) return res.status(404).json({ success: false, message: "Mock test not found." });
 
   const scheduledAt = payload.scheduledAt ? new Date(payload.scheduledAt) : undefined;
@@ -235,17 +234,15 @@ export const updateMockTest = async (req: Request, res: Response) => {
 };
 
 export const deleteMockTest = async (req: Request, res: Response) => {
-  const userId = req.authUser!.id;
   const testId = req.params.id;
-  const existing = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  const existing = await prisma.mockTest.findUnique({ where: { id: testId } });
   if (!existing) return res.status(404).json({ success: false, message: "Mock test not found." });
   await prisma.mockTest.delete({ where: { id: existing.id } });
   res.json({ success: true });
 };
 
 export const publishResults = async (req: Request, res: Response) => {
-  const userId = req.authUser!.id;
-  const tests = await prisma.mockTest.findMany({ where: { createdByUserId: userId } });
+  const tests = await prisma.mockTest.findMany({});
   const testIds = tests.map((t: any) => t.id);
   if (testIds.length === 0) return res.json({ success: true, publishedTests: 0, publishedAttempts: 0 });
 
@@ -268,7 +265,7 @@ export const publishResults = async (req: Request, res: Response) => {
 export const getTeacherAnalytics = async (req: Request, res: Response) => {
   const userId = req.authUser!.id;
   const attempts = await prisma.mockTestAttempt.findMany({
-    where: { mockTest: { createdByUserId: userId, isPublished: true } },
+    where: { mockTest: { isPublished: true, createdByUserId: userId } },
     include: { student: true, mockTest: true },
   });
 
@@ -355,9 +352,8 @@ export const deleteResource = async (req: Request, res: Response) => {
 };
 
 export const getMockTestQuestions = async (req: Request, res: Response) => {
-  const userId = req.authUser!.id;
   const testId = req.params.id;
-  const test = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  const test = await prisma.mockTest.findUnique({ where: { id: testId } });
   if (!test) return res.status(404).json({ success: false, message: "Mock test not found." });
 
   const questions = await prisma.mockQuestion.findMany({
@@ -390,11 +386,10 @@ const questionsSchema = z.object({
 });
 
 export const updateMockTestQuestions = async (req: Request, res: Response) => {
-  const userId = req.authUser!.id;
   const testId = req.params.id;
   const payload = questionsSchema.parse(req.body);
 
-  const test = await prisma.mockTest.findFirst({ where: { id: testId, createdByUserId: userId } });
+  const test = await prisma.mockTest.findUnique({ where: { id: testId } });
   if (!test) return res.status(404).json({ success: false, message: "Mock test not found." });
 
   await prisma.$transaction(async (tx: any) => {

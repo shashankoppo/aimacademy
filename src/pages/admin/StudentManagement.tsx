@@ -114,9 +114,9 @@ const StudentManagement = () => {
   };
 
   const validateStudent = (student: StudentForm | Student, currentId?: number) => {
-    if (!student.name.trim() || !student.email.trim() || !student.course.trim() || !student.phone.trim()) return "Please fill in all required fields";
+    if (!student.name.trim() || !student.course.trim() || !student.phone.trim()) return "Please fill in all required fields";
     if (!courseTitles.includes(student.course)) return "Please select an existing course";
-    if (students.find(e => e.email.toLowerCase() === student.email.toLowerCase() && e.id !== currentId)) return "A student with this email already exists";
+    if (student.email && students.find(e => e.email.toLowerCase() === student.email.toLowerCase() && e.id !== currentId)) return "A student with this email already exists";
     if (students.find(e => e.phone === student.phone && e.id !== currentId)) return "A student with this phone already exists";
     return null;
   };
@@ -129,15 +129,20 @@ const StudentManagement = () => {
   };
 
   const handleAddStudent = async () => {
-    const err = validateStudent(newStudent);
+    const submitData = { ...newStudent };
+    if (!submitData.email) submitData.email = `student_${submitData.phone.replace(/\D/g, '')}@aim.edu`;
+    if (!submitData.attendance) submitData.attendance = "100%";
+    if (!submitData.nextDueDate) submitData.nextDueDate = new Date().toISOString().slice(0, 10);
+
+    const err = validateStudent(submitData);
     if (err) { toast.error(err); return; }
     setIsCreating(true);
     try {
-      let photoUrl = newStudent.photoUrl;
-      let applicationFormUrl = newStudent.applicationFormUrl;
+      let photoUrl = submitData.photoUrl;
+      let applicationFormUrl = submitData.applicationFormUrl;
       if (photoFile) { const r = await uploadFile(photoFile); photoUrl = r.url; }
       if (formFile) { const r = await uploadFile(formFile); applicationFormUrl = r.url; }
-      const payload = populateFees(newStudent.course, { ...newStudent, photoUrl, applicationFormUrl }) as StudentForm;
+      const payload = { ...submitData, photoUrl, applicationFormUrl } as StudentForm;
       await addStudent(payload);
       setNewStudent(initialForm()); setPhotoFile(null); setFormFile(null); setAddOpen(false);
       toast.success("Student added successfully");
@@ -147,16 +152,21 @@ const StudentManagement = () => {
 
   const handleUpdateStudent = async () => {
     if (!editingStudent) return;
-    const err = validateStudent(editingStudent, editingStudent.id);
+    const submitData = { ...editingStudent };
+    if (!submitData.email) submitData.email = `student_${submitData.phone.replace(/\D/g, '')}@aim.edu`;
+    if (!submitData.attendance) submitData.attendance = "100%";
+    if (!submitData.nextDueDate) submitData.nextDueDate = new Date().toISOString().slice(0, 10);
+
+    const err = validateStudent(submitData, submitData.id);
     if (err) { toast.error(err); return; }
     setIsUpdating(true);
     try {
-      let photoUrl = editingStudent.photoUrl;
-      let applicationFormUrl = editingStudent.applicationFormUrl;
+      let photoUrl = submitData.photoUrl;
+      let applicationFormUrl = submitData.applicationFormUrl;
       if (editPhotoFile) { const r = await uploadFile(editPhotoFile); photoUrl = r.url; }
       if (editFormFile) { const r = await uploadFile(editFormFile); applicationFormUrl = r.url; }
-      const payload = populateFees(editingStudent.course, { ...editingStudent, photoUrl, applicationFormUrl }) as Student;
-      await updateStudent(editingStudent.id, payload);
+      const payload = { ...submitData, photoUrl, applicationFormUrl } as Student;
+      await updateStudent(submitData.id, payload);
       setEditingStudent(null); setEditPhotoFile(null); setEditFormFile(null);
       toast.success("Student updated successfully");
     } catch (error) { toast.error(error instanceof Error ? error.message : "Failed to update student"); }
@@ -429,15 +439,12 @@ const StudentManagement = () => {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2 col-span-2"><Label>Full Name *</Label><Input value={newStudent.name} onChange={e => setNewStudent({...newStudent,name:e.target.value})} placeholder="Enter full name" /></div>
-              <div className="grid gap-2"><Label>Email *</Label><Input type="email" value={newStudent.email} onChange={e => setNewStudent({...newStudent,email:e.target.value})} placeholder="email@example.com" /></div>
-              <div className="grid gap-2"><Label>Phone *</Label><Input value={newStudent.phone} onChange={e => setNewStudent({...newStudent,phone:e.target.value})} placeholder="+91 XXXXX XXXXX" /></div>
+              <div className="grid gap-2 col-span-2"><Label>Phone *</Label><Input value={newStudent.phone} onChange={e => setNewStudent({...newStudent,phone:e.target.value})} placeholder="+91 XXXXX XXXXX" /></div>
               <div className="grid gap-2 col-span-2"><Label>Course *</Label><Select onValueChange={v => setNewStudent(populateFees(v,newStudent) as StudentForm)} value={newStudent.course}><SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger><SelectContent>{courseTitles.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
               <div className="grid gap-2"><Label>Batch</Label><Select onValueChange={v => setNewStudent({...newStudent,batch:v})} value={newStudent.batch}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Morning">Morning</SelectItem><SelectItem value="Evening">Evening</SelectItem><SelectItem value="Weekend">Weekend</SelectItem></SelectContent></Select></div>
               <div className="grid gap-2"><Label>Fee Status</Label><Select value={newStudent.feeStatus} onValueChange={(v: FeeStatus) => setNewStudent({...newStudent,feeStatus:v})}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Paid">Paid</SelectItem><SelectItem value="Part Paid">Part Paid</SelectItem><SelectItem value="Overdue">Overdue</SelectItem></SelectContent></Select></div>
               <div className="grid gap-2"><Label>Total Fee (Rs.)</Label><Input type="number" value={newStudent.totalFee} onChange={e => setNewStudent({...newStudent,totalFee:Number(e.target.value)})} /></div>
               <div className="grid gap-2"><Label>Amount Paid (Rs.)</Label><Input type="number" value={newStudent.paidFee} onChange={e => setNewStudent({...newStudent,paidFee:Number(e.target.value)})} /></div>
-              <div className="grid gap-2"><Label>Next Due Date</Label><Input type="date" value={newStudent.nextDueDate} onChange={e => setNewStudent({...newStudent,nextDueDate:e.target.value})} /></div>
-              <div className="grid gap-2"><Label>Attendance %</Label><Input value={newStudent.attendance} onChange={e => setNewStudent({...newStudent,attendance:e.target.value})} placeholder="e.g. 85%" /></div>
               <div className="grid gap-2"><Label>Student Photo</Label><Input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files?.[0] || null)} /></div>
               <div className="grid gap-2"><Label>Application Form Image</Label><Input type="file" accept="image/*,application/pdf" onChange={e => setFormFile(e.target.files?.[0] || null)} /></div>
               <CustomFeeManager student={newStudent} onChange={v => setNewStudent({...newStudent,customFeesJson:v})} />
@@ -460,15 +467,12 @@ const StudentManagement = () => {
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2 col-span-2"><Label>Full Name</Label><Input value={editingStudent.name} onChange={e => setEditingStudent({...editingStudent,name:e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>Email</Label><Input type="email" value={editingStudent.email} onChange={e => setEditingStudent({...editingStudent,email:e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>Phone</Label><Input value={editingStudent.phone} onChange={e => setEditingStudent({...editingStudent,phone:e.target.value})} /></div>
+                  <div className="grid gap-2 col-span-2"><Label>Phone</Label><Input value={editingStudent.phone} onChange={e => setEditingStudent({...editingStudent,phone:e.target.value})} /></div>
                   <div className="grid gap-2 col-span-2"><Label>Course</Label><Select value={editingStudent.course} onValueChange={v => setEditingStudent(populateFees(v,editingStudent) as Student)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{courseTitles.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select></div>
                   <div className="grid gap-2"><Label>Batch</Label><Select value={editingStudent.batch} onValueChange={v => setEditingStudent({...editingStudent,batch:v})}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Morning">Morning</SelectItem><SelectItem value="Evening">Evening</SelectItem><SelectItem value="Weekend">Weekend</SelectItem></SelectContent></Select></div>
                   <div className="grid gap-2"><Label>Fee Status</Label><Select value={editingStudent.feeStatus} onValueChange={(v: FeeStatus) => setEditingStudent({...editingStudent,feeStatus:v})}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Paid">Paid</SelectItem><SelectItem value="Part Paid">Part Paid</SelectItem><SelectItem value="Overdue">Overdue</SelectItem></SelectContent></Select></div>
                   <div className="grid gap-2"><Label>Total Fee (Rs.)</Label><Input type="number" value={editingStudent.totalFee} onChange={e => setEditingStudent({...editingStudent,totalFee:Number(e.target.value)})} /></div>
                   <div className="grid gap-2"><Label>Amount Paid (Rs.)</Label><Input type="number" value={editingStudent.paidFee} onChange={e => setEditingStudent({...editingStudent,paidFee:Number(e.target.value)})} /></div>
-                  <div className="grid gap-2"><Label>Next Due Date</Label><Input type="date" value={editingStudent.nextDueDate} onChange={e => setEditingStudent({...editingStudent,nextDueDate:e.target.value})} /></div>
-                  <div className="grid gap-2"><Label>Attendance %</Label><Input value={editingStudent.attendance} onChange={e => setEditingStudent({...editingStudent,attendance:e.target.value})} /></div>
                   <div className="grid gap-2">
                     <Label>Update Student Photo</Label>
                     <Input type="file" accept="image/*" onChange={e => setEditPhotoFile(e.target.files?.[0] || null)} />

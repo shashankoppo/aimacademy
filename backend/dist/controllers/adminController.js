@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = void 0;
+exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.updateAdminStaff = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = void 0;
 const zod_1 = require("zod");
 const prisma_1 = require("../prisma");
+const password_1 = require("../security/password");
 const feeStatusSchema = zod_1.z.enum(["Paid", "Part Paid", "Overdue"]);
 const courseStatusSchema = zod_1.z.enum(["Active", "Upcoming", "Completed"]);
 const payrollStatusSchema = zod_1.z.enum(["Paid", "Pending", "Processing"]);
@@ -21,6 +22,9 @@ const studentSchema = zod_1.z.object({
     nextInstallmentLabel: zod_1.z.string().trim().min(2).optional(),
     nextInstallmentAmount: zod_1.z.coerce.number().int().nonnegative().optional(),
     nextDueDate: zod_1.z.string().trim().min(1).optional(),
+    customFeesJson: zod_1.z.string().optional(),
+    photoUrl: zod_1.z.string().nullable().optional(),
+    applicationFormUrl: zod_1.z.string().nullable().optional(),
 });
 const courseSchema = zod_1.z.object({
     title: zod_1.z.string().trim().min(2),
@@ -359,6 +363,25 @@ const addAdminStudent = async (req, res) => {
                 courseId: course.id,
             },
         });
+        const userEmail = payload.email.toLowerCase();
+        const existingUser = await prisma_1.prisma.user.findUnique({ where: { email: userEmail } });
+        if (!existingUser) {
+            const user = await prisma_1.prisma.user.create({
+                data: {
+                    name: payload.name,
+                    email: userEmail,
+                    phone: payload.phone || null,
+                    role: "STUDENT",
+                    password: await (0, password_1.hashPassword)("aim123"),
+                    isActive: true,
+                },
+            });
+            await prisma_1.prisma.studentProfile.create({
+                data: {
+                    userId: user.id,
+                },
+            });
+        }
         await syncCourseStudentCount(payload.course);
         res.status(201).json(student);
     }
@@ -506,6 +529,28 @@ const processPayroll = async (_req, res) => {
     }
 };
 exports.processPayroll = processPayroll;
+const updateAdminStaff = async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const { salary, payrollStatus, attendanceStatus, clockIn, clockOut } = req.body;
+        const updated = await prisma_1.prisma.adminStaff.update({
+            where: { id },
+            data: {
+                ...(salary !== undefined && { salary }),
+                ...(payrollStatus && { payrollStatus }),
+                ...(attendanceStatus && { attendanceStatus }),
+                ...(clockIn && { clockIn }),
+                ...(clockOut && { clockOut }),
+                ...(payrollStatus === "Paid" && { payrollDate: new Date().toISOString().slice(0, 10) }),
+            },
+        });
+        res.json(updated);
+    }
+    catch (error) {
+        handleError(res, error, "Failed to update staff member");
+    }
+};
+exports.updateAdminStaff = updateAdminStaff;
 const markAttendance = async (_req, res) => {
     try {
         // Basic mock logic for demonstrative attendance update

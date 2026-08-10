@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -15,6 +16,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, link: "/admin" },
     { title: "Access Control", icon: UserRound, link: "/admin/users" },
+    { title: "Roles & Permissions", icon: Shield, link: "/admin/roles" },
     { title: "Students", icon: Users, link: "/admin/students" },
     { title: "Courses", icon: BookOpen, link: "/admin/courses" },
     { title: "Mock Tests", icon: FileText, link: "/admin/mock-tests" },
@@ -93,13 +95,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </button>
           
           <div className="flex items-center gap-4 ml-auto">
-            <div className="text-right hidden sm:block">
-              <p className="text-[13px] font-black text-slate-900 leading-tight">Dr. Imran Khan</p>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Super Admin</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-slate-900 border-2 border-[#FFFF00] flex items-center justify-center text-[#FFFF00] font-black shadow-md">
-              IK
-            </div>
+            <ProfileDropdown profilePath="/admin/profile" />
           </div>
         </header>
 

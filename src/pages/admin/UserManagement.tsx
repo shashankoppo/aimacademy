@@ -117,6 +117,7 @@ const UserManagement = () => {
         phone: form.phone.trim() || undefined,
         role: form.role,
         isActive: form.isActive,
+        password: form.password || undefined,
       };
       const data = await apiRequest<{ success: true; user: IamUser }>(`/admin/iam/users/${editUser.id}`, {
         method: "PUT",
@@ -355,6 +356,12 @@ const UserManagement = () => {
                         <SelectItem value="DISABLED">Disabled</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label>New Password (Optional)</Label>
+                    <Input value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="Leave blank to keep unchanged" />
                   </div>
                 </div>
               </div>
