@@ -1,4 +1,7 @@
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { authenticate, requirePermission } from "../middleware/auth";
 import { auditLog } from "../middleware/audit";
 import {
@@ -30,9 +33,25 @@ import {
   addAdminVideo,
   updateAdminVideo,
   deleteAdminVideo,
+  handleFileUpload,
 } from '../controllers/adminController';
 
 const router = Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), "uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
 
 // Admin API: authenticated + authorized
 router.use(authenticate);
@@ -49,6 +68,8 @@ router.use((req, res, next) => {
 });
 
 router.get('/overview', getAdminOverview);
+
+router.post("/upload", upload.single("file"), handleFileUpload);
 
 router.get("/students", requirePermission("admin:manage_students"), getAdminStudents);
 router.post("/students", requirePermission("admin:manage_students"), addAdminStudent);

@@ -1,10 +1,30 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const auth_1 = require("../middleware/auth");
 const audit_1 = require("../middleware/audit");
 const adminController_1 = require("../controllers/adminController");
 const router = (0, express_1.Router)();
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadDir = path_1.default.join(process.cwd(), "uploads");
+        if (!fs_1.default.existsSync(uploadDir)) {
+            fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + path_1.default.extname(file.originalname));
+    },
+});
+const upload = (0, multer_1.default)({ storage });
 // Admin API: authenticated + authorized
 router.use(auth_1.authenticate);
 router.use((0, auth_1.requirePermission)("admin:access"));
@@ -19,6 +39,7 @@ router.use((req, res, next) => {
     next();
 });
 router.get('/overview', adminController_1.getAdminOverview);
+router.post("/upload", upload.single("file"), adminController_1.handleFileUpload);
 router.get("/students", (0, auth_1.requirePermission)("admin:manage_students"), adminController_1.getAdminStudents);
 router.post("/students", (0, auth_1.requirePermission)("admin:manage_students"), adminController_1.addAdminStudent);
 router.put("/students/:id", (0, auth_1.requirePermission)("admin:manage_students"), adminController_1.updateAdminStudent);

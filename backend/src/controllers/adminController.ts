@@ -421,7 +421,41 @@ export const updateAdminStudent = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     const payload = studentSchema.partial().parse(req.body);
+    
+    // Fetch existing student to check if email/phone changed
+    const existing = await prisma.adminStudent.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: "Student not found" });
+
     const student = await prisma.adminStudent.update({ where: { id }, data: payload });
+
+    // Sync with User table if applicable
+    if (
+      (payload.email && payload.email !== existing.email) || 
+      (payload.phone && payload.phone !== existing.phone) ||
+      (payload.name && payload.name !== existing.name)
+    ) {
+      // Find user by old email or old phone
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: existing.email },
+            { phone: existing.phone }
+          ]
+        }
+      });
+
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            ...(payload.email ? { email: payload.email } : {}),
+            ...(payload.phone ? { phone: payload.phone } : {}),
+            ...(payload.name ? { name: payload.name } : {}),
+          }
+        });
+      }
+    }
+
     if (payload.course) await syncCourseStudentCount(payload.course);
     res.json(student);
   } catch (error) {
@@ -531,10 +565,29 @@ export const getAdminStaff = async (_req: Request, res: Response) => {
   }
 };
 
-export const processPayroll = async (_req: Request, res: Response) => {
+export const processPayroll = async (req: Request, res: Response) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    await prisma.adminStaff.updateMany({ where: { payrollStatus: { not: "Paid" } }, data: { payrollStatus: "Paid", payrollDate: today } });
+    let ids: number[] = [];
+
+    // Optional payload: { staffIds: [1, 2, 3] }
+    if (req.body.staffIds && Array.isArray(req.body.staffIds)) {
+      ids = req.body.staffIds.map(Number);
+    }
+
+    if (ids.length > 0) {
+      await prisma.adminStaff.updateMany({ 
+        where: { id: { in: ids }, payrollStatus: { not: "Paid" } }, 
+        data: { payrollStatus: "Paid", payrollDate: today } 
+      });
+    } else {
+      // Fallback: pay all pending (bulk action backward compatibility)
+      await prisma.adminStaff.updateMany({ 
+        where: { payrollStatus: { not: "Paid" } }, 
+        data: { payrollStatus: "Paid", payrollDate: today } 
+      });
+    }
+
     const staff = await prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } });
     res.json(staff);
   } catch (error) {
@@ -567,9 +620,18 @@ export const updateAdminStaff = async (req: Request, res: Response) => {
 
 export const markAttendance = async (_req: Request, res: Response) => {
   try {
-    // Basic mock logic for demonstrative attendance update
     const students = await prisma.adminStudent.findMany();
-    const updated = await Promise.all(students.map(s => prisma.adminStudent.update({ where: { id: s.id }, data: { attendance: '90%' } })));
+    const updated = await Promise.all(
+      students.map((s) => {
+        const current = parseInt(s.attendance, 10) || 0;
+        // Realistic simulation: boost attendance slightly up to 100%
+        const newVal = Math.min(100, current + Math.floor(Math.random() * 3) + 1);
+        return prisma.adminStudent.update({
+          where: { id: s.id },
+          data: { attendance: `${newVal}%` },
+        });
+      })
+    );
     res.json(updated);
   } catch (error) {
     handleError(res, error, "Failed to mark attendance");
@@ -578,11 +640,14 @@ export const markAttendance = async (_req: Request, res: Response) => {
 
 export const sendFeeReminders = async (req: Request, res: Response) => {
   try {
+    console.log("sendFeeReminders body:", req.body);
     const ids = z.array(z.number()).parse(req.body.studentIds);
+    console.log("sendFeeReminders ids:", ids);
     await prisma.adminStudent.updateMany({ where: { id: { in: ids } }, data: { remindersSent: { increment: 1 }, lastReminderAt: new Date() } });
     const students = await prisma.adminStudent.findMany({ where: { id: { in: ids } } });
     res.json(students);
   } catch (error) {
+    console.error("sendFeeReminders error:", error);
     handleError(res, error, "Failed to send reminders");
   }
 };
@@ -709,5 +774,17 @@ export const deleteAdminVideo = async (req: Request, res: Response) => {
     res.json({ success: true });
   } catch (error) {
     handleError(res, error, "Failed to delete video");
+  }
+};
+
+export const handleFileUpload = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+    const url = `/uploads/${req.file.filename}`;
+    res.json({ success: true, url });
+  } catch (error) {
+    handleError(res, error, "Failed to handle file upload");
   }
 };

@@ -38,7 +38,18 @@ const FeeReminders = () => {
     }
     try {
       await sendFeeReminders(studentIds);
-      toast.success(`${studentIds.length} reminders sent successfully via SMS & WhatsApp!`);
+      
+      studentIds.forEach((id) => {
+        const student = students.find((s) => s.id === id);
+        if (student && student.phone) {
+          const message = `Dear ${student.name},\n\nThis is a gentle reminder that your fee installment for *${student.course}* at *AIM Academy* is due.\n\nKindly clear the dues at the earliest to continue your studies uninterrupted. 📋\n\nContact: +91 70672 31189\n\n– *AIM Academy, Jabalpur*`;
+          const phone = student.phone.replace(/[^0-9]/g, "");
+          const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+          window.open(url, "_blank");
+        }
+      });
+
+      toast.success(`${studentIds.length} reminders recorded successfully and WhatsApp opened!`);
       setSelectedStudents(new Set());
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to send reminders");

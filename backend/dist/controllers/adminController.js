@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.updateAdminStaff = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = void 0;
+exports.handleFileUpload = exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.updateAdminStaff = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = void 0;
 const zod_1 = require("zod");
 const prisma_1 = require("../prisma");
 const password_1 = require("../security/password");
@@ -394,7 +394,35 @@ const updateAdminStudent = async (req, res) => {
     try {
         const id = Number(req.params.id);
         const payload = studentSchema.partial().parse(req.body);
+        // Fetch existing student to check if email/phone changed
+        const existing = await prisma_1.prisma.adminStudent.findUnique({ where: { id } });
+        if (!existing)
+            return res.status(404).json({ error: "Student not found" });
         const student = await prisma_1.prisma.adminStudent.update({ where: { id }, data: payload });
+        // Sync with User table if applicable
+        if ((payload.email && payload.email !== existing.email) ||
+            (payload.phone && payload.phone !== existing.phone) ||
+            (payload.name && payload.name !== existing.name)) {
+            // Find user by old email or old phone
+            const user = await prisma_1.prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { email: existing.email },
+                        { phone: existing.phone }
+                    ]
+                }
+            });
+            if (user) {
+                await prisma_1.prisma.user.update({
+                    where: { id: user.id },
+                    data: {
+                        ...(payload.email ? { email: payload.email } : {}),
+                        ...(payload.phone ? { phone: payload.phone } : {}),
+                        ...(payload.name ? { name: payload.name } : {}),
+                    }
+                });
+            }
+        }
         if (payload.course)
             await syncCourseStudentCount(payload.course);
         res.json(student);
@@ -517,10 +545,27 @@ const getAdminStaff = async (_req, res) => {
     }
 };
 exports.getAdminStaff = getAdminStaff;
-const processPayroll = async (_req, res) => {
+const processPayroll = async (req, res) => {
     try {
         const today = new Date().toISOString().slice(0, 10);
-        await prisma_1.prisma.adminStaff.updateMany({ where: { payrollStatus: { not: "Paid" } }, data: { payrollStatus: "Paid", payrollDate: today } });
+        let ids = [];
+        // Optional payload: { staffIds: [1, 2, 3] }
+        if (req.body.staffIds && Array.isArray(req.body.staffIds)) {
+            ids = req.body.staffIds.map(Number);
+        }
+        if (ids.length > 0) {
+            await prisma_1.prisma.adminStaff.updateMany({
+                where: { id: { in: ids }, payrollStatus: { not: "Paid" } },
+                data: { payrollStatus: "Paid", payrollDate: today }
+            });
+        }
+        else {
+            // Fallback: pay all pending (bulk action backward compatibility)
+            await prisma_1.prisma.adminStaff.updateMany({
+                where: { payrollStatus: { not: "Paid" } },
+                data: { payrollStatus: "Paid", payrollDate: today }
+            });
+        }
         const staff = await prisma_1.prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } });
         res.json(staff);
     }
@@ -553,9 +598,16 @@ const updateAdminStaff = async (req, res) => {
 exports.updateAdminStaff = updateAdminStaff;
 const markAttendance = async (_req, res) => {
     try {
-        // Basic mock logic for demonstrative attendance update
         const students = await prisma_1.prisma.adminStudent.findMany();
-        const updated = await Promise.all(students.map(s => prisma_1.prisma.adminStudent.update({ where: { id: s.id }, data: { attendance: '90%' } })));
+        const updated = await Promise.all(students.map((s) => {
+            const current = parseInt(s.attendance, 10) || 0;
+            // Realistic simulation: boost attendance slightly up to 100%
+            const newVal = Math.min(100, current + Math.floor(Math.random() * 3) + 1);
+            return prisma_1.prisma.adminStudent.update({
+                where: { id: s.id },
+                data: { attendance: `${newVal}%` },
+            });
+        }));
         res.json(updated);
     }
     catch (error) {
@@ -565,12 +617,15 @@ const markAttendance = async (_req, res) => {
 exports.markAttendance = markAttendance;
 const sendFeeReminders = async (req, res) => {
     try {
+        console.log("sendFeeReminders body:", req.body);
         const ids = zod_1.z.array(zod_1.z.number()).parse(req.body.studentIds);
+        console.log("sendFeeReminders ids:", ids);
         await prisma_1.prisma.adminStudent.updateMany({ where: { id: { in: ids } }, data: { remindersSent: { increment: 1 }, lastReminderAt: new Date() } });
         const students = await prisma_1.prisma.adminStudent.findMany({ where: { id: { in: ids } } });
         res.json(students);
     }
     catch (error) {
+        console.error("sendFeeReminders error:", error);
         handleError(res, error, "Failed to send reminders");
     }
 };
@@ -711,3 +766,16 @@ const deleteAdminVideo = async (req, res) => {
     }
 };
 exports.deleteAdminVideo = deleteAdminVideo;
+const handleFileUpload = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded" });
+        }
+        const url = `/uploads/${req.file.filename}`;
+        res.json({ success: true, url });
+    }
+    catch (error) {
+        handleError(res, error, "Failed to handle file upload");
+    }
+};
+exports.handleFileUpload = handleFileUpload;
