@@ -255,7 +255,7 @@ const TeacherDashboard = () => {
       const mapped = res.questions.map((q) => ({
         id: q.id,
         question: q.question,
-        options: JSON.parse(q.optionsJson),
+        options: q.options,
         correctIndex: q.correctIndex,
       }));
       setQuestions(mapped);
@@ -269,11 +269,15 @@ const TeacherDashboard = () => {
   const updateQuestion = (qIndex: number, field: string, value: any, optIndex?: number) => {
     setQuestions((prev) => {
       const q = [...prev];
+      const updatedQuestion = { ...q[qIndex] };
       if (field === "options" && typeof optIndex === "number") {
-        q[qIndex].options[optIndex] = value;
+        const newOptions = [...updatedQuestion.options];
+        newOptions[optIndex] = value;
+        updatedQuestion.options = newOptions;
       } else {
-        (q[qIndex] as any)[field] = value;
+        (updatedQuestion as any)[field] = value;
       }
+      q[qIndex] = updatedQuestion;
       return q;
     });
   };

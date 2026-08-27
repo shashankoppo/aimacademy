@@ -74,11 +74,21 @@ const MockTestManagement = () => {
 
   const openEdit = (test: MockTest) => {
     setEditingTest(test);
-    const formattedQuestions = test.questions.map((q: any) => ({
-      question: q.question,
-      options: JSON.parse(q.optionsJson),
-      correct: q.correctIndex,
-    }));
+    const formattedQuestions = test.questions.map((q: any) => {
+      let parsedOptions = ["", "", "", ""];
+      try {
+        if (q.optionsJson && q.optionsJson !== "undefined") {
+          parsedOptions = JSON.parse(q.optionsJson);
+        }
+      } catch (e) {
+        console.error("Failed to parse optionsJson:", q.optionsJson);
+      }
+      return {
+        question: q.question,
+        options: parsedOptions,
+        correct: q.correctIndex,
+      };
+    });
     setForm({
       title: test.title,
       durationMinutes: test.durationMinutes,
@@ -132,11 +142,15 @@ const MockTestManagement = () => {
   const updateQuestion = (qIndex: number, field: string, value: any, optIndex?: number) => {
     setForm(prev => {
       const q = [...prev.questions];
+      const updatedQuestion = { ...q[qIndex] };
       if (field === "options" && typeof optIndex === "number") {
-        q[qIndex].options[optIndex] = value;
+        const newOptions = [...updatedQuestion.options];
+        newOptions[optIndex] = value;
+        updatedQuestion.options = newOptions;
       } else {
-        (q[qIndex] as any)[field] = value;
+        (updatedQuestion as any)[field] = value;
       }
+      q[qIndex] = updatedQuestion;
       return { ...prev, questions: q };
     });
   };
