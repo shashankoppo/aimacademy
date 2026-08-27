@@ -29,6 +29,13 @@ type TeacherMockTest = {
 type LeaderboardRow = { studentId: number; name: string; avgPct: string; testsTaken: number; status: string };
 type TeacherResource = { id: string; title: string; description: string; url: string; courseId: number | null; batch: string | null; isPublished: boolean };
 
+type Question = {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+};
+
 type AssignMode = "batch" | "student";
 
 const TeacherDashboard = () => {
@@ -53,6 +60,11 @@ const TeacherDashboard = () => {
   const [editingTest, setEditingTest] = useState<TeacherMockTest | null>(null);
   const [savingTest, setSavingTest] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
+  const [questionsDialogOpen, setQuestionsDialogOpen] = useState(false);
+  const [managingTestQuestions, setManagingTestQuestions] = useState<TeacherMockTest | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [savingQuestions, setSavingQuestions] = useState(false);
 
   const [testForm, setTestForm] = useState({
     title: "",
@@ -234,6 +246,52 @@ const TeacherDashboard = () => {
       toast.success("Mock test deleted.");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to delete mock test");
+    }
+  };
+
+  const openManageQuestions = async (t: TeacherMockTest) => {
+    try {
+      const res = await apiRequest<{ success: true; questions: any[] }>(`/teacher/mock-tests/${t.id}/questions`);
+      const mapped = res.questions.map((q) => ({
+        id: q.id,
+        question: q.question,
+        options: JSON.parse(q.optionsJson),
+        correctIndex: q.correctIndex,
+      }));
+      setQuestions(mapped);
+      setManagingTestQuestions(t);
+      setQuestionsDialogOpen(true);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load questions");
+    }
+  };
+
+  const updateQuestion = (qIndex: number, field: string, value: any, optIndex?: number) => {
+    setQuestions((prev) => {
+      const q = [...prev];
+      if (field === "options" && typeof optIndex === "number") {
+        q[qIndex].options[optIndex] = value;
+      } else {
+        (q[qIndex] as any)[field] = value;
+      }
+      return q;
+    });
+  };
+
+  const saveQuestions = async () => {
+    if (!managingTestQuestions) return;
+    try {
+      setSavingQuestions(true);
+      await apiRequest(`/teacher/mock-tests/${managingTestQuestions.id}/questions`, {
+        method: "PUT",
+        body: JSON.stringify({ questions }),
+      });
+      toast.success("Questions updated successfully");
+      setQuestionsDialogOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save questions");
+    } finally {
+      setSavingQuestions(false);
     }
   };
 
@@ -470,7 +528,10 @@ const TeacherDashboard = () => {
                              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {test.durationMinutes}m</span>
                              <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(test.scheduledAt).toLocaleDateString("en-US", { month: "short", day: "2-digit" })}</span>
                           </div>
-                          <button className="mt-6 w-full py-2 bg-slate-50 text-slate-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-primary hover:text-white transition-all">Live Evaluation</button>
+                          <div className="flex gap-2 mt-6">
+                            <button onClick={() => void openManageQuestions(test)} className="flex-1 py-2 bg-emerald-50 text-emerald-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-emerald-600 hover:text-white transition-all">Manage Qs</button>
+                            <button className="flex-1 py-2 bg-slate-50 text-slate-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-primary hover:text-white transition-all">Live Eval</button>
+                          </div>
                        </div>
                      ))}
                   </div>
@@ -606,6 +667,47 @@ const TeacherDashboard = () => {
           <DialogFooter>
             <button onClick={() => void saveTest()} disabled={savingTest} className="w-full bg-primary text-white font-bold py-2 rounded-lg disabled:opacity-60">
               {savingTest ? "Saving..." : editingTest ? "Save Changes" : "Create Test"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={questionsDialogOpen} onOpenChange={setQuestionsDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Questions - {managingTestQuestions?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {questions.map((q, qIndex) => (
+              <div key={q.id} className="p-4 border border-slate-200 rounded-xl">
+                <div className="mb-4">
+                  <Label>Question {qIndex + 1}</Label>
+                  <Input value={q.question} onChange={e => updateQuestion(qIndex, "question", e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {q.options.map((opt, optIndex) => (
+                    <div key={optIndex} className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name={`correct-${q.id}`}
+                        checked={q.correctIndex === optIndex}
+                        onChange={() => updateQuestion(qIndex, "correctIndex", optIndex)}
+                        className="w-4 h-4 text-emerald-600"
+                      />
+                      <Input
+                        value={opt}
+                        onChange={e => updateQuestion(qIndex, "options", e.target.value, optIndex)}
+                        placeholder={`Option ${optIndex + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <button onClick={() => void saveQuestions()} disabled={savingQuestions} className="w-full bg-emerald-600 text-white font-bold py-2 rounded-lg disabled:opacity-60">
+              {savingQuestions ? "Saving..." : "Save Questions"}
             </button>
           </DialogFooter>
         </DialogContent>
