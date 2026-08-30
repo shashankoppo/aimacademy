@@ -465,7 +465,7 @@ const Index = () => {
                   ].map((center, i) => (
                      <div key={i} className="bg-white/40 p-8 rounded-3xl flex items-start gap-5 border-2 border-slate-200 shadow-lg hover:border-black/20 hover:shadow-xl transition-all group cursor-pointer">
                         <div className="mt-1 shrink-0 bg-white shadow-sm p-3 rounded-2xl group-hover:bg-[hsl(var(--primary))] transition-colors">
-                           <MapPin className="text-[hsl(var(--primary-foreground))] w-6 h-6" />
+                           <MapPin className="text-slate-700 group-hover:text-white w-6 h-6 transition-colors" />
                         </div>
                         <div>
                            <h3 className="font-extrabold text-slate-900 text-[17px] mb-2">{center.city}</h3>
@@ -491,7 +491,7 @@ const Index = () => {
 
          {/* ── NON-INTRUSIVE FLOATING WIDGET ── */}
          {showPopup && (
-            <div className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[100] max-w-sm w-[calc(100%-2rem)] md:w-80 animate-in slide-in-from-bottom-8 duration-300">
+            <div className="fixed bottom-28 right-4 md:bottom-24 md:right-8 z-[100] max-w-sm w-[calc(100%-2rem)] md:w-80 animate-in slide-in-from-bottom-8 duration-300">
                <div className="bg-white rounded-2xl overflow-hidden shadow-2xl relative border border-slate-200">
                   <button onClick={closePopup} className="absolute top-3 right-3 w-7 h-7 bg-white text-slate-500 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors z-20 shadow-sm border border-slate-200">
                      <X className="w-3.5 h-3.5" />

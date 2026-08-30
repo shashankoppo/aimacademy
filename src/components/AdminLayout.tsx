@@ -18,6 +18,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { title: "Access Control", icon: UserRound, link: "/admin/users" },
     { title: "Roles & Permissions", icon: Shield, link: "/admin/roles" },
     { title: "Students", icon: Users, link: "/admin/students" },
+    { title: "Teachers", icon: GraduationCap, link: "/admin/teachers" },
     { title: "Courses", icon: BookOpen, link: "/admin/courses" },
     { title: "Mock Tests", icon: FileText, link: "/admin/mock-tests" },
     { title: "Fees", icon: CreditCard, link: "/admin/fees" },

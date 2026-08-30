@@ -27,6 +27,7 @@ import FeesManagement from "./pages/admin/FeesManagement";
 import AttendanceManagement from "./pages/admin/AttendanceManagement";
 import FeeReminders from "./pages/admin/FeeReminders";
 import StudentManagement from "./pages/admin/StudentManagement";
+import TeacherManagement from "./pages/admin/TeacherManagement";
 import Announcements from "./pages/admin/Announcements";
 import LeadManagement from "./pages/admin/LeadManagement";
 import CourseManagement from "./pages/admin/CourseManagement";
@@ -215,6 +216,16 @@ const AppRoutes = () => {
             <RequireAuth allowedRoles={["ADMIN"]}>
               <AdminLayout>
                 <StudentManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/teachers"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <TeacherManagement />
               </AdminLayout>
             </RequireAuth>
           }
