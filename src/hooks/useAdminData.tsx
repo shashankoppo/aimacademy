@@ -52,7 +52,7 @@ export interface Announcement {
 }
 
 export interface StaffMember {
-  id: number;
+  id: string;
   name: string;
   role: string;
   salary: number;
@@ -139,7 +139,7 @@ interface AdminContextType extends DashboardData {
   updateAnnouncement: (id: string, announcement: Partial<Announcement>) => Promise<Announcement>;
   deleteAnnouncement: (id: string) => Promise<void>;
   processPayroll: () => Promise<void>;
-  updateStaff: (id: number, data: Partial<StaffMember>) => Promise<StaffMember>;
+  updateStaff: (id: string, data: Partial<StaffMember>) => Promise<StaffMember>;
   markAttendance: () => Promise<void>;
   sendFeeReminders: (studentIds: number[]) => Promise<void>;
   updateWebsiteSettings: (settings: WebsiteSettings) => Promise<WebsiteSettings>;
@@ -343,7 +343,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setStaff(updated);
   };
 
-  const updateStaff = async (id: number, data: Partial<StaffMember>) => {
+  const updateStaff = async (id: string, data: Partial<StaffMember>) => {
     const updated = await apiRequest<StaffMember>(`/admin/staff/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),

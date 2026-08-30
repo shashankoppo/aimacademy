@@ -285,6 +285,46 @@ export const seedAdminData = async () => {
   return seedResult;
 };
 
+async function syncAndGetStaff() {
+  const users = await prisma.user.findMany({
+    where: { role: { in: ["TEACHER", "STAFF", "ADMIN"] } },
+    include: { adminStaff: true },
+    orderBy: { createdAt: "asc" }
+  });
+
+  const staff = await Promise.all(users.map(async (u) => {
+    let adminStaff = u.adminStaff;
+    if (!adminStaff) {
+      adminStaff = await prisma.adminStaff.create({
+        data: {
+          userId: u.id,
+          name: u.name,
+          role: u.role,
+          salary: 0,
+          payrollStatus: "Pending",
+          payrollDate: "-",
+          attendanceStatus: "Present",
+          clockIn: "-",
+          clockOut: "-"
+        }
+      });
+    } else if (adminStaff.name !== u.name || adminStaff.role !== u.role) {
+      adminStaff = await prisma.adminStaff.update({
+        where: { id: adminStaff.id },
+        data: { name: u.name, role: u.role }
+      });
+    }
+    
+    return {
+      ...adminStaff,
+      id: u.id,
+      adminStaffId: adminStaff.id
+    };
+  }));
+
+  return staff;
+}
+
 export const getAdminOverview = async (_req: Request, res: Response) => {
   try {
     await seedAdminData();
@@ -292,7 +332,7 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
       prisma.adminStudent.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.adminCourse.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.announcement.findMany({ orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }] }),
-      prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } }),
+      syncAndGetStaff(),
       prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
       prisma.adminNote.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
       prisma.adminVideo.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
@@ -558,7 +598,7 @@ export const deleteAnnouncement = async (req: Request, res: Response) => {
 
 export const getAdminStaff = async (_req: Request, res: Response) => {
   try {
-    const staff = await prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } });
+    const staff = await syncAndGetStaff();
     res.json(staff);
   } catch (error) {
     handleError(res, error, "Failed to fetch staff records");
@@ -568,16 +608,16 @@ export const getAdminStaff = async (_req: Request, res: Response) => {
 export const processPayroll = async (req: Request, res: Response) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
-    let ids: number[] = [];
+    let ids: string[] = [];
 
     // Optional payload: { staffIds: [1, 2, 3] }
     if (req.body.staffIds && Array.isArray(req.body.staffIds)) {
-      ids = req.body.staffIds.map(Number);
+      ids = req.body.staffIds.map(String);
     }
 
     if (ids.length > 0) {
       await prisma.adminStaff.updateMany({ 
-        where: { id: { in: ids }, payrollStatus: { not: "Paid" } }, 
+        where: { userId: { in: ids }, payrollStatus: { not: "Paid" } }, 
         data: { payrollStatus: "Paid", payrollDate: today } 
       });
     } else {
@@ -588,7 +628,7 @@ export const processPayroll = async (req: Request, res: Response) => {
       });
     }
 
-    const staff = await prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } });
+    const staff = await syncAndGetStaff();
     res.json(staff);
   } catch (error) {
     handleError(res, error, "Failed to process payroll");
@@ -597,12 +637,12 @@ export const processPayroll = async (req: Request, res: Response) => {
 
 export const updateAdminStaff = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = String(req.params.id);
     const { salary, payrollStatus, attendanceStatus, clockIn, clockOut } = req.body as {
       salary?: number; payrollStatus?: string; attendanceStatus?: string; clockIn?: string; clockOut?: string;
     };
-    const updated = await prisma.adminStaff.update({
-      where: { id },
+    let updated = await prisma.adminStaff.update({
+      where: { userId: id },
       data: {
         ...(salary !== undefined && { salary }),
         ...(payrollStatus && { payrollStatus }),
@@ -612,7 +652,8 @@ export const updateAdminStaff = async (req: Request, res: Response) => {
         ...(payrollStatus === "Paid" && { payrollDate: new Date().toISOString().slice(0, 10) }),
       },
     });
-    res.json(updated);
+    const mapped = { ...updated, id: id, adminStaffId: updated.id };
+    res.json(mapped);
   } catch (error) {
     handleError(res, error, "Failed to update staff member");
   }

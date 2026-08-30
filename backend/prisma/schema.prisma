@@ -30,6 +30,7 @@ model User {
   assignedCourseAccesses StudentCourseAccess[] @relation("AssignedByUser")
   createdMockTests       MockTest[]            @relation("MockTestCreatedBy")
   createdResources       TeacherResource[]     @relation("TeacherResourceCreatedBy")
+  adminStaff             AdminStaff?
 }
 
 model RefreshToken {
@@ -240,6 +241,8 @@ model AdminStudent {
 
 model AdminStaff {
   id               Int      @id @default(autoincrement())
+  userId           String?  @unique
+  user             User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   name             String
   role             String
   salary           Int

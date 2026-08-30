@@ -18,7 +18,7 @@ const PayrollManagement = () => {
   const [editPayStatus, setEditPayStatus] = useState<PayrollStatus>("Pending");
   const [isSaving, setIsSaving] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [payingId, setPayingId] = useState<number | null>(null);
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   const filtered = staff.filter(m => {
     const q = searchTerm.toLowerCase();
