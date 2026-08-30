@@ -23,6 +23,7 @@ const VideoManagement = () => {
   const [form, setForm] = useState<VideoForm>(emptyVideo);
   const [editing, setEditing] = useState<VideoItem | null>(null);
   const [isFetchingInfo, setIsFetchingInfo] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const sortedVideos = useMemo(() => [...videos].sort((a, b) => a.displayOrder - b.displayOrder), [videos]);
 
@@ -34,12 +35,15 @@ const VideoManagement = () => {
   const saveNew = async () => {
     const error = validate(form);
     if (error) return toast.error(error);
+    setIsSaving(true);
     try {
       await addVideo(form);
       setForm(emptyVideo);
       toast.success("Video added successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add video");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -47,12 +51,15 @@ const VideoManagement = () => {
     if (!editing) return;
     const error = validate(editing);
     if (error) return toast.error(error);
+    setIsSaving(true);
     try {
       await updateVideo(editing.id, editing);
       setEditing(null);
       toast.success("Video updated successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update video");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -144,15 +151,23 @@ const VideoManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <button onClick={() => void saveNew()} className="w-full bg-primary text-white font-bold py-2 rounded-lg">Save Video</button>
+              <button onClick={() => void saveNew()} disabled={isSaving} className="w-full bg-primary text-white font-bold py-2 rounded-lg disabled:opacity-60">
+                {isSaving ? "Saving..." : "Save Video"}
+              </button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {sortedVideos.map((video) => (
-          <div key={video.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      {sortedVideos.length === 0 ? (
+        <div className="py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl">
+          <Youtube className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+          <p className="text-slate-400 font-bold">No videos found.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {sortedVideos.map((video) => (
+            <div key={video.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="aspect-video bg-slate-900 relative">
               <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover opacity-70" />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -183,7 +198,8 @@ const VideoManagement = () => {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="sm:max-w-[520px]">
@@ -222,7 +238,9 @@ const VideoManagement = () => {
                 </div>
               </div>
               <DialogFooter>
-                <button onClick={() => void saveEdit()} className="w-full bg-primary text-white font-bold py-2 rounded-lg">Save Changes</button>
+                <button onClick={() => void saveEdit()} disabled={isSaving} className="w-full bg-primary text-white font-bold py-2 rounded-lg disabled:opacity-60">
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
               </DialogFooter>
             </>
           )}

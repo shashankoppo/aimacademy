@@ -37,6 +37,7 @@ const LeadManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [editStatus, setEditStatus] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const loadLeads = async () => {
     try {
@@ -61,6 +62,7 @@ const LeadManagement = () => {
 
   const handleUpdateStatus = async () => {
     if (!selectedLead) return;
+    setIsUpdating(true);
     try {
       await apiRequest(`/admin/leads/${selectedLead.id}`, {
         method: "PUT",
@@ -71,6 +73,8 @@ const LeadManagement = () => {
       loadLeads();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to update lead");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -237,12 +241,12 @@ const LeadManagement = () => {
               </div>
             </div>
           )}
-          <DialogFooter>
-            <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
-            <button onClick={handleUpdateStatus} className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity">
-              Update Status
-            </button>
-          </DialogFooter>
+            <DialogFooter>
+              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleUpdateStatus} disabled={isUpdating} className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60">
+                {isUpdating ? "Updating..." : "Update Status"}
+              </button>
+            </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -202,6 +202,12 @@ const AttendanceManagement = () => {
                 })}
               </tbody>
             </table>
+            {filteredStudents.length === 0 && (
+              <div className="p-20 text-center">
+                <Users className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-400 font-bold">No students found.</p>
+              </div>
+            )}
           ) : (
             <table className="w-full text-left">
               <thead>
@@ -232,6 +238,12 @@ const AttendanceManagement = () => {
                 ))}
               </tbody>
             </table>
+            {filteredStaff.length === 0 && (
+              <div className="p-20 text-center">
+                <Users className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-400 font-bold">No staff found.</p>
+              </div>
+            )}
           )}
         </div>
       </div>

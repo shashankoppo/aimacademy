@@ -23,6 +23,7 @@ const NotesManagement = () => {
   const { notes, addNote, updateNote, deleteNote } = useAdminData();
   const [form, setForm] = useState<NoteForm>(emptyNote);
   const [editing, setEditing] = useState<NoteItem | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const sortedNotes = useMemo(() => [...notes].sort((a, b) => a.displayOrder - b.displayOrder), [notes]);
 
@@ -49,12 +50,15 @@ const NotesManagement = () => {
   const saveNew = async () => {
     const error = validate(form);
     if (error) return toast.error(error);
+    setIsSaving(true);
     try {
       await addNote(form);
       setForm(emptyNote);
       toast.success("Note added successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to add note");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -62,12 +66,15 @@ const NotesManagement = () => {
     if (!editing) return;
     const error = validate(editing);
     if (error) return toast.error(error);
+    setIsSaving(true);
     try {
       await updateNote(editing.id, editing);
       setEditing(null);
       toast.success("Note updated successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update note");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -135,15 +142,23 @@ const NotesManagement = () => {
               </div>
             </div>
             <DialogFooter>
-              <button onClick={() => void saveNew()} className="w-full bg-primary text-white font-bold py-2 rounded-lg">Save Note</button>
+              <button onClick={() => void saveNew()} disabled={isSaving} className="w-full bg-primary text-white font-bold py-2 rounded-lg disabled:opacity-60">
+                {isSaving ? "Saving..." : "Save Note"}
+              </button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {sortedNotes.map((note) => (
-          <div key={note.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+      {sortedNotes.length === 0 ? (
+        <div className="py-20 text-center border-2 border-dashed border-slate-200 rounded-2xl">
+          <FileText className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+          <p className="text-slate-400 font-bold">No notes found.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {sortedNotes.map((note) => (
+            <div key={note.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="p-3 rounded-xl bg-slate-50 text-slate-500">
@@ -171,7 +186,8 @@ const NotesManagement = () => {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="sm:max-w-[520px]">
@@ -194,7 +210,9 @@ const NotesManagement = () => {
                 <input type="file" accept="image/*" onChange={(e) => onFileLoad("thumbnailUrl", e.target.files?.[0], true)} className="text-xs text-slate-500" />
               </div>
               <DialogFooter>
-                <button onClick={() => void saveEdit()} className="w-full bg-primary text-white font-bold py-2 rounded-lg">Save Changes</button>
+                <button onClick={() => void saveEdit()} disabled={isSaving} className="w-full bg-primary text-white font-bold py-2 rounded-lg disabled:opacity-60">
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
               </DialogFooter>
             </>
           )}

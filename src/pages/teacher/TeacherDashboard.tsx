@@ -65,6 +65,8 @@ const TeacherDashboard = () => {
   const [managingTestQuestions, setManagingTestQuestions] = useState<TeacherMockTest | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [savingQuestions, setSavingQuestions] = useState(false);
+  const [assigningAccess, setAssigningAccess] = useState(false);
+  const [savingResource, setSavingResource] = useState(false);
 
   const [testForm, setTestForm] = useState({
     title: "",
@@ -152,6 +154,12 @@ const TeacherDashboard = () => {
       return;
     }
 
+    if (assignMode === "student" && selectedStudentIds.size === 0) {
+      toast.error("Please choose at least one student.");
+      return;
+    }
+
+    setAssigningAccess(true);
     try {
       const body =
         assignMode === "batch"
@@ -171,6 +179,8 @@ const TeacherDashboard = () => {
       setStudents(studentResp.students);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to assign access");
+    } finally {
+      setAssigningAccess(false);
     }
   };
 
@@ -326,6 +336,7 @@ const TeacherDashboard = () => {
         toast.error("Please fill all resource fields.");
         return;
       }
+      setSavingResource(true);
       await apiRequest<{ success: true; resource: TeacherResource }>("/teacher/resources", {
         method: "POST",
         body: JSON.stringify({
@@ -342,6 +353,8 @@ const TeacherDashboard = () => {
       void loadAll();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to create resource");
+    } finally {
+      setSavingResource(false);
     }
   };
 
@@ -500,7 +513,9 @@ const TeacherDashboard = () => {
                                 </label>
                               ))}
                        </div>
-                       <button onClick={() => void confirmAssign()} className="w-full btn-coursera py-4 mt-6">Confirm and Assign Access</button>
+                       <button onClick={() => void confirmAssign()} disabled={assigningAccess} className="w-full btn-coursera py-4 mt-6 disabled:opacity-60">
+                         {assigningAccess ? "Assigning..." : "Confirm and Assign Access"}
+                       </button>
                     </div>
                  </div>
                </div>
@@ -514,31 +529,40 @@ const TeacherDashboard = () => {
                         <Plus className="w-4 h-4" /> Create New Test
                      </button>
                   </div>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                     {tests.map((test) => (
-                       <div key={test.id} className="p-6 rounded-xl border border-slate-100 hover:shadow-lg transition-all">
-                          <div className="flex items-start justify-between mb-4">
-                             <div className="p-2 rounded bg-surface-accent text-primary">
-                                <FileText className="w-5 h-5" />
-                             </div>
-                             <div className="flex gap-2">
-                                <button onClick={() => openEditTest(test)} aria-label="Edit test" className="p-1.5 hover:bg-slate-50 text-slate-400 rounded"><Edit className="w-4 h-4" /></button>
-                                <button onClick={() => void deleteTest(test)} aria-label="Delete test" className="p-1.5 hover:bg-red-50 text-red-400 rounded"><Trash2 className="w-4 h-4" /></button>
-                             </div>
-                          </div>
-                          <h4 className="font-bold text-slate-900 mb-4">{test.title}</h4>
-                          <div className="flex flex-wrap gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                             <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {test.questionCount} Qs</span>
-                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {test.durationMinutes}m</span>
-                             <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(test.scheduledAt).toLocaleDateString("en-US", { month: "short", day: "2-digit" })}</span>
-                          </div>
-                          <div className="flex gap-2 mt-6">
-                            <button onClick={() => void openManageQuestions(test)} className="flex-1 py-2 bg-emerald-50 text-emerald-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-emerald-600 hover:text-white transition-all">Manage Qs</button>
-                            <button className="flex-1 py-2 bg-slate-50 text-slate-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-primary hover:text-white transition-all">Live Eval</button>
-                          </div>
-                       </div>
-                     ))}
-                  </div>
+                  {tests.length === 0 ? (
+                    <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 rounded-xl">
+                       <p className="text-slate-500 mb-2">No mock tests found</p>
+                       <button onClick={openCreateTest} className="text-primary font-bold text-sm">
+                          Create your first mock test
+                       </button>
+                    </div>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                       {tests.map((test) => (
+                         <div key={test.id} className="p-6 rounded-xl border border-slate-100 hover:shadow-lg transition-all">
+                            <div className="flex items-start justify-between mb-4">
+                               <div className="p-2 rounded bg-surface-accent text-primary">
+                                  <FileText className="w-5 h-5" />
+                               </div>
+                               <div className="flex gap-2">
+                                  <button onClick={() => openEditTest(test)} aria-label="Edit test" className="p-1.5 hover:bg-slate-50 text-slate-400 rounded"><Edit className="w-4 h-4" /></button>
+                                  <button onClick={() => void deleteTest(test)} aria-label="Delete test" className="p-1.5 hover:bg-red-50 text-red-400 rounded"><Trash2 className="w-4 h-4" /></button>
+                               </div>
+                            </div>
+                            <h4 className="font-bold text-slate-900 mb-4">{test.title}</h4>
+                            <div className="flex flex-wrap gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                               <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {test.questionCount} Qs</span>
+                               <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {test.durationMinutes}m</span>
+                               <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(test.scheduledAt).toLocaleDateString("en-US", { month: "short", day: "2-digit" })}</span>
+                            </div>
+                            <div className="flex gap-2 mt-6">
+                              <button onClick={() => void openManageQuestions(test)} className="flex-1 py-2 bg-emerald-50 text-emerald-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-emerald-600 hover:text-white transition-all">Manage Qs</button>
+                              <button className="flex-1 py-2 bg-slate-50 text-slate-600 font-bold text-[10px] uppercase tracking-widest rounded hover:bg-primary hover:text-white transition-all">Live Eval</button>
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                  )}
                </div>
              )}
 
@@ -740,8 +764,8 @@ const TeacherDashboard = () => {
             </div>
           </div>
           <DialogFooter>
-            <button onClick={() => void saveResource()} className="w-full bg-slate-900 text-white font-bold py-2 rounded-lg">
-              Publish Resource
+            <button onClick={() => void saveResource()} disabled={savingResource} className="w-full bg-slate-900 text-white font-bold py-2 rounded-lg disabled:opacity-60">
+              {savingResource ? "Publishing..." : "Publish Resource"}
             </button>
           </DialogFooter>
         </DialogContent>

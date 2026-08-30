@@ -154,36 +154,43 @@ const StudentDashboard = () => {
                 </Link>
               </div>
               <div className="space-y-6">
-                {courses.map((course, i) => (
-                  <div
-                    key={course.id}
-                    className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
-                  >
-                    <div className="w-12 h-12 rounded bg-surface-accent text-primary flex items-center justify-center shrink-0">
-                      {React.createElement(iconCycle[i % iconCycle.length], { className: "w-6 h-6" })}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-slate-900 mb-1">{course.title}</h3>
-                      <p className="text-xs text-slate-400 font-medium">Next: {course.nextLesson}</p>
-                    </div>
-                    <div className="w-full sm:w-48">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
-                        <span className="text-[10px] font-bold text-primary">{course.progress}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary" style={{ width: `${course.progress}%` }} />
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => navigate("/courses")}
-                      aria-label={`Resume ${course.title}`}
-                      className="p-3 rounded-full hover:bg-primary/10 text-primary transition-all"
-                    >
-                      <Play className="w-5 h-5 fill-current" />
-                    </button>
+                {courses.length === 0 ? (
+                  <div className="py-12 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                    <BookOpen className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                    <p className="text-sm font-bold text-slate-400">No active courses found.</p>
                   </div>
-                ))}
+                ) : (
+                  courses.map((course, i) => (
+                    <div
+                      key={course.id}
+                      className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-4 rounded-xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
+                    >
+                      <div className="w-12 h-12 rounded bg-surface-accent text-primary flex items-center justify-center shrink-0">
+                        {React.createElement(iconCycle[i % iconCycle.length], { className: "w-6 h-6" })}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-slate-900 mb-1">{course.title}</h3>
+                        <p className="text-xs text-slate-400 font-medium">Next: {course.nextLesson}</p>
+                      </div>
+                      <div className="w-full sm:w-48">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
+                          <span className="text-[10px] font-bold text-primary">{course.progress}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary" style={{ width: `${course.progress}%` }} />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate("/courses")}
+                        aria-label={`Resume ${course.title}`}
+                        className="p-3 rounded-full hover:bg-primary/10 text-primary transition-all"
+                      >
+                        <Play className="w-5 h-5 fill-current" />
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -202,37 +209,44 @@ const StudentDashboard = () => {
                 </button>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
-                {mockTests.map((test, i) => (
-                  <div
-                    key={i}
-                    className="p-6 rounded-xl border border-slate-100 hover:border-primary/20 transition-all relative overflow-hidden group"
-                  >
-                    <div className="absolute top-0 right-0 p-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
-                          test.status === "Upcoming" ? "bg-slate-100 text-slate-500" : "bg-primary text-white"
-                        }`}
-                      >
-                        {test.status}
-                      </span>
-                    </div>
-                    <h4 className="font-black text-slate-900 group-hover:text-primary transition-colors pr-20">{test.title}</h4>
-                    <div className="mt-4 flex gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {test.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {test.duration}
-                      </span>
-                    </div>
-                    <Link
-                      to={`/student/mock-test?testId=${encodeURIComponent(test.id)}`}
-                      className="mt-6 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-primary group-hover:translate-x-1 transition-transform"
-                    >
-                      {test.status === "Upcoming" ? "View Details" : "Start Test Now"} <ArrowRight className="w-4 h-4" />
-                    </Link>
+                {mockTests.length === 0 ? (
+                  <div className="sm:col-span-2 py-12 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                    <CheckCircle2 className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                    <p className="text-sm font-bold text-slate-400">No upcoming tests.</p>
                   </div>
-                ))}
+                ) : (
+                  mockTests.map((test, i) => (
+                    <div
+                      key={i}
+                      className="p-6 rounded-xl border border-slate-100 hover:border-primary/20 transition-all relative overflow-hidden group"
+                    >
+                      <div className="absolute top-0 right-0 p-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${
+                            test.status === "Upcoming" ? "bg-slate-100 text-slate-500" : "bg-primary text-white"
+                          }`}
+                        >
+                          {test.status}
+                        </span>
+                      </div>
+                      <h4 className="font-black text-slate-900 group-hover:text-primary transition-colors pr-20">{test.title}</h4>
+                      <div className="mt-4 flex gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" /> {test.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {test.duration}
+                        </span>
+                      </div>
+                      <Link
+                        to={`/student/mock-test?testId=${encodeURIComponent(test.id)}`}
+                        className="mt-6 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-primary group-hover:translate-x-1 transition-transform"
+                      >
+                        {test.status === "Upcoming" ? "View Details" : "Start Test Now"} <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -283,18 +297,24 @@ const StudentDashboard = () => {
             <div className="bg-white rounded-xl border border-slate-100 p-8">
               <h3 className="heading-display text-slate-900 text-lg mb-6">Academy Alerts</h3>
               <div className="space-y-6">
-                {alerts.map((alert, i) => (
-                  <div key={i} className="flex gap-4 border-b border-slate-50 last:border-0 pb-4 last:pb-0">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900 leading-tight">{alert.title}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-bold text-slate-400">{alert.time}</span>
-                        <span className="text-[8px] bg-slate-50 text-slate-400 px-1.5 rounded uppercase font-bold tracking-widest">{alert.type}</span>
+                {alerts.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 font-medium text-sm">
+                    No new alerts at this time.
+                  </div>
+                ) : (
+                  alerts.map((alert, i) => (
+                    <div key={i} className="flex gap-4 border-b border-slate-50 last:border-0 pb-4 last:pb-0">
+                      <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900 leading-tight">{alert.title}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold text-slate-400">{alert.time}</span>
+                          <span className="text-[8px] bg-slate-50 text-slate-400 px-1.5 rounded uppercase font-bold tracking-widest">{alert.type}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

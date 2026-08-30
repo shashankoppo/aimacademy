@@ -193,10 +193,17 @@ const CourseManagement = () => {
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => {
-          const linkedStudents = students.filter((student) => student.course === course.title);
-          return (
+      {courses.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500">
+          <BookOpen className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+          <h3 className="text-lg font-bold text-slate-700 mb-1">No courses found</h3>
+          <p>Click "Create Course" to add your first course.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => {
+            const linkedStudents = students.filter((student) => student.course === course.title);
+            return (
             <div key={course.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-lg transition-all group border-b-4 border-b-primary/10">
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">

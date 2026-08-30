@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Search, ShieldCheck, KeyRound, Edit, UserX } from "lucide-react";
+import { Plus, Search, ShieldCheck, KeyRound, Edit, UserX, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { apiRequest } from "@/lib/admin-api";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -249,8 +249,9 @@ const UserManagement = () => {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-16 text-center text-slate-400 font-bold">
-                    No users found.
+                  <td colSpan={6} className="py-20 text-center">
+                    <UserPlus className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                    <p className="text-slate-400 font-bold">No users found.</p>
                   </td>
                 </tr>
               )}

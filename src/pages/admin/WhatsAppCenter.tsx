@@ -23,6 +23,7 @@ const WhatsAppCenter = () => {
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingTemplates, setEditingTemplates] = useState<{id: string, label: string, message: string}[]>([]);
 
   const dbTemplates = websiteSettings?.whatsappTemplates || [];
@@ -103,12 +104,15 @@ const WhatsAppCenter = () => {
 
   const saveTemplates = async () => {
     if (!websiteSettings) return;
+    setIsSaving(true);
     try {
       await updateWebsiteSettings({ ...websiteSettings, whatsappTemplates: editingTemplates });
       toast.success("Templates updated successfully!");
       setIsEditing(false);
     } catch (e) {
       toast.error("Failed to save templates.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -306,8 +310,8 @@ const WhatsAppCenter = () => {
             </div>
 
             <div className="p-6 border-t border-slate-100 bg-white flex justify-end">
-              <button onClick={saveTemplates} className="flex items-center gap-2 bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/20">
-                <Save className="w-4 h-4" /> Save Templates
+              <button onClick={saveTemplates} disabled={isSaving} className="flex items-center gap-2 bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-emerald-600 transition-all shadow-md shadow-emerald-500/20 disabled:opacity-60">
+                <Save className="w-4 h-4" /> {isSaving ? "Saving..." : "Save Templates"}
               </button>
             </div>
           </div>

@@ -178,55 +178,64 @@ export function RoleManagement() {
                 </tr>
               </thead>
               <tbody>
-                {roles.map((role) => (
-                  <tr key={role.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                    <td className="p-4">
-                      <div className="font-semibold text-gray-900">{role.name}</div>
-                      {role.isSystem && (
-                        <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded text-xs font-medium bg-red-100 text-red-800">
-                          System Default
-                        </span>
-                      )}
+                {roles.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-16 text-center text-slate-500">
+                      <ShieldAlert className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                      <p className="font-bold">No roles found.</p>
                     </td>
-                    <td className="p-4">
-                      <code className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded">{role.key}</code>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex flex-wrap gap-1">
-                        {role.permissions.length === 0 ? (
-                          <span className="text-sm text-gray-400 italic">No permissions</span>
-                        ) : role.permissions.length > 5 ? (
-                          <>
-                            {role.permissions.slice(0, 5).map((perm) => (
+                  </tr>
+                ) : (
+                  roles.map((role) => (
+                    <tr key={role.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                      <td className="p-4">
+                        <div className="font-semibold text-gray-900">{role.name}</div>
+                        {role.isSystem && (
+                          <span className="inline-flex items-center px-2 py-0.5 mt-1 rounded text-xs font-medium bg-red-100 text-red-800">
+                            System Default
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <code className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded">{role.key}</code>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-wrap gap-1">
+                          {role.permissions.length === 0 ? (
+                            <span className="text-sm text-gray-400 italic">No permissions</span>
+                          ) : role.permissions.length > 5 ? (
+                            <>
+                              {role.permissions.slice(0, 5).map((perm) => (
+                                <span key={perm} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full border border-indigo-100">
+                                  {perm}
+                                </span>
+                              ))}
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">+{role.permissions.length - 5} more</span>
+                            </>
+                          ) : (
+                            role.permissions.map((perm) => (
                               <span key={perm} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full border border-indigo-100">
                                 {perm}
                               </span>
-                            ))}
-                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">+{role.permissions.length - 5} more</span>
-                          </>
-                        ) : (
-                          role.permissions.map((perm) => (
-                            <span key={perm} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full border border-indigo-100">
-                              {perm}
-                            </span>
-                          ))
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => {
-                          setSelectedRole(role);
-                          setEditForm({ name: role.name, permissions: role.permissions });
-                          setIsEditOpen(true);
-                        }}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                            ))
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button
+                          onClick={() => {
+                            setSelectedRole(role);
+                            setEditForm({ name: role.name, permissions: role.permissions });
+                            setIsEditOpen(true);
+                          }}
+                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
