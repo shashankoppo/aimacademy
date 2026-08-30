@@ -139,7 +139,8 @@ const AttendanceManagement = () => {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           {viewMode === "students" ? (
-            <table className="w-full text-left">
+            <>
+              <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="px-6 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Student</th>
@@ -208,8 +209,10 @@ const AttendanceManagement = () => {
                 <p className="text-slate-400 font-bold">No students found.</p>
               </div>
             )}
+            </>
           ) : (
-            <table className="w-full text-left">
+            <>
+              <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="px-6 py-5 text-xs font-black uppercase tracking-wider text-slate-400">Staff Member</th>
@@ -244,6 +247,7 @@ const AttendanceManagement = () => {
                 <p className="text-slate-400 font-bold">No staff found.</p>
               </div>
             )}
+            </>
           )}
         </div>
       </div>
