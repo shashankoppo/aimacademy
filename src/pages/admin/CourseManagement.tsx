@@ -263,6 +263,7 @@ const CourseManagement = () => {
           );
         })}
       </div>
+      )}
 
       <Dialog open={Boolean(viewingCourse)} onOpenChange={(open) => !open && setViewingCourse(null)}>
         <DialogContent className="sm:max-w-[460px]">
