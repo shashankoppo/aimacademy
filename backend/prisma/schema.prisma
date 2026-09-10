@@ -382,6 +382,36 @@ model TeacherResource {
 }
 
 
+model GalleryCategory {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  slug         String   @unique
+  coverUrl     String?
+  description  String?
+  displayOrder Int      @default(0)
+  isVisible    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  items        GalleryItem[]
+}
+
+model GalleryItem {
+  id           Int      @id @default(autoincrement())
+  title        String?
+  imageUrl     String
+  thumbnailUrl String?
+  categoryId   Int
+  category     GalleryCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  isVisible    Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+  displayOrder Int      @default(0)
+  eventDate    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  @@index([categoryId])
+}
+
 model Lead {
   id        String   @id @default(uuid())
   name      String

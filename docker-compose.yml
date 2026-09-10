@@ -18,6 +18,7 @@ services:
       - ./backend/.env
     volumes:
       - ./backend/data:/data
+      - ./backend/uploads:/app/uploads
     ports:
       - "5000:5000"
     healthcheck:

@@ -67,6 +67,15 @@ router.get("/videos", (0, auth_1.requirePermission)("admin:manage_videos"), admi
 router.post("/videos", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.addAdminVideo);
 router.put("/videos/:id", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.updateAdminVideo);
 router.delete("/videos/:id", (0, auth_1.requirePermission)("admin:manage_videos"), adminController_1.deleteAdminVideo);
+router.get("/gallery/categories", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.getGalleryCategories);
+router.post("/gallery/categories", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.addGalleryCategory);
+router.put("/gallery/categories/:id", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.updateGalleryCategory);
+router.delete("/gallery/categories/:id", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.deleteGalleryCategory);
+router.get("/gallery/items", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.getGalleryItems);
+router.post("/gallery/items", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.addGalleryItem);
+router.post("/gallery/items/bulk", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.addGalleryItemsBulk);
+router.put("/gallery/items/:id", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.updateGalleryItem);
+router.delete("/gallery/items/:id", (0, auth_1.requirePermission)("admin:manage_gallery"), adminController_1.deleteGalleryItem);
 const mockTestController_1 = require("../controllers/mockTestController");
 router.get("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.getMockTests);
 router.post("/mock-tests", (0, auth_1.requirePermission)("teacher:manage_tests"), mockTestController_1.createMockTest);

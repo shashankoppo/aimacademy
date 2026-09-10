@@ -113,6 +113,32 @@ export interface VideoItem {
   displayOrder: number;
 }
 
+export interface GalleryCategory {
+  id: number;
+  name: string;
+  slug: string;
+  coverUrl: string | null;
+  description: string | null;
+  displayOrder: number;
+  isVisible: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GalleryItem {
+  id: number;
+  title: string | null;
+  imageUrl: string;
+  thumbnailUrl: string | null;
+  categoryId: number;
+  isVisible: boolean;
+  isFeatured: boolean;
+  displayOrder: number;
+  eventDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DashboardData {
   students: Student[];
   courses: Course[];
@@ -120,10 +146,12 @@ interface DashboardData {
   staff: StaffMember[];
   notes: NoteItem[];
   videos: VideoItem[];
+  galleryCategories: GalleryCategory[];
+  galleryItems: GalleryItem[];
   websiteSettings: WebsiteSettings | null;
 }
 
-type PublicContentData = Pick<DashboardData, "notes" | "videos" | "websiteSettings">;
+type PublicContentData = Pick<DashboardData, "notes" | "videos" | "websiteSettings" | "galleryCategories" | "galleryItems">;
 
 interface AdminContextType extends DashboardData {
   loading: boolean;
@@ -149,6 +177,12 @@ interface AdminContextType extends DashboardData {
   addVideo: (video: Omit<VideoItem, "id" | "thumbnailUrl"> & { thumbnailUrl?: string }) => Promise<VideoItem>;
   updateVideo: (id: number, video: Partial<VideoItem>) => Promise<VideoItem>;
   deleteVideo: (id: number) => Promise<void>;
+  addGalleryCategory: (cat: Omit<GalleryCategory, "id" | "createdAt" | "updatedAt">) => Promise<GalleryCategory>;
+  updateGalleryCategory: (id: number, cat: Partial<GalleryCategory>) => Promise<GalleryCategory>;
+  deleteGalleryCategory: (id: number) => Promise<void>;
+  addGalleryItem: (item: Omit<GalleryItem, "id" | "createdAt" | "updatedAt">) => Promise<GalleryItem>;
+  updateGalleryItem: (id: number, item: Partial<GalleryItem>) => Promise<GalleryItem>;
+  deleteGalleryItem: (id: number) => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -181,6 +215,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [galleryCategories, setGalleryCategories] = useState<GalleryCategory[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [websiteSettings, setWebsiteSettings] = useState<WebsiteSettings | null>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -202,6 +238,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setStaff(data.staff);
       setNotes(data.notes);
       setVideos(data.videos);
+      setGalleryCategories(data.galleryCategories ?? []);
+      setGalleryItems(data.galleryItems ?? []);
       setWebsiteSettings(data.websiteSettings ?? defaultSettings);
       syncLocalWebsiteSettings(data.websiteSettings ?? defaultSettings);
       setError(null);
@@ -219,6 +257,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const data = await apiRequest<PublicContentData>("/public/content");
       setNotes(data.notes);
       setVideos(data.videos);
+      setGalleryCategories(data.galleryCategories ?? []);
+      setGalleryItems(data.galleryItems ?? []);
       setWebsiteSettings(data.websiteSettings ?? defaultSettings);
       syncLocalWebsiteSettings(data.websiteSettings ?? defaultSettings);
       setError(null);
@@ -425,6 +465,57 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setVideos((prev) => prev.filter((entry) => entry.id !== id));
   };
 
+  // ── Gallery Categories ──
+
+  const addGalleryCategory = async (cat: Omit<GalleryCategory, "id" | "createdAt" | "updatedAt">) => {
+    const created = await apiRequest<GalleryCategory>("/admin/gallery/categories", {
+      method: "POST",
+      body: JSON.stringify(cat),
+    });
+    setGalleryCategories((prev) => [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder));
+    return created;
+  };
+
+  const updateGalleryCategory = async (id: number, cat: Partial<GalleryCategory>) => {
+    const updated = await apiRequest<GalleryCategory>(`/admin/gallery/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(cat),
+    });
+    setGalleryCategories((prev) => prev.map((c) => (c.id === id ? updated : c)).sort((a, b) => a.displayOrder - b.displayOrder));
+    return updated;
+  };
+
+  const deleteGalleryCategory = async (id: number) => {
+    await apiRequest<{ success: true }>(`/admin/gallery/categories/${id}`, { method: "DELETE" });
+    setGalleryCategories((prev) => prev.filter((c) => c.id !== id));
+    setGalleryItems((prev) => prev.filter((i) => i.categoryId !== id));
+  };
+
+  // ── Gallery Items ──
+
+  const addGalleryItem = async (item: Omit<GalleryItem, "id" | "createdAt" | "updatedAt">) => {
+    const created = await apiRequest<GalleryItem>("/admin/gallery/items", {
+      method: "POST",
+      body: JSON.stringify(item),
+    });
+    setGalleryItems((prev) => [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder));
+    return created;
+  };
+
+  const updateGalleryItem = async (id: number, item: Partial<GalleryItem>) => {
+    const updated = await apiRequest<GalleryItem>(`/admin/gallery/items/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(item),
+    });
+    setGalleryItems((prev) => prev.map((i) => (i.id === id ? updated : i)).sort((a, b) => a.displayOrder - b.displayOrder));
+    return updated;
+  };
+
+  const deleteGalleryItem = async (id: number) => {
+    await apiRequest<{ success: true }>(`/admin/gallery/items/${id}`, { method: "DELETE" });
+    setGalleryItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
   const value = useMemo<AdminContextType>(
     () => ({
       students,
@@ -457,6 +548,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addVideo,
       updateVideo,
       deleteVideo,
+      addGalleryCategory,
+      updateGalleryCategory,
+      deleteGalleryCategory,
+      addGalleryItem,
+      updateGalleryItem,
+      deleteGalleryItem,
     }),
     [
       students,
@@ -465,6 +562,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       staff,
       notes,
       videos,
+      galleryCategories,
+      galleryItems,
       websiteSettings,
       loading,
       error,
@@ -479,6 +578,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addVideo,
       updateVideo,
       deleteVideo,
+      addGalleryCategory,
+      updateGalleryCategory,
+      deleteGalleryCategory,
+      addGalleryItem,
+      updateGalleryItem,
+      deleteGalleryItem,
     ],
   );
 

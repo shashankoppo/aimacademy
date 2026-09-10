@@ -113,6 +113,26 @@ const videoSchema = z.object({
   displayOrder: z.coerce.number().int().nonnegative().optional(),
 });
 
+const galleryCategorySchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  slug: z.string().trim().min(1, "Slug is required"),
+  coverUrl: z.string().trim().optional().nullable(),
+  description: z.string().trim().optional().nullable(),
+  displayOrder: z.coerce.number().int().nonnegative().optional(),
+  isVisible: z.boolean().optional(),
+});
+
+const galleryItemSchema = z.object({
+  title: z.string().trim().optional().nullable(),
+  imageUrl: z.string().trim().min(1, "Image URL is required"),
+  thumbnailUrl: z.string().trim().optional().nullable(),
+  categoryId: z.coerce.number().int().positive(),
+  isVisible: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  displayOrder: z.coerce.number().int().nonnegative().optional(),
+  eventDate: z.string().trim().optional().nullable(),
+});
+
 const handleError = (res: Response, error: unknown, fallbackMessage: string) => {
   if (error instanceof z.ZodError) {
     return res.status(400).json({ error: error.issues[0]?.message ?? fallbackMessage });
@@ -328,7 +348,7 @@ async function syncAndGetStaff() {
 export const getAdminOverview = async (_req: Request, res: Response) => {
   try {
     await seedAdminData();
-    const [students, courses, announcements, staff, settings, notes, videos] = await Promise.all([
+    const [students, courses, announcements, staff, settings, notes, videos, galleryCategories, galleryItems] = await Promise.all([
       prisma.adminStudent.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.adminCourse.findMany({ orderBy: { createdAt: "asc" } }),
       prisma.announcement.findMany({ orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }] }),
@@ -336,6 +356,8 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
       prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
       prisma.adminNote.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
       prisma.adminVideo.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.galleryCategory.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.galleryItem.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
     ]);
 
     res.json({
@@ -345,6 +367,8 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
         staff,
         notes,
         videos,
+        galleryCategories,
+        galleryItems,
         websiteSettings: settings
           ? {
               id: settings.id,
@@ -365,7 +389,7 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
 export const getPublicContent = async (_req: Request, res: Response) => {
   try {
     void seedAdminData().catch(e => console.warn("[PublicContent] Seeding delayed/failed:", e.message));
-    const [settings, notes, videos] = await Promise.all([
+    const [settings, notes, videos, galleryCategories, galleryItems] = await Promise.all([
       prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
       prisma.adminNote.findMany({
         where: { isVisible: true },
@@ -375,11 +399,21 @@ export const getPublicContent = async (_req: Request, res: Response) => {
         where: { isVisible: true },
         orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "asc" }],
       }),
+      prisma.galleryCategory.findMany({
+        where: { isVisible: true },
+        orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+      }),
+      prisma.galleryItem.findMany({
+        where: { isVisible: true },
+        orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "asc" }],
+      }),
     ]);
 
     res.json({
         notes,
         videos,
+        galleryCategories,
+        galleryItems,
         websiteSettings: settings
           ? {
               id: settings.id,
@@ -827,5 +861,115 @@ export const handleFileUpload = async (req: Request, res: Response) => {
     res.json({ success: true, url });
   } catch (error) {
     handleError(res, error, "Failed to handle file upload");
+  }
+};
+
+// ── Gallery Categories ──────────────────────────────
+
+export const getGalleryCategories = async (_req: Request, res: Response) => {
+  try {
+    const categories = await prisma.galleryCategory.findMany({
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+      include: { _count: { select: { items: true } } },
+    });
+    res.json(categories);
+  } catch (error) {
+    handleError(res, error, "Failed to fetch gallery categories");
+  }
+};
+
+export const addGalleryCategory = async (req: Request, res: Response) => {
+  try {
+    console.log("Adding category payload:", req.body);
+    const payload = galleryCategorySchema.parse(req.body);
+    const category = await prisma.galleryCategory.create({ data: payload });
+    res.status(201).json(category);
+  } catch (error) {
+    console.error("Error adding category:", error);
+    handleError(res, error, "Failed to add gallery category");
+  }
+};
+
+export const updateGalleryCategory = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const payload = galleryCategorySchema.partial().parse(req.body);
+    const category = await prisma.galleryCategory.update({ where: { id }, data: payload });
+    res.json(category);
+  } catch (error) {
+    handleError(res, error, "Failed to update gallery category");
+  }
+};
+
+export const deleteGalleryCategory = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.galleryCategory.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error) {
+    handleError(res, error, "Failed to delete gallery category");
+  }
+};
+
+// ── Gallery Items ──────────────────────────────
+
+export const getGalleryItems = async (_req: Request, res: Response) => {
+  try {
+    const items = await prisma.galleryItem.findMany({
+      orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+    });
+    res.json(items);
+  } catch (error) {
+    handleError(res, error, "Failed to fetch gallery items");
+  }
+};
+
+export const addGalleryItem = async (req: Request, res: Response) => {
+  try {
+    const payload = galleryItemSchema.parse(req.body);
+    const item = await prisma.galleryItem.create({ data: payload });
+    res.status(201).json(item);
+  } catch (error) {
+    handleError(res, error, "Failed to add gallery item");
+  }
+};
+
+export const addGalleryItemsBulk = async (req: Request, res: Response) => {
+  try {
+    const { urls, categoryId, eventDate } = req.body as { urls: string[]; categoryId: number; eventDate?: string };
+    if (!Array.isArray(urls) || urls.length === 0) {
+      return res.status(400).json({ error: "Provide an array of URLs" });
+    }
+    const items = await Promise.all(
+      urls.filter(u => u.trim()).map(url =>
+        prisma.galleryItem.create({
+          data: { imageUrl: url.trim(), categoryId, eventDate: eventDate || null },
+        })
+      )
+    );
+    res.status(201).json(items);
+  } catch (error) {
+    handleError(res, error, "Failed to bulk add gallery items");
+  }
+};
+
+export const updateGalleryItem = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const payload = galleryItemSchema.partial().parse(req.body);
+    const item = await prisma.galleryItem.update({ where: { id }, data: payload });
+    res.json(item);
+  } catch (error) {
+    handleError(res, error, "Failed to update gallery item");
+  }
+};
+
+export const deleteGalleryItem = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.galleryItem.delete({ where: { id } });
+    res.json({ success: true });
+  } catch (error) {
+    handleError(res, error, "Failed to delete gallery item");
   }
 };

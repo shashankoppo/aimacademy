@@ -13,6 +13,7 @@ const PERMISSIONS = [
     { key: "admin:manage_website_settings", description: "Manage website settings" },
     { key: "admin:manage_notes", description: "Manage notes" },
     { key: "admin:manage_videos", description: "Manage videos" },
+    { key: "admin:manage_gallery", description: "Manage gallery categories and photos" },
     { key: "pam:manage_users", description: "Privileged user/role administration" },
     { key: "pam:export_data", description: "Privileged exports" },
     { key: "teacher:access", description: "Access teacher portal" },

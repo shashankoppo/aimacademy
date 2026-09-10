@@ -34,6 +34,15 @@ import {
   updateAdminVideo,
   deleteAdminVideo,
   handleFileUpload,
+  getGalleryCategories,
+  addGalleryCategory,
+  updateGalleryCategory,
+  deleteGalleryCategory,
+  getGalleryItems,
+  addGalleryItem,
+  addGalleryItemsBulk,
+  updateGalleryItem,
+  deleteGalleryItem,
 } from '../controllers/adminController';
 
 const router = Router();
@@ -104,6 +113,17 @@ router.get("/videos", requirePermission("admin:manage_videos"), getAdminVideos);
 router.post("/videos", requirePermission("admin:manage_videos"), addAdminVideo);
 router.put("/videos/:id", requirePermission("admin:manage_videos"), updateAdminVideo);
 router.delete("/videos/:id", requirePermission("admin:manage_videos"), deleteAdminVideo);
+
+router.get("/gallery/categories", requirePermission("admin:manage_gallery"), getGalleryCategories);
+router.post("/gallery/categories", requirePermission("admin:manage_gallery"), addGalleryCategory);
+router.put("/gallery/categories/:id", requirePermission("admin:manage_gallery"), updateGalleryCategory);
+router.delete("/gallery/categories/:id", requirePermission("admin:manage_gallery"), deleteGalleryCategory);
+
+router.get("/gallery/items", requirePermission("admin:manage_gallery"), getGalleryItems);
+router.post("/gallery/items", requirePermission("admin:manage_gallery"), addGalleryItem);
+router.post("/gallery/items/bulk", requirePermission("admin:manage_gallery"), addGalleryItemsBulk);
+router.put("/gallery/items/:id", requirePermission("admin:manage_gallery"), updateGalleryItem);
+router.delete("/gallery/items/:id", requirePermission("admin:manage_gallery"), deleteGalleryItem);
 
 import { getMockTests, createMockTest, updateMockTest, deleteMockTest } from '../controllers/mockTestController';
 

@@ -35,11 +35,13 @@ import AdminWebsiteSettings from "./pages/admin/AdminWebsiteSettings";
 import WhatsAppCenter from "./pages/admin/WhatsAppCenter";
 import NotesManagement from "./pages/admin/NotesManagement";
 import VideoManagement from "./pages/admin/VideoManagement";
+import GalleryManagement from "./pages/admin/GalleryManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import MockTestManagement from "./pages/admin/MockTestManagement";
 import { RoleManagement } from "./pages/admin/RoleManagement";
 import { ProfileSettings } from "./components/ProfileSettings";
 
+import Gallery from "./pages/Gallery";
 import GSAPWrapper from "@/components/GSAPWrapper";
 import { AdminProvider } from "@/hooks/useAdminData";
 import AdminLayout from "@/components/AdminLayout";
@@ -82,6 +84,8 @@ const AppRoutes = () => {
         <Route path="/about" element={<About />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/results" element={<Results />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/mock-test/:testId" element={<MockTestInterface />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
@@ -256,6 +260,16 @@ const AppRoutes = () => {
             <RequireAuth allowedRoles={["ADMIN"]}>
               <AdminLayout>
                 <VideoManagement />
+              </AdminLayout>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/gallery"
+          element={
+            <RequireAuth allowedRoles={["ADMIN"]}>
+              <AdminLayout>
+                <GalleryManagement />
               </AdminLayout>
             </RequireAuth>
           }

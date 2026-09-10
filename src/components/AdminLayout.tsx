@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   Users, Wallet, Settings, LayoutDashboard, UserRound, CreditCard,
   TrendingUp, Clock, CheckCircle2, Bell, BookOpen, Calendar,
-  Megaphone, GraduationCap, BarChart3, Shield, Menu, X, ArrowLeft, MessageSquare, FileText, Youtube
+  Megaphone, GraduationCap, BarChart3, Shield, Menu, X, ArrowLeft, MessageSquare, FileText, Youtube, ImageIcon
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { title: "Announcements", icon: Megaphone, link: "/admin/announcements" },
     { title: "Notes", icon: FileText, link: "/admin/notes" },
     { title: "Videos", icon: Youtube, link: "/admin/videos" },
+    { title: "Gallery", icon: ImageIcon, link: "/admin/gallery" },
     { title: "WhatsApp Center", icon: MessageSquare, link: "/admin/whatsapp" },
     { title: "Website Settings", icon: Settings, link: "/admin/website-settings" },
   ];
