@@ -99,8 +99,8 @@ const videoSchema = zod_1.z.object({
     displayOrder: zod_1.z.coerce.number().int().nonnegative().optional(),
 });
 const galleryCategorySchema = zod_1.z.object({
-    name: zod_1.z.string().trim().min(2),
-    slug: zod_1.z.string().trim().min(2),
+    name: zod_1.z.string().trim().min(1, "Name is required"),
+    slug: zod_1.z.string().trim().min(1, "Slug is required"),
     coverUrl: zod_1.z.string().trim().optional().nullable(),
     description: zod_1.z.string().trim().optional().nullable(),
     displayOrder: zod_1.z.coerce.number().int().nonnegative().optional(),
@@ -108,7 +108,7 @@ const galleryCategorySchema = zod_1.z.object({
 });
 const galleryItemSchema = zod_1.z.object({
     title: zod_1.z.string().trim().optional().nullable(),
-    imageUrl: zod_1.z.string().trim().min(5),
+    imageUrl: zod_1.z.string().trim().min(1, "Image URL is required"),
     thumbnailUrl: zod_1.z.string().trim().optional().nullable(),
     categoryId: zod_1.z.coerce.number().int().positive(),
     isVisible: zod_1.z.boolean().optional(),
@@ -865,11 +865,13 @@ const getGalleryCategories = async (_req, res) => {
 exports.getGalleryCategories = getGalleryCategories;
 const addGalleryCategory = async (req, res) => {
     try {
+        console.log("Adding category payload:", req.body);
         const payload = galleryCategorySchema.parse(req.body);
         const category = await prisma_1.prisma.galleryCategory.create({ data: payload });
         res.status(201).json(category);
     }
     catch (error) {
+        console.error("Error adding category:", error);
         handleError(res, error, "Failed to add gallery category");
     }
 };
