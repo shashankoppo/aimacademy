@@ -29,10 +29,7 @@ export async function ensureDemoUsers() {
           continue;
         }
 
-        const isMainAdmin = existing.email?.toLowerCase() === "admin@aim.edu";
-        const passwordToStore = isMainAdmin
-          ? await hashPassword(demoUser.password)
-          : isHashedPassword(existing.password)
+        const passwordToStore = isHashedPassword(existing.password)
           ? existing.password
           : await hashPassword(demoUser.password);
 
@@ -40,10 +37,10 @@ export async function ensureDemoUsers() {
           where: { id: existing.id },
           data: {
             name: existing.name || demoUser.name,
-            role: demoUser.role,
+            role: existing.role || demoUser.role,
             phone: existing.phone ?? demoUser.phone,
             password: passwordToStore,
-            isActive: true,
+            isActive: existing.isActive !== undefined ? existing.isActive : true,
           },
         });
       }
