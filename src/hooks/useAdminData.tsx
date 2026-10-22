@@ -233,12 +233,12 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     try {
       const data = await apiRequest<DashboardData>("/admin/overview");
-      setStudents(data.students);
-      setCourses(data.courses);
-      setAnnouncements(data.announcements);
-      setStaff(data.staff);
-      setNotes(data.notes);
-      setVideos(data.videos);
+      setStudents(data.students ?? []);
+      setCourses(data.courses ?? []);
+      setAnnouncements(data.announcements ?? []);
+      setStaff(data.staff ?? []);
+      setNotes(data.notes ?? []);
+      setVideos(data.videos ?? []);
       setGalleryCategories(data.galleryCategories ?? []);
       setGalleryItems(data.galleryItems ?? []);
       setWebsiteSettings(data.websiteSettings ?? defaultSettings);
@@ -246,7 +246,16 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setError(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load admin data";
+      console.error("[useAdminData] Error loading overview:", err);
       setError(message);
+      // Fallback: load public content so media and gallery are still populated
+      try {
+        const pub = await apiRequest<PublicContentData>("/public/content");
+        if (pub.galleryCategories) setGalleryCategories(pub.galleryCategories);
+        if (pub.galleryItems) setGalleryItems(pub.galleryItems);
+        if (pub.videos) setVideos(pub.videos);
+        if (pub.notes) setNotes(pub.notes);
+      } catch {}
     } finally {
       setLoading(false);
     }
@@ -256,8 +265,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setLoading(true);
     try {
       const data = await apiRequest<PublicContentData>("/public/content");
-      setNotes(data.notes);
-      setVideos(data.videos);
+      setNotes(data.notes ?? []);
+      setVideos(data.videos ?? []);
       setGalleryCategories(data.galleryCategories ?? []);
       setGalleryItems(data.galleryItems ?? []);
       setWebsiteSettings(data.websiteSettings ?? defaultSettings);
@@ -273,11 +282,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const user = getStoredUser();
-    const isAdmin = (user?.role ?? "").toString().toUpperCase() === "ADMIN";
     const isAdminRoute = location.pathname.startsWith("/admin");
     if (isAdminRoute) {
-      if (token && isAdmin) {
+      if (token) {
         void refreshData();
       } else {
         setLoading(false);

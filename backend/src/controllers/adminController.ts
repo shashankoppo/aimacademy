@@ -354,17 +354,16 @@ async function syncAndGetStaff() {
 
 export const getAdminOverview = async (_req: Request, res: Response) => {
   try {
-    await seedAdminData();
     const [students, courses, announcements, staff, settings, notes, videos, galleryCategories, galleryItems] = await Promise.all([
-      prisma.adminStudent.findMany({ orderBy: { createdAt: "asc" } }),
-      prisma.adminCourse.findMany({ orderBy: { createdAt: "asc" } }),
-      prisma.announcement.findMany({ orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }] }),
-      syncAndGetStaff(),
-      prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
-      prisma.adminNote.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.adminVideo.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.galleryCategory.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.galleryItem.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.adminStudent.findMany({ orderBy: { createdAt: "asc" } }).catch((e) => { console.warn("[Overview] students:", e?.message); return []; }),
+      prisma.adminCourse.findMany({ orderBy: { createdAt: "asc" } }).catch((e) => { console.warn("[Overview] courses:", e?.message); return []; }),
+      prisma.announcement.findMany({ orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }] }).catch((e) => { console.warn("[Overview] announcements:", e?.message); return []; }),
+      prisma.adminStaff.findMany({ orderBy: { createdAt: "asc" } }).catch((e) => { console.warn("[Overview] staff:", e?.message); return []; }),
+      prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }).catch((e) => { console.warn("[Overview] settings:", e?.message); return null; }),
+      prisma.adminNote.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] notes:", e?.message); return []; }),
+      prisma.adminVideo.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] videos:", e?.message); return []; }),
+      prisma.galleryCategory.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] galleryCategories:", e?.message); return []; }),
+      prisma.galleryItem.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] galleryItems:", e?.message); return []; }),
     ]);
 
     res.json({
@@ -380,8 +379,8 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
           ? {
               id: settings.id,
               bannerText: settings.bannerText,
-              slides: JSON.parse(settings.slidesJson),
-              faculty: JSON.parse(settings.facultyJson),
+              slides: settings.slidesJson ? JSON.parse(settings.slidesJson) : [],
+              faculty: settings.facultyJson ? JSON.parse(settings.facultyJson) : [],
               upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
               socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
               whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []

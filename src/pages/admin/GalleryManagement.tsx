@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Edit, Eye, EyeOff, ImagePlus, Plus, Settings, Star, Trash2, Upload, Video, Play, Image as ImageIcon, Loader2 } from "lucide-react";
+import React, { useMemo, useState, useEffect } from "react";
+import { Edit, Eye, EyeOff, ImagePlus, Plus, Settings, Star, Trash2, Upload, Video, Play, Image as ImageIcon, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminData, type GalleryCategory, type GalleryItem } from "@/hooks/useAdminData";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -50,12 +50,21 @@ const GalleryManagement = () => {
     deleteGalleryCategory, 
     addGalleryItem, 
     updateGalleryItem, 
-    deleteGalleryItem 
+    deleteGalleryItem,
+    refreshData,
+    loading = false
   } = useAdminData() as any;
 
   const [activeTab, setActiveTab] = useState<number | "all">("all");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (refreshData) {
+      void refreshData();
+    }
+  }, [refreshData]);
   
   // Dialog visibility states
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -234,6 +243,22 @@ const GalleryManagement = () => {
           <p className="text-slate-500 font-medium">Manage photo & video categories and gallery media. Upload files directly or paste YouTube/external links.</p>
         </div>
         <div className="flex items-center gap-3">
+          <button 
+            onClick={async () => {
+              if (refreshData) {
+                setIsRefreshing(true);
+                await refreshData();
+                setIsRefreshing(false);
+                toast.success("Gallery refreshed");
+              }
+            }}
+            disabled={isRefreshing || loading}
+            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-all shadow-sm"
+            title="Refresh Gallery Data"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing || loading ? "animate-spin text-primary" : ""}`} />
+          </button>
+
           {/* Add Category Dialog */}
           <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
             <DialogTrigger asChild>
