@@ -11,6 +11,7 @@ import studentRoutes from "./routes/studentRoutes";
 import staffRoutes from "./routes/staffRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import { getPublicContent, seedAdminData } from "./controllers/adminController";
+import { ensureDatabaseTables } from "./seed/ensureTables";
 import { ensureIamSeeded } from "./seed/iamSeed";
 import { ensureDemoUsers } from "./seed/demoUsers";
 import { ensurePortalSeeded } from "./seed/portalSeed";
@@ -43,7 +44,8 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: "5mb" }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(attachRequestId);
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
@@ -71,6 +73,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`[Server] Starting background data synchronization...`);
     Promise.resolve()
       .then(async () => {
+        await ensureDatabaseTables();
         await ensureIamSeeded();
         await ensureDemoUsers();
         await seedAdminData();

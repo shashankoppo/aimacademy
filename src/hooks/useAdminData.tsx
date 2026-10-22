@@ -135,6 +135,7 @@ export interface GalleryItem {
   isFeatured: boolean;
   displayOrder: number;
   eventDate: string | null;
+  mediaType?: "IMAGE" | "VIDEO" | string | null;
   createdAt: string;
   updatedAt: string;
 }

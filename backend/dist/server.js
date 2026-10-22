@@ -16,6 +16,7 @@ const studentRoutes_1 = __importDefault(require("./routes/studentRoutes"));
 const staffRoutes_1 = __importDefault(require("./routes/staffRoutes"));
 const uploadRoutes_1 = __importDefault(require("./routes/uploadRoutes"));
 const adminController_1 = require("./controllers/adminController");
+const ensureTables_1 = require("./seed/ensureTables");
 const iamSeed_1 = require("./seed/iamSeed");
 const demoUsers_1 = require("./seed/demoUsers");
 const portalSeed_1 = require("./seed/portalSeed");
@@ -40,7 +41,8 @@ app.use((0, cors_1.default)({
     },
     credentials: true,
 }));
-app.use(express_1.default.json({ limit: "5mb" }));
+app.use(express_1.default.json({ limit: "50mb" }));
+app.use(express_1.default.urlencoded({ extended: true, limit: "50mb" }));
 app.use(audit_1.attachRequestId);
 app.use('/uploads', express_1.default.static(path_1.default.join(process.cwd(), 'uploads')));
 // Routes
@@ -64,6 +66,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`[Server] Starting background data synchronization...`);
     Promise.resolve()
         .then(async () => {
+        await (0, ensureTables_1.ensureDatabaseTables)();
         await (0, iamSeed_1.ensureIamSeeded)();
         await (0, demoUsers_1.ensureDemoUsers)();
         await (0, adminController_1.seedAdminData)();

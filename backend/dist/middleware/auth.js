@@ -59,8 +59,9 @@ function requirePermission(permission) {
         const au = req.authUser;
         if (!au)
             return res.status(401).json({ success: false, message: "Unauthorized." });
-        if (!au.permissions.has(permission))
-            return res.status(403).json({ success: false, message: "Forbidden." });
-        next();
+        if (au.role === "ADMIN" || au.permissions.has(permission)) {
+            return next();
+        }
+        return res.status(403).json({ success: false, message: "Forbidden." });
     };
 }

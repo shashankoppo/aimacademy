@@ -124,18 +124,25 @@ const galleryCategorySchema = z.object({
 
 const galleryItemSchema = z.object({
   title: z.string().trim().optional().nullable(),
-  imageUrl: z.string().trim().min(1, "Image URL is required"),
+  imageUrl: z.string().trim().min(1, "Image or Video URL is required"),
   thumbnailUrl: z.string().trim().optional().nullable(),
-  categoryId: z.coerce.number().int().positive(),
+  categoryId: z.coerce.number().int().positive("Valid Category is required"),
   isVisible: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   displayOrder: z.coerce.number().int().nonnegative().optional(),
   eventDate: z.string().trim().optional().nullable(),
+  mediaType: z.string().trim().optional().nullable(),
 });
 
-const handleError = (res: Response, error: unknown, fallbackMessage: string) => {
+const handleError = (res: Response, error: any, fallbackMessage: string) => {
   if (error instanceof z.ZodError) {
     return res.status(400).json({ error: error.issues[0]?.message ?? fallbackMessage });
+  }
+  if (error?.code === "P2002") {
+    return res.status(400).json({ error: "An item with this name or identifier already exists." });
+  }
+  if (error?.code === "P2025") {
+    return res.status(404).json({ error: "Record not found." });
   }
   const message = error instanceof Error ? error.message : fallbackMessage;
   console.error(`[AdminController] ${fallbackMessage}:`, error);
@@ -824,6 +831,10 @@ export const getAdminVideos = async (_req: Request, res: Response) => {
 export const addAdminVideo = async (req: Request, res: Response) => {
   try {
     const payload = videoSchema.parse(req.body);
+    const existing = await prisma.adminVideo.findUnique({ where: { youtubeUrl: payload.youtubeUrl } });
+    if (existing) {
+      return res.status(400).json({ error: "A video with this YouTube URL already exists." });
+    }
     const video = await prisma.adminVideo.create({ data: payload });
     res.status(201).json(video);
   } catch (error) {
@@ -882,6 +893,20 @@ export const addGalleryCategory = async (req: Request, res: Response) => {
   try {
     console.log("Adding category payload:", req.body);
     const payload = galleryCategorySchema.parse(req.body);
+
+    // Prevent duplicate category name or slug
+    const existing = await prisma.galleryCategory.findFirst({
+      where: {
+        OR: [
+          { name: { equals: payload.name } },
+          { slug: { equals: payload.slug } }
+        ]
+      }
+    });
+    if (existing) {
+      return res.status(400).json({ error: "A category with this name or identifier already exists." });
+    }
+
     const category = await prisma.galleryCategory.create({ data: payload });
     res.status(201).json(category);
   } catch (error) {
@@ -927,7 +952,23 @@ export const getGalleryItems = async (_req: Request, res: Response) => {
 export const addGalleryItem = async (req: Request, res: Response) => {
   try {
     const payload = galleryItemSchema.parse(req.body);
-    const item = await prisma.galleryItem.create({ data: payload });
+
+    const category = await prisma.galleryCategory.findUnique({ where: { id: payload.categoryId } });
+    if (!category) {
+      return res.status(404).json({ error: "Selected category was not found." });
+    }
+
+    const isYoutube = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/i.test(payload.imageUrl);
+    const mediaType = payload.mediaType || (isYoutube ? "VIDEO" : "IMAGE");
+    const thumbnailUrl = payload.thumbnailUrl || (isYoutube ? getYouTubeThumbnail(payload.imageUrl) : null);
+
+    const item = await prisma.galleryItem.create({
+      data: {
+        ...payload,
+        mediaType,
+        thumbnailUrl,
+      },
+    });
     res.status(201).json(item);
   } catch (error) {
     handleError(res, error, "Failed to add gallery item");
@@ -940,12 +981,26 @@ export const addGalleryItemsBulk = async (req: Request, res: Response) => {
     if (!Array.isArray(urls) || urls.length === 0) {
       return res.status(400).json({ error: "Provide an array of URLs" });
     }
+
+    const category = await prisma.galleryCategory.findUnique({ where: { id: categoryId } });
+    if (!category) {
+      return res.status(404).json({ error: "Selected category was not found." });
+    }
+
     const items = await Promise.all(
-      urls.filter(u => u.trim()).map(url =>
-        prisma.galleryItem.create({
-          data: { imageUrl: url.trim(), categoryId, eventDate: eventDate || null },
-        })
-      )
+      urls.filter(u => u.trim()).map(url => {
+        const cleanUrl = url.trim();
+        const isYoutube = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/i.test(cleanUrl);
+        return prisma.galleryItem.create({
+          data: {
+            imageUrl: cleanUrl,
+            thumbnailUrl: isYoutube ? getYouTubeThumbnail(cleanUrl) : null,
+            mediaType: isYoutube ? "VIDEO" : "IMAGE",
+            categoryId,
+            eventDate: eventDate || null
+          },
+        });
+      })
     );
     res.status(201).json(items);
   } catch (error) {
