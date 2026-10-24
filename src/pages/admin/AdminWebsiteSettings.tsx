@@ -130,11 +130,7 @@ const AdminWebsiteSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-20 pt-32">
-      <div className="container mx-auto px-6 max-w-4xl">
-        <Link to="/admin" className="flex items-center gap-2 text-slate-500 font-bold mb-6 hover:text-primary transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-        </Link>
+    <div className="space-y-8 pb-12 max-w-5xl">
 
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -308,7 +304,6 @@ const AdminWebsiteSettings = () => {
             ))}
           </div>
         </div>
-      </div>
       
       {cropModalOpen && (
         <ImageCropperModal

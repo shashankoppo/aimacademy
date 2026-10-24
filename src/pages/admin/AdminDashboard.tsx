@@ -54,8 +54,8 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div>
-      <div className="mb-10">
+    <div className="space-y-8 pb-12">
+      <div>
         <div className="flex items-center gap-4 mb-4">
           <div className="p-3.5 rounded-2xl bg-slate-900 text-[#FFFF00] shadow-xl border border-slate-800">
             <Shield className="w-7 h-7" />

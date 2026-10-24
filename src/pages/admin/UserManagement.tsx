@@ -162,7 +162,7 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-xl bg-primary text-white shadow-lg shadow-primary/20">

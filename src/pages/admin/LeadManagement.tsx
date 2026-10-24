@@ -106,7 +106,7 @@ const LeadManagement = () => {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 font-display">Lead Management</h1>

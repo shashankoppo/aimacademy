@@ -68,14 +68,10 @@ const Announcements = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-20 pt-32">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
-          <div className="space-y-4">
-            <Link to="/admin" className="inline-flex items-center gap-2 text-primary font-bold text-sm tracking-tight hover:underline">
-              <ArrowLeft className="w-4 h-4" /> Back to Admin Panel
-            </Link>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900">Announcements & Notices</h1>
+    <div className="space-y-8 pb-12">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black tracking-tight text-slate-900">Announcements & Notices</h1>
             <p className="text-slate-500 font-medium">Manage campus-wide broadcasts, notices, and bulletins.</p>
           </div>
           <button onClick={() => setShowForm(!showForm)} className="btn-coursera py-2.5 px-6 flex items-center gap-2 bg-primary text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all">
@@ -215,7 +211,6 @@ const Announcements = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 

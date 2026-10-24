@@ -101,7 +101,7 @@ export function RoleManagement() {
   };
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto text-gray-800">
+    <div className="space-y-8 pb-12 text-gray-800">
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center space-x-4">
           <div className="bg-indigo-100 p-3 rounded-xl">

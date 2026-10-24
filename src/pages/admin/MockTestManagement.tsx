@@ -165,7 +165,7 @@ const MockTestManagement = () => {
   const filteredTests = tests.filter(t => t.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+    <div className="space-y-8 pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Mock Tests</h1>
