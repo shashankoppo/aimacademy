@@ -46,6 +46,25 @@ export async function ensureDatabaseTables() {
       // Ignored if column already exists
     }
 
+    // 4. Ensure default categories exist if empty
+    try {
+      const existingCats: any[] = await prisma.$queryRawUnsafe(`SELECT count(*) as count FROM "GalleryCategory";`);
+      const count = Number(existingCats[0]?.count ?? 0);
+      if (count === 0) {
+        await prisma.$executeRawUnsafe(`
+          INSERT INTO "GalleryCategory" ("name", "slug", "displayOrder", "isVisible")
+          VALUES 
+            ('Campus & Facilities', 'campus-facilities', 1, 1),
+            ('Events & Celebrations', 'events-celebrations', 2, 1),
+            ('Toppers & Achievers', 'toppers-achievers', 3, 1),
+            ('Classroom & Seminars', 'classroom-seminars', 4, 1);
+        `);
+        console.log("[DB] Seeded 4 default gallery categories");
+      }
+    } catch (e) {
+      console.warn("[DB] Could not verify/seed default gallery categories:", e);
+    }
+
     console.log("[DB] Dynamic schema verification: Gallery tables are ready.");
   } catch (error) {
     console.error("[DB] Failed to verify/create database tables:", error);

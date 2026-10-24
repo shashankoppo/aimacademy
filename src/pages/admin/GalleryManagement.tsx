@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { Edit, Eye, EyeOff, ImagePlus, Plus, Settings, Star, Trash2, Upload, Video, Play, Image as ImageIcon, Loader2, RefreshCw } from "lucide-react";
+import { Edit, Eye, EyeOff, ImagePlus, Plus, Settings, Star, Trash2, Upload, Video, Play, Image as ImageIcon, Loader2, RefreshCw, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminData, type GalleryCategory, type GalleryItem } from "@/hooks/useAdminData";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -76,6 +76,9 @@ const GalleryManagement = () => {
   const [itemForm, setItemForm] = useState<ItemForm>(emptyItem);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   const [bulkUrls, setBulkUrls] = useState("");
+  const [quickCatName, setQuickCatName] = useState("");
+  const [isCreatingQuickCat, setIsCreatingQuickCat] = useState(false);
+  const [showQuickCat, setShowQuickCat] = useState(false);
 
   const sortedCategories = useMemo(() => [...galleryCategories].sort((a, b) => a.displayOrder - b.displayOrder), [galleryCategories]);
   
@@ -145,12 +148,45 @@ const GalleryManagement = () => {
     }
   };
 
+  const handleQuickAddCategory = async () => {
+    if (!quickCatName.trim()) return toast.error("Category name is required");
+    setIsCreatingQuickCat(true);
+    try {
+      const newCat = await addGalleryCategory({
+        name: quickCatName.trim(),
+        slug: generateSlug(quickCatName.trim()),
+        coverUrl: "",
+        description: "",
+        displayOrder: sortedCategories.length + 1,
+        isVisible: true,
+      });
+      setItemForm((prev) => ({ ...prev, categoryId: newCat.id }));
+      setQuickCatName("");
+      setShowQuickCat(false);
+      toast.success(`Category "${newCat.name}" created and selected!`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create category");
+    } finally {
+      setIsCreatingQuickCat(false);
+    }
+  };
+
+  useEffect(() => {
+    if (sortedCategories.length > 0 && (!itemForm.categoryId || itemForm.categoryId === 0)) {
+      setItemForm((prev) => ({
+        ...prev,
+        categoryId: activeTab !== "all" ? Number(activeTab) : sortedCategories[0].id,
+      }));
+    }
+  }, [sortedCategories, activeTab]);
+
   const openAddItemDialog = () => {
     setItemForm({
       ...emptyItem,
-      categoryId: activeTab !== "all" ? activeTab : (sortedCategories[0]?.id || 0),
+      categoryId: activeTab !== "all" ? Number(activeTab) : (sortedCategories[0]?.id || 0),
     });
     setBulkUrls("");
+    setShowQuickCat(false);
     setIsAddItemOpen(true);
   };
 
@@ -345,17 +381,77 @@ const GalleryManagement = () => {
               <DialogHeader><DialogTitle>Add New Photo or Video</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>Category *</Label>
-                  <Select value={itemForm.categoryId ? itemForm.categoryId.toString() : ""} onValueChange={(v) => setItemForm({ ...itemForm, categoryId: Number(v) })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sortedCategories.map((cat: GalleryCategory) => (
-                        <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center justify-between">
+                    <Label className="font-bold text-slate-800 text-sm">Category *</Label>
+                    <button
+                      type="button"
+                      onClick={() => setShowQuickCat(!showQuickCat)}
+                      className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> {showQuickCat ? "Cancel" : "New Category"}
+                    </button>
+                  </div>
+
+                  {showQuickCat && (
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                      <Label className="text-xs font-bold text-slate-600">Quickly Create New Category</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={quickCatName}
+                          onChange={(e) => setQuickCatName(e.target.value)}
+                          placeholder="e.g. Annual Sports, Farewell 2026..."
+                          className="bg-white"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void handleQuickAddCategory();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          disabled={!quickCatName.trim() || isCreatingQuickCat}
+                          onClick={() => void handleQuickAddCategory()}
+                          className="px-4 py-2 bg-primary text-white font-bold rounded-lg text-xs shrink-0 hover:opacity-90 disabled:opacity-50"
+                        >
+                          {isCreatingQuickCat ? "Adding..." : "Add & Select"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {sortedCategories.length === 0 && !showQuickCat ? (
+                    <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900">
+                      <div>
+                        <p className="font-bold">No categories exist yet.</p>
+                        <p className="text-amber-700 text-[11px]">Create at least one category to add media items.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowQuickCat(true)}
+                        className="px-3 py-1.5 bg-amber-600 text-white font-bold rounded-lg text-xs hover:bg-amber-700 shrink-0"
+                      >
+                        + Create Category
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <select
+                        value={itemForm.categoryId || ""}
+                        onChange={(e) => setItemForm({ ...itemForm, categoryId: Number(e.target.value) })}
+                        className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
+                      >
+                        <option value="" disabled>-- Select Category --</option>
+                        {sortedCategories.map((cat: GalleryCategory) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -621,17 +717,22 @@ const GalleryManagement = () => {
             <>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label>Category *</Label>
-                  <Select value={editingItem.categoryId.toString()} onValueChange={(v) => setEditingItem({ ...editingItem, categoryId: Number(v) })}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
+                  <Label className="font-bold text-slate-800 text-sm">Category *</Label>
+                  <div className="relative">
+                    <select
+                      value={editingItem.categoryId || ""}
+                      onChange={(e) => setEditingItem({ ...editingItem, categoryId: Number(e.target.value) })}
+                      className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
+                    >
+                      <option value="" disabled>-- Select Category --</option>
                       {sortedCategories.map((cat: GalleryCategory) => (
-                        <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </option>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
