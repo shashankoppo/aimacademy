@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { User, KeyRound, Save, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { User, KeyRound, Save, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { apiRequest, getStoredUser, setStoredUser } from "@/lib/admin-api";
 import { Input } from "@/components/ui/input";
@@ -91,8 +92,25 @@ export function ProfileSettings() {
     }
   };
 
+    const dashboardLink = user?.role === "TEACHER" 
+    ? "/teacher/dashboard" 
+    : user?.role === "STAFF" 
+    ? "/staff/dashboard" 
+    : user?.role === "ADMIN" 
+    ? "/admin" 
+    : "/student/dashboard";
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4">
+      <div className="flex items-center justify-between">
+        <Link
+          to={dashboardLink}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </Link>
+      </div>
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-900 p-6 flex items-center space-x-4">
           <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-[#FFFF00] flex items-center justify-center text-[#FFFF00] text-2xl font-black shadow-md">

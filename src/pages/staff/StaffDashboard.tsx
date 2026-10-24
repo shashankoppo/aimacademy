@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { 
   Users, Briefcase, FileText, BarChart3, 
   Calendar, CheckCircle2, ChevronRight, GraduationCap, 
@@ -114,8 +115,30 @@ const StaffDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-slate-50/60 pb-16">
+      {/* Portal Top Bar */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center font-black shadow-xs">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-black text-slate-900 text-sm tracking-tight">AIM Academy</span>
+              <span className="text-[10px] text-amber-600 block font-bold uppercase tracking-widest -mt-0.5">Staff Portal</span>
+            </div>
+          </Link>
+        </div>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link to="/" className="text-xs font-bold text-slate-600 hover:text-slate-900 hidden sm:inline-flex items-center gap-1">
+            Back to Website
+          </Link>
+          <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+          <ProfileDropdown profilePath="/staff/profile" />
+        </div>
+      </header>
+
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
@@ -130,9 +153,6 @@ const StaffDashboard = () => {
               </h1>
               <p className="text-slate-500 font-medium">Administrator</p>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <ProfileDropdown profilePath="/staff/profile" />
           </div>
           <div className="flex gap-4">
             <button onClick={() => setBroadcastOpen(true)} className="flex items-center gap-2 bg-slate-900 text-white font-bold py-3 px-6 rounded hover:bg-slate-800 transition-all">

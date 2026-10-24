@@ -362,8 +362,12 @@ export const getAdminOverview = async (_req: Request, res: Response) => {
       prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }).catch((e) => { console.warn("[Overview] settings:", e?.message); return null; }),
       prisma.adminNote.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] notes:", e?.message); return []; }),
       prisma.adminVideo.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] videos:", e?.message); return []; }),
-      prisma.galleryCategory.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] galleryCategories:", e?.message); return []; }),
-      prisma.galleryItem.findMany({ orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }] }).catch((e) => { console.warn("[Overview] galleryItems:", e?.message); return []; }),
+      prisma.galleryCategory.findMany({ orderBy: { id: "asc" } }).catch(async () => {
+        return prisma.galleryCategory.findMany().catch((e) => { console.warn("[Overview] galleryCategories:", e?.message); return []; });
+      }),
+      prisma.galleryItem.findMany({ orderBy: { id: "asc" } }).catch(async () => {
+        return prisma.galleryItem.findMany().catch((e) => { console.warn("[Overview] galleryItems:", e?.message); return []; });
+      }),
     ]);
 
     res.json({
@@ -879,8 +883,10 @@ export const handleFileUpload = async (req: Request, res: Response) => {
 export const getGalleryCategories = async (_req: Request, res: Response) => {
   try {
     const categories = await prisma.galleryCategory.findMany({
-      orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+      orderBy: { id: "asc" },
       include: { _count: { select: { items: true } } },
+    }).catch(async () => {
+      return prisma.galleryCategory.findMany();
     });
     res.json(categories);
   } catch (error) {
@@ -893,7 +899,7 @@ export const addGalleryCategory = async (req: Request, res: Response) => {
     console.log("Adding category payload:", req.body);
     const payload = galleryCategorySchema.parse(req.body);
 
-    // Prevent duplicate category name or slug
+    // If category already exists, return existing so caller can immediately select it
     const existing = await prisma.galleryCategory.findFirst({
       where: {
         OR: [
@@ -903,7 +909,7 @@ export const addGalleryCategory = async (req: Request, res: Response) => {
       }
     });
     if (existing) {
-      return res.status(400).json({ error: "A category with this name or identifier already exists." });
+      return res.status(200).json(existing);
     }
 
     const category = await prisma.galleryCategory.create({ data: payload });

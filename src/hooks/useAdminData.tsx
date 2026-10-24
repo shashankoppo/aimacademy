@@ -244,6 +244,14 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setWebsiteSettings(data.websiteSettings ?? defaultSettings);
       syncLocalWebsiteSettings(data.websiteSettings ?? defaultSettings);
       setError(null);
+
+      // Direct fetch gallery categories to guarantee fresh and populated state
+      try {
+        const directCats = await apiRequest<GalleryCategory[]>("/admin/gallery/categories");
+        if (Array.isArray(directCats) && directCats.length > 0) {
+          setGalleryCategories(directCats);
+        }
+      } catch {}
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load admin data";
       console.error("[useAdminData] Error loading overview:", err);
@@ -480,7 +488,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       method: "POST",
       body: JSON.stringify(cat),
     });
-    setGalleryCategories((prev) => [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder));
+    setGalleryCategories((prev) => {
+      const exists = prev.some((c) => c.id === created.id || c.name.toLowerCase() === created.name.toLowerCase());
+      if (exists) {
+        return prev.map((c) => (c.id === created.id ? created : c));
+      }
+      return [...prev, created].sort((a, b) => a.displayOrder - b.displayOrder);
+    });
     return created;
   };
 

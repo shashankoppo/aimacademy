@@ -438,13 +438,13 @@ const GalleryManagement = () => {
                   ) : (
                     <div className="relative">
                       <select
-                        value={itemForm.categoryId || ""}
+                        value={itemForm.categoryId ? String(itemForm.categoryId) : ""}
                         onChange={(e) => setItemForm({ ...itemForm, categoryId: Number(e.target.value) })}
                         className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
                       >
                         <option value="" disabled>-- Select Category --</option>
                         {sortedCategories.map((cat: GalleryCategory) => (
-                          <option key={cat.id} value={cat.id}>
+                          <option key={cat.id} value={String(cat.id)}>
                             {cat.name}
                           </option>
                         ))}
@@ -720,13 +720,13 @@ const GalleryManagement = () => {
                   <Label className="font-bold text-slate-800 text-sm">Category *</Label>
                   <div className="relative">
                     <select
-                      value={editingItem.categoryId || ""}
+                      value={editingItem.categoryId ? String(editingItem.categoryId) : ""}
                       onChange={(e) => setEditingItem({ ...editingItem, categoryId: Number(e.target.value) })}
                       className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
                     >
                       <option value="" disabled>-- Select Category --</option>
                       {sortedCategories.map((cat: GalleryCategory) => (
-                        <option key={cat.id} value={cat.id}>
+                        <option key={cat.id} value={String(cat.id)}>
                           {cat.name}
                         </option>
                       ))}

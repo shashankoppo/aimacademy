@@ -108,7 +108,7 @@ const AppRoutes = () => {
           path="/student/profile"
           element={
             <RequireAuth allowedRoles={["STUDENT"]}>
-              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+              <div className="min-h-screen bg-slate-50/60 py-8 px-4 sm:px-6">
                 <ProfileSettings />
               </div>
             </RequireAuth>
@@ -136,7 +136,7 @@ const AppRoutes = () => {
           path="/teacher/profile"
           element={
             <RequireAuth allowedRoles={["TEACHER"]}>
-              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+              <div className="min-h-screen bg-slate-50/60 py-8 px-4 sm:px-6">
                 <ProfileSettings />
               </div>
             </RequireAuth>
@@ -156,7 +156,7 @@ const AppRoutes = () => {
           path="/staff/profile"
           element={
             <RequireAuth allowedRoles={["STAFF"]}>
-              <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
+              <div className="min-h-screen bg-slate-50/60 py-8 px-4 sm:px-6">
                 <ProfileSettings />
               </div>
             </RequireAuth>

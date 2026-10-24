@@ -87,8 +87,30 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent pt-32 pb-20 px-6">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-slate-50/60 pb-16">
+      {/* Portal Top Bar */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-black shadow-xs">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-black text-slate-900 text-sm tracking-tight">AIM Academy</span>
+              <span className="text-[10px] text-primary block font-bold uppercase tracking-widest -mt-0.5">Student Portal</span>
+            </div>
+          </Link>
+        </div>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link to="/" className="text-xs font-bold text-slate-600 hover:text-slate-900 hidden sm:inline-flex items-center gap-1">
+            Back to Website
+          </Link>
+          <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+          <ProfileDropdown profilePath="/student/profile" />
+        </div>
+      </header>
+
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
           <div className="flex items-center gap-6">
@@ -102,9 +124,6 @@ const StudentDashboard = () => {
               </h1>
               <p className="text-slate-500 font-medium">{studentBatch}</p>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <ProfileDropdown profilePath="/student/profile" />
           </div>
           <div className="flex gap-4">
             <button onClick={() => void downloadReportCard()} className="btn-outline-coursera py-3">

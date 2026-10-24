@@ -39,11 +39,33 @@ export async function ensureDatabaseTables() {
     `);
     await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "GalleryItem_categoryId_idx" ON "GalleryItem"("categoryId");`);
 
-    // 3. Ensure mediaType column exists on GalleryItem (for tables created previously without mediaType)
-    try {
-      await prisma.$executeRawUnsafe(`ALTER TABLE "GalleryItem" ADD COLUMN "mediaType" TEXT DEFAULT 'IMAGE';`);
-    } catch {
-      // Ignored if column already exists
+    // 3. Ensure all columns exist on GalleryCategory
+    const catColumns = [
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "coverUrl" TEXT;`,
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "description" TEXT;`,
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "displayOrder" INTEGER NOT NULL DEFAULT 0;`,
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "isVisible" BOOLEAN NOT NULL DEFAULT 1;`,
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;`,
+      `ALTER TABLE "GalleryCategory" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;`,
+    ];
+    for (const sql of catColumns) {
+      try { await prisma.$executeRawUnsafe(sql); } catch {}
+    }
+
+    // 4. Ensure all columns exist on GalleryItem
+    const itemColumns = [
+      `ALTER TABLE "GalleryItem" ADD COLUMN "title" TEXT;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "thumbnailUrl" TEXT;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "isVisible" BOOLEAN NOT NULL DEFAULT 1;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "isFeatured" BOOLEAN NOT NULL DEFAULT 0;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "displayOrder" INTEGER NOT NULL DEFAULT 0;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "eventDate" TEXT;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "mediaType" TEXT DEFAULT 'IMAGE';`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;`,
+      `ALTER TABLE "GalleryItem" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;`,
+    ];
+    for (const sql of itemColumns) {
+      try { await prisma.$executeRawUnsafe(sql); } catch {}
     }
 
     // 4. Ensure default categories exist if empty

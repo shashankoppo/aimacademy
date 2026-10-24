@@ -83,7 +83,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const CurrentIcon = currentItem.icon;
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-slate-100/60 font-sans antialiased text-slate-800">
+    <div className="fixed inset-0 overflow-hidden flex bg-slate-100/60 font-sans antialiased text-slate-800">
       
       {/* Mobile Backdrop */}
       {isMobileSidebarOpen && (
@@ -182,7 +182,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </aside>
 
       {/* Main Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden">
         
         {/* Top Header Bar */}
         <header className="h-16 shrink-0 bg-white/95 backdrop-blur-md border-b border-slate-200/80 flex items-center justify-between px-4 sm:px-6 lg:px-8 z-30 shadow-xs">
@@ -236,7 +236,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </header>
 
         {/* Dedicated Scrollable Content Container */}
-        <main className="flex-1 overflow-y-auto min-w-0 h-[calc(100vh-4rem)] p-4 sm:p-6 lg:p-8 admin-scrollbar">
+        <main className="flex-1 overflow-y-auto min-w-0 min-h-0 p-4 sm:p-6 lg:p-8 admin-scrollbar">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

@@ -59,7 +59,17 @@ function requirePermission(permission) {
         const au = req.authUser;
         if (!au)
             return res.status(401).json({ success: false, message: "Unauthorized." });
-        if (au.role === "ADMIN" || au.permissions.has(permission)) {
+        // Superuser admin bypass
+        if (au.role === "ADMIN")
+            return next();
+        // Role-inherent permissions fallback
+        if (au.role === "TEACHER" && permission.startsWith("teacher:"))
+            return next();
+        if (au.role === "STUDENT" && permission.startsWith("student:"))
+            return next();
+        if (au.role === "STAFF" && permission.startsWith("staff:"))
+            return next();
+        if (au.permissions.has(permission)) {
             return next();
         }
         return res.status(403).json({ success: false, message: "Forbidden." });
