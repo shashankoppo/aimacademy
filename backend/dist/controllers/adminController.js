@@ -866,12 +866,24 @@ exports.handleFileUpload = handleFileUpload;
 // ── Gallery Categories ──────────────────────────────
 const getGalleryCategories = async (_req, res) => {
     try {
-        const categories = await prisma_1.prisma.galleryCategory.findMany({
+        let categories = await prisma_1.prisma.galleryCategory.findMany({
             orderBy: { id: "asc" },
             include: { _count: { select: { items: true } } },
         }).catch(async () => {
-            return prisma_1.prisma.galleryCategory.findMany();
+            return prisma_1.prisma.galleryCategory.findMany({ orderBy: { id: "asc" } });
         });
+        if (categories.length === 0) {
+            const defaults = [
+                { name: "Campus & Facilities", slug: "campus-facilities", displayOrder: 1, isVisible: true },
+                { name: "Events & Celebrations", slug: "events-celebrations", displayOrder: 2, isVisible: true },
+                { name: "Toppers & Achievers", slug: "toppers-achievers", displayOrder: 3, isVisible: true },
+                { name: "Classroom & Seminars", slug: "classroom-seminars", displayOrder: 4, isVisible: true },
+            ];
+            for (const d of defaults) {
+                await prisma_1.prisma.galleryCategory.create({ data: d }).catch(() => { });
+            }
+            categories = await prisma_1.prisma.galleryCategory.findMany({ orderBy: { id: "asc" } });
+        }
         res.json(categories);
     }
     catch (error) {
@@ -881,25 +893,30 @@ const getGalleryCategories = async (_req, res) => {
 exports.getGalleryCategories = getGalleryCategories;
 const addGalleryCategory = async (req, res) => {
     try {
-        console.log("Adding category payload:", req.body);
         const payload = galleryCategorySchema.parse(req.body);
-        // If category already exists, return existing so caller can immediately select it
-        const existing = await prisma_1.prisma.galleryCategory.findFirst({
-            where: {
-                OR: [
-                    { name: { equals: payload.name } },
-                    { slug: { equals: payload.slug } }
-                ]
-            }
-        });
+        // Case-insensitive match on existing category
+        const all = await prisma_1.prisma.galleryCategory.findMany();
+        const existing = all.find((c) => c.name.trim().toLowerCase() === payload.name.trim().toLowerCase() ||
+            c.slug.trim().toLowerCase() === payload.slug.trim().toLowerCase());
         if (existing) {
             return res.status(200).json(existing);
         }
-        const category = await prisma_1.prisma.galleryCategory.create({ data: payload });
-        res.status(201).json(category);
+        try {
+            const category = await prisma_1.prisma.galleryCategory.create({ data: payload });
+            return res.status(201).json(category);
+        }
+        catch (createErr) {
+            const fallback = await prisma_1.prisma.galleryCategory.findFirst({
+                where: {
+                    OR: [{ name: payload.name }, { slug: payload.slug }],
+                },
+            });
+            if (fallback)
+                return res.status(200).json(fallback);
+            throw createErr;
+        }
     }
     catch (error) {
-        console.error("Error adding category:", error);
         handleError(res, error, "Failed to add gallery category");
     }
 };
@@ -942,10 +959,35 @@ const getGalleryItems = async (_req, res) => {
 exports.getGalleryItems = getGalleryItems;
 const addGalleryItem = async (req, res) => {
     try {
-        const payload = galleryItemSchema.parse(req.body);
-        const category = await prisma_1.prisma.galleryCategory.findUnique({ where: { id: payload.categoryId } });
+        let categoryId = Number(req.body.categoryId);
+        // Auto-resolve category if missing or 0
+        if (!categoryId || isNaN(categoryId) || categoryId <= 0) {
+            const catName = typeof req.body.categoryName === "string" && req.body.categoryName.trim()
+                ? req.body.categoryName.trim()
+                : "Campus & Facilities";
+            const slug = catName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || "general";
+            let cat = await prisma_1.prisma.galleryCategory.findFirst({
+                where: { OR: [{ name: catName }, { slug }] },
+            });
+            if (!cat) {
+                cat = await prisma_1.prisma.galleryCategory.create({
+                    data: { name: catName, slug, displayOrder: 1, isVisible: true },
+                }).catch(async () => {
+                    return prisma_1.prisma.galleryCategory.findFirst();
+                });
+            }
+            categoryId = cat?.id ?? 1;
+        }
+        const payload = galleryItemSchema.parse({
+            ...req.body,
+            categoryId,
+        });
+        let category = await prisma_1.prisma.galleryCategory.findUnique({ where: { id: payload.categoryId } });
         if (!category) {
-            return res.status(404).json({ error: "Selected category was not found." });
+            category = await prisma_1.prisma.galleryCategory.findFirst();
+            if (category) {
+                payload.categoryId = category.id;
+            }
         }
         const isYoutube = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/i.test(payload.imageUrl);
         const mediaType = payload.mediaType || (isYoutube ? "VIDEO" : "IMAGE");
@@ -966,13 +1008,14 @@ const addGalleryItem = async (req, res) => {
 exports.addGalleryItem = addGalleryItem;
 const addGalleryItemsBulk = async (req, res) => {
     try {
-        const { urls, categoryId, eventDate } = req.body;
+        let { urls, categoryId, eventDate } = req.body;
         if (!Array.isArray(urls) || urls.length === 0) {
             return res.status(400).json({ error: "Provide an array of URLs" });
         }
-        const category = await prisma_1.prisma.galleryCategory.findUnique({ where: { id: categoryId } });
-        if (!category) {
-            return res.status(404).json({ error: "Selected category was not found." });
+        let parsedCategoryId = Number(categoryId);
+        if (!parsedCategoryId || isNaN(parsedCategoryId) || parsedCategoryId <= 0) {
+            const firstCat = await prisma_1.prisma.galleryCategory.findFirst();
+            parsedCategoryId = firstCat?.id ?? 1;
         }
         const items = await Promise.all(urls.filter(u => u.trim()).map(url => {
             const cleanUrl = url.trim();
@@ -982,7 +1025,7 @@ const addGalleryItemsBulk = async (req, res) => {
                     imageUrl: cleanUrl,
                     thumbnailUrl: isYoutube ? getYouTubeThumbnail(cleanUrl) : null,
                     mediaType: isYoutube ? "VIDEO" : "IMAGE",
-                    categoryId,
+                    categoryId: parsedCategoryId,
                     eventDate: eventDate || null
                 },
             });

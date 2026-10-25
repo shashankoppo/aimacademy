@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Edit, Eye, EyeOff, ImagePlus, Plus, Settings, Star, Trash2, Upload, Video, Play, Image as ImageIcon, Loader2, RefreshCw, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminData, type GalleryCategory, type GalleryItem } from "@/hooks/useAdminData";
@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { uploadFile } from "@/lib/admin-api";
+import { uploadFile, apiRequest } from "@/lib/admin-api";
 
 type CategoryForm = Omit<GalleryCategory, "id" | "createdAt" | "updatedAt">;
 type ItemForm = Omit<GalleryItem, "id" | "createdAt" | "updatedAt">;
@@ -55,16 +55,42 @@ const GalleryManagement = () => {
     loading = false
   } = useAdminData() as any;
 
+  const [localCategories, setLocalCategories] = useState<GalleryCategory[]>([]);
   const [activeTab, setActiveTab] = useState<number | "all">("all");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Sync external galleryCategories when available
   useEffect(() => {
+    if (Array.isArray(galleryCategories) && galleryCategories.length > 0) {
+      setLocalCategories(galleryCategories);
+    }
+  }, [galleryCategories]);
+
+  // Direct fetch categories on mount for guaranteed fresh data
+  const loadCategories = useCallback(async () => {
+    try {
+      const cats = await apiRequest<GalleryCategory[]>("/admin/gallery/categories");
+      if (Array.isArray(cats) && cats.length > 0) {
+        setLocalCategories(cats);
+        return;
+      }
+    } catch {}
+    try {
+      const pubCats = await apiRequest<GalleryCategory[]>("/public/gallery/categories");
+      if (Array.isArray(pubCats) && pubCats.length > 0) {
+        setLocalCategories(pubCats);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    void loadCategories();
     if (refreshData) {
       void refreshData();
     }
-  }, [refreshData]);
+  }, [loadCategories, refreshData]);
   
   // Dialog visibility states
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -80,7 +106,10 @@ const GalleryManagement = () => {
   const [isCreatingQuickCat, setIsCreatingQuickCat] = useState(false);
   const [showQuickCat, setShowQuickCat] = useState(false);
 
-  const sortedCategories = useMemo(() => [...galleryCategories].sort((a, b) => a.displayOrder - b.displayOrder), [galleryCategories]);
+  const sortedCategories = useMemo(() => {
+    const list = localCategories.length > 0 ? localCategories : (galleryCategories || []);
+    return [...list].sort((a, b) => a.displayOrder - b.displayOrder);
+  }, [localCategories, galleryCategories]);
   
   const filteredItems = useMemo(() => {
     let items = activeTab === "all" ? galleryItems : galleryItems.filter((i: GalleryItem) => i.categoryId === activeTab);
@@ -132,11 +161,16 @@ const GalleryManagement = () => {
     setIsSaving(true);
     try {
       if (isEdit && editingCategory) {
-        await updateGalleryCategory(editingCategory.id, data);
+        const updated = await updateGalleryCategory(editingCategory.id, data);
+        setLocalCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
         toast.success("Category updated successfully");
         setEditingCategory(null);
       } else {
-        await addGalleryCategory(categoryForm);
+        const created = await addGalleryCategory(categoryForm);
+        setLocalCategories((prev) => {
+          const filtered = prev.filter((c) => c.id !== created.id && c.name.toLowerCase() !== created.name.toLowerCase());
+          return [...filtered, created].sort((a, b) => a.displayOrder - b.displayOrder);
+        });
         toast.success("Category added successfully");
         setCategoryForm(emptyCategory);
         setIsAddCategoryOpen(false);
@@ -160,6 +194,10 @@ const GalleryManagement = () => {
         displayOrder: sortedCategories.length + 1,
         isVisible: true,
       });
+      setLocalCategories((prev) => {
+        const filtered = prev.filter((c) => c.id !== newCat.id && c.name.toLowerCase() !== newCat.name.toLowerCase());
+        return [...filtered, newCat].sort((a, b) => a.displayOrder - b.displayOrder);
+      });
       setItemForm((prev) => ({ ...prev, categoryId: newCat.id }));
       setQuickCatName("");
       setShowQuickCat(false);
@@ -181,9 +219,10 @@ const GalleryManagement = () => {
   }, [sortedCategories, activeTab]);
 
   const openAddItemDialog = () => {
+    const defaultCatId = activeTab !== "all" ? Number(activeTab) : (sortedCategories[0]?.id || 1);
     setItemForm({
       ...emptyItem,
-      categoryId: activeTab !== "all" ? Number(activeTab) : (sortedCategories[0]?.id || 0),
+      categoryId: defaultCatId,
     });
     setBulkUrls("");
     setShowQuickCat(false);
@@ -192,7 +231,8 @@ const GalleryManagement = () => {
 
   const saveItem = async (isEdit: boolean) => {
     if (isEdit && editingItem) {
-      if (!editingItem.imageUrl.trim() || !editingItem.categoryId) return toast.error("Media URL and Category are required");
+      const finalCategoryId = Number(editingItem.categoryId) || sortedCategories[0]?.id || 1;
+      if (!editingItem.imageUrl.trim()) return toast.error("Media URL is required");
       setIsSaving(true);
       try {
         const isYt = isYouTubeUrl(editingItem.imageUrl);
@@ -200,6 +240,7 @@ const GalleryManagement = () => {
         const thumb = editingItem.thumbnailUrl || (isYt ? getYouTubeThumbnail(editingItem.imageUrl) : editingItem.imageUrl);
         await updateGalleryItem(editingItem.id, {
           ...editingItem,
+          categoryId: finalCategoryId,
           mediaType,
           thumbnailUrl: thumb,
         });
@@ -216,7 +257,8 @@ const GalleryManagement = () => {
     // Add Mode (supports bulk)
     const urls = bulkUrls.trim() ? bulkUrls.split("\n").map(u => u.trim()).filter(Boolean) : [];
     if (!itemForm.imageUrl.trim() && urls.length === 0) return toast.error("Provide a media URL, upload a file, or paste bulk URLs");
-    if (!itemForm.categoryId) return toast.error("Please select a Category");
+
+    const finalCategoryId = Number(itemForm.categoryId) || sortedCategories[0]?.id || 1;
 
     setIsSaving(true);
     try {
@@ -226,8 +268,9 @@ const GalleryManagement = () => {
           const thumb = isYt ? getYouTubeThumbnail(url) : url;
           await addGalleryItem({ 
             ...itemForm, 
+            categoryId: finalCategoryId,
             imageUrl: url, 
-            thumbnailUrl: thumb,
+            thumbnailUrl: thumb, 
             mediaType: isYt ? "VIDEO" : "IMAGE" 
           });
         }
@@ -237,7 +280,8 @@ const GalleryManagement = () => {
         const thumb = itemForm.thumbnailUrl || (isYt ? getYouTubeThumbnail(itemForm.imageUrl) : itemForm.imageUrl);
         await addGalleryItem({ 
           ...itemForm, 
-          thumbnailUrl: thumb,
+          categoryId: finalCategoryId,
+          thumbnailUrl: thumb, 
           mediaType: itemForm.mediaType || (isYt ? "VIDEO" : "IMAGE") 
         });
         toast.success("Gallery item added successfully");
@@ -421,37 +465,24 @@ const GalleryManagement = () => {
                     </div>
                   )}
 
-                  {sortedCategories.length === 0 && !showQuickCat ? (
-                    <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-900">
-                      <div>
-                        <p className="font-bold">No categories exist yet.</p>
-                        <p className="text-amber-700 text-[11px]">Create at least one category to add media items.</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowQuickCat(true)}
-                        className="px-3 py-1.5 bg-amber-600 text-white font-bold rounded-lg text-xs hover:bg-amber-700 shrink-0"
-                      >
-                        + Create Category
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="relative">
-                      <select
-                        value={itemForm.categoryId ? String(itemForm.categoryId) : ""}
-                        onChange={(e) => setItemForm({ ...itemForm, categoryId: Number(e.target.value) })}
-                        className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
-                      >
-                        <option value="" disabled>-- Select Category --</option>
-                        {sortedCategories.map((cat: GalleryCategory) => (
+                  <div className="relative">
+                    <select
+                      value={itemForm.categoryId ? String(itemForm.categoryId) : (sortedCategories[0]?.id ? String(sortedCategories[0].id) : "")}
+                      onChange={(e) => setItemForm({ ...itemForm, categoryId: Number(e.target.value) })}
+                      className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
+                    >
+                      {sortedCategories.length === 0 ? (
+                        <option value="">Default (Campus & Facilities)</option>
+                      ) : (
+                        sortedCategories.map((cat: GalleryCategory) => (
                           <option key={cat.id} value={String(cat.id)}>
                             {cat.name}
                           </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    </div>
-                  )}
+                        ))
+                      )}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -720,16 +751,19 @@ const GalleryManagement = () => {
                   <Label className="font-bold text-slate-800 text-sm">Category *</Label>
                   <div className="relative">
                     <select
-                      value={editingItem.categoryId ? String(editingItem.categoryId) : ""}
+                      value={editingItem.categoryId ? String(editingItem.categoryId) : (sortedCategories[0]?.id ? String(sortedCategories[0].id) : "")}
                       onChange={(e) => setEditingItem({ ...editingItem, categoryId: Number(e.target.value) })}
                       className="w-full h-11 px-3.5 pr-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer appearance-none"
                     >
-                      <option value="" disabled>-- Select Category --</option>
-                      {sortedCategories.map((cat: GalleryCategory) => (
-                        <option key={cat.id} value={String(cat.id)}>
-                          {cat.name}
-                        </option>
-                      ))}
+                      {sortedCategories.length === 0 ? (
+                        <option value="">Default (Campus & Facilities)</option>
+                      ) : (
+                        sortedCategories.map((cat: GalleryCategory) => (
+                          <option key={cat.id} value={String(cat.id)}>
+                            {cat.name}
+                          </option>
+                        ))
+                      )}
                     </select>
                     <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>

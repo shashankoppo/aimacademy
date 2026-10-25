@@ -50,6 +50,8 @@ app.use('/api/auth', authRoutes_1.default);
 const leadController_1 = require("./controllers/leadController");
 app.post("/api/public/leads", leadController_1.createLead);
 app.get("/api/public/content", adminController_1.getPublicContent);
+app.get("/api/public/gallery/categories", adminController_1.getGalleryCategories);
+app.get("/api/public/gallery/items", adminController_1.getGalleryItems);
 app.use('/api/admin', adminRoutes_1.default);
 app.use('/api/admin/upload', uploadRoutes_1.default);
 app.use("/api/admin/iam", auth_1.authenticate, (0, auth_1.requirePermission)("admin:access"), iamRoutes_1.default);
