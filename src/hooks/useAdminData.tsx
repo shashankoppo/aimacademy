@@ -245,11 +245,17 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       syncLocalWebsiteSettings(data.websiteSettings ?? defaultSettings);
       setError(null);
 
-      // Direct fetch gallery categories to guarantee fresh and populated state
+      // Direct fetch gallery categories and items to guarantee fresh and populated state
       try {
         const directCats = await apiRequest<GalleryCategory[]>("/admin/gallery/categories");
         if (Array.isArray(directCats) && directCats.length > 0) {
           setGalleryCategories(directCats);
+        }
+      } catch {}
+      try {
+        const directItems = await apiRequest<GalleryItem[]>("/admin/gallery/items");
+        if (Array.isArray(directItems)) {
+          setGalleryItems(directItems);
         }
       } catch {}
     } catch (err) {

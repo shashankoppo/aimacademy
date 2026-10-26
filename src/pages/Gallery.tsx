@@ -32,7 +32,7 @@ const Gallery = () => {
   const featuredItems = visibleItems.filter((item: GalleryItem) => item.isFeatured);
   
   const displayItems = activeCategory !== null
-    ? visibleItems.filter((item: GalleryItem) => item.categoryId === activeCategory)
+    ? visibleItems.filter((item: GalleryItem) => Number(item.categoryId) === Number(activeCategory))
     : visibleItems;
 
   const handleNext = () => {
@@ -185,13 +185,14 @@ const Gallery = () => {
               All Media <span className="ml-2 text-xs opacity-75 bg-black/10 px-2 py-0.5 rounded-full">{visibleItems.length}</span>
             </button>
             {visibleCategories.map((cat: GalleryCategory) => {
-              const count = visibleItems.filter((i: GalleryItem) => i.categoryId === cat.id).length;
+              const count = visibleItems.filter((i: GalleryItem) => Number(i.categoryId) === Number(cat.id)).length;
+              const isTabActive = activeCategory !== null && Number(activeCategory) === Number(cat.id);
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={`shrink-0 px-6 py-2.5 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
-                    activeCategory === cat.id 
+                    isTabActive 
                       ? "bg-primary text-slate-900 shadow-md scale-105 font-black" 
                       : "bg-white text-slate-600 border border-slate-200 hover:border-primary hover:text-slate-900 hover:bg-slate-50"
                   }`}

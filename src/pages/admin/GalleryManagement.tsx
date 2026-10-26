@@ -56,6 +56,7 @@ const GalleryManagement = () => {
   } = useAdminData() as any;
 
   const [localCategories, setLocalCategories] = useState<GalleryCategory[]>([]);
+  const [localItems, setLocalItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<number | "all">("all");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -68,29 +69,47 @@ const GalleryManagement = () => {
     }
   }, [galleryCategories]);
 
-  // Direct fetch categories on mount for guaranteed fresh data
-  const loadCategories = useCallback(async () => {
+  // Sync external galleryItems when available
+  useEffect(() => {
+    if (Array.isArray(galleryItems)) {
+      setLocalItems(galleryItems);
+    }
+  }, [galleryItems]);
+
+  // Direct fetch categories and items on mount for guaranteed fresh data
+  const loadData = useCallback(async () => {
     try {
       const cats = await apiRequest<GalleryCategory[]>("/admin/gallery/categories");
       if (Array.isArray(cats) && cats.length > 0) {
         setLocalCategories(cats);
-        return;
       }
     } catch {}
     try {
       const pubCats = await apiRequest<GalleryCategory[]>("/public/gallery/categories");
       if (Array.isArray(pubCats) && pubCats.length > 0) {
-        setLocalCategories(pubCats);
+        setLocalCategories((prev) => (prev.length > 0 ? prev : pubCats));
+      }
+    } catch {}
+    try {
+      const items = await apiRequest<GalleryItem[]>("/admin/gallery/items");
+      if (Array.isArray(items)) {
+        setLocalItems(items);
+      }
+    } catch {}
+    try {
+      const pubItems = await apiRequest<GalleryItem[]>("/public/gallery/items");
+      if (Array.isArray(pubItems)) {
+        setLocalItems((prev) => (prev.length > 0 ? prev : pubItems));
       }
     } catch {}
   }, []);
 
   useEffect(() => {
-    void loadCategories();
+    void loadData();
     if (refreshData) {
       void refreshData();
     }
-  }, [loadCategories, refreshData]);
+  }, [loadData, refreshData]);
   
   // Dialog visibility states
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -111,10 +130,16 @@ const GalleryManagement = () => {
     return [...list].sort((a, b) => a.displayOrder - b.displayOrder);
   }, [localCategories, galleryCategories]);
   
+  const allItems = useMemo(() => {
+    return localItems.length > 0 ? localItems : (galleryItems || []);
+  }, [localItems, galleryItems]);
+
   const filteredItems = useMemo(() => {
-    let items = activeTab === "all" ? galleryItems : galleryItems.filter((i: GalleryItem) => i.categoryId === activeTab);
+    let items = activeTab === "all" 
+      ? allItems 
+      : allItems.filter((i: GalleryItem) => Number(i.categoryId) === Number(activeTab));
     return [...items].sort((a: GalleryItem, b: GalleryItem) => a.displayOrder - b.displayOrder);
-  }, [galleryItems, activeTab]);
+  }, [allItems, activeTab]);
 
   const generateSlug = (name: string) => {
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -238,12 +263,13 @@ const GalleryManagement = () => {
         const isYt = isYouTubeUrl(editingItem.imageUrl);
         const mediaType = editingItem.mediaType || (isYt ? "VIDEO" : "IMAGE");
         const thumb = editingItem.thumbnailUrl || (isYt ? getYouTubeThumbnail(editingItem.imageUrl) : editingItem.imageUrl);
-        await updateGalleryItem(editingItem.id, {
+        const updated = await updateGalleryItem(editingItem.id, {
           ...editingItem,
           categoryId: finalCategoryId,
           mediaType,
           thumbnailUrl: thumb,
         });
+        setLocalItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
         toast.success("Gallery item updated");
         setEditingItem(null);
       } catch (err) {
@@ -263,29 +289,38 @@ const GalleryManagement = () => {
     setIsSaving(true);
     try {
       if (urls.length > 0) {
+        const addedItems: GalleryItem[] = [];
         for (const url of urls) {
           const isYt = isYouTubeUrl(url);
           const thumb = isYt ? getYouTubeThumbnail(url) : url;
-          await addGalleryItem({ 
+          const created = await addGalleryItem({ 
             ...itemForm, 
             categoryId: finalCategoryId,
             imageUrl: url, 
             thumbnailUrl: thumb, 
             mediaType: isYt ? "VIDEO" : "IMAGE" 
           });
+          if (created) addedItems.push(created);
+        }
+        if (addedItems.length > 0) {
+          setLocalItems((prev) => [...addedItems, ...prev.filter(i => !addedItems.some(a => a.id === i.id))]);
         }
         toast.success(`${urls.length} gallery items added successfully`);
       } else {
         const isYt = isYouTubeUrl(itemForm.imageUrl);
         const thumb = itemForm.thumbnailUrl || (isYt ? getYouTubeThumbnail(itemForm.imageUrl) : itemForm.imageUrl);
-        await addGalleryItem({ 
+        const created = await addGalleryItem({ 
           ...itemForm, 
           categoryId: finalCategoryId,
           thumbnailUrl: thumb, 
           mediaType: itemForm.mediaType || (isYt ? "VIDEO" : "IMAGE") 
         });
+        if (created) {
+          setLocalItems((prev) => [created, ...prev.filter(i => i.id !== created.id)]);
+        }
         toast.success("Gallery item added successfully");
       }
+      setActiveTab("all");
       setItemForm(emptyItem);
       setBulkUrls("");
       setIsAddItemOpen(false);
@@ -298,7 +333,9 @@ const GalleryManagement = () => {
 
   const toggleItemVisibility = async (item: GalleryItem) => {
     try {
-      await updateGalleryItem(item.id, { isVisible: !item.isVisible });
+      const nextVisible = !item.isVisible;
+      await updateGalleryItem(item.id, { isVisible: nextVisible });
+      setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isVisible: nextVisible } : i));
       toast.success(`Item ${item.isVisible ? "hidden" : "shown"}`);
     } catch (err) {
       toast.error("Failed to update visibility");
@@ -307,7 +344,9 @@ const GalleryManagement = () => {
 
   const toggleItemFeatured = async (item: GalleryItem) => {
     try {
-      await updateGalleryItem(item.id, { isFeatured: !item.isFeatured });
+      const nextFeatured = !item.isFeatured;
+      await updateGalleryItem(item.id, { isFeatured: nextFeatured });
+      setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isFeatured: nextFeatured } : i));
       toast.success(item.isFeatured ? "Item unfeatured" : "Item featured");
     } catch (err) {
       toast.error("Failed to update featured status");
@@ -594,21 +633,22 @@ const GalleryManagement = () => {
           onClick={() => setActiveTab("all")}
           className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === "all" ? "bg-primary text-white shadow-md shadow-primary/20" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}
         >
-          All Media ({galleryItems.length})
+          All Media ({allItems.length})
         </button>
         {sortedCategories.map((cat: GalleryCategory) => {
-          const count = galleryItems.filter((i: GalleryItem) => i.categoryId === cat.id).length;
+          const count = allItems.filter((i: GalleryItem) => Number(i.categoryId) === Number(cat.id)).length;
+          const isTabActive = activeTab !== "all" && Number(activeTab) === Number(cat.id);
           return (
             <div key={cat.id} className="flex items-center group relative">
               <button
                 onClick={() => setActiveTab(cat.id)}
-                className={`pr-10 pl-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === cat.id ? "bg-primary text-white shadow-md shadow-primary/20" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}
+                className={`pr-10 pl-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${isTabActive ? "bg-primary text-white shadow-md shadow-primary/20" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}
               >
                 {cat.name} ({count})
               </button>
               <button 
                 onClick={() => setEditingCategory(cat)} 
-                className={`absolute right-2 p-1.5 rounded-full transition-all ${activeTab === cat.id ? "text-white/80 hover:bg-white/20 hover:text-white" : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"}`}
+                className={`absolute right-2 p-1.5 rounded-full transition-all ${isTabActive ? "text-white/80 hover:bg-white/20 hover:text-white" : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"}`}
                 title="Edit Category"
               >
                 <Settings className="w-3.5 h-3.5" />
@@ -628,7 +668,7 @@ const GalleryManagement = () => {
       ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           {filteredItems.map((item: GalleryItem) => {
-            const catName = sortedCategories.find((c: GalleryCategory) => c.id === item.categoryId)?.name || "Unknown";
+            const catName = sortedCategories.find((c: GalleryCategory) => Number(c.id) === Number(item.categoryId))?.name || "Unknown";
             const isVid = item.mediaType === "VIDEO" || isYouTubeUrl(item.imageUrl);
             const thumb = item.thumbnailUrl || (isVid ? getYouTubeThumbnail(item.imageUrl) : item.imageUrl);
 
@@ -666,7 +706,20 @@ const GalleryManagement = () => {
                     <button onClick={() => setEditingItem(item)} className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all" title="Edit"><Edit className="w-4 h-4 mx-auto" /></button>
                     <button onClick={() => void toggleItemVisibility(item)} className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5 transition-all" title="Toggle Visibility">{item.isVisible ? <EyeOff className="w-4 h-4 mx-auto" /> : <Eye className="w-4 h-4 mx-auto" />}</button>
                     <button onClick={() => void toggleItemFeatured(item)} className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all" title="Toggle Featured"><Star className={`w-4 h-4 mx-auto ${item.isFeatured ? "fill-amber-500 text-amber-500" : ""}`} /></button>
-                    <button onClick={() => void deleteGalleryItem(item.id).then(() => toast.success("Item deleted")).catch(() => toast.error("Failed to delete"))} className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Delete"><Trash2 className="w-4 h-4 mx-auto" /></button>
+                    <button 
+                      onClick={() => {
+                        void deleteGalleryItem(item.id)
+                          .then(() => {
+                            setLocalItems((prev) => prev.filter(i => i.id !== item.id));
+                            toast.success("Item deleted");
+                          })
+                          .catch(() => toast.error("Failed to delete"));
+                      }} 
+                      className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" 
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4 mx-auto" />
+                    </button>
                   </div>
                 </div>
               </div>
