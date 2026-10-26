@@ -1,5 +1,5 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-FROM node:20-bullseye-slim AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -13,10 +13,10 @@ RUN npx prisma generate
 RUN npm run build
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
-FROM node:20-bullseye-slim AS runtime
+FROM node:20-bookworm-slim AS runtime
 
 # Install wget and openssl (Debian slim doesn't include wget by default)
-RUN apt-get update && apt-get install -y openssl ca-certificates wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates wget && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
