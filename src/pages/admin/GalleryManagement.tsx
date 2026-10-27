@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { uploadFile, apiRequest } from "@/lib/admin-api";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 
 type CategoryForm = Omit<GalleryCategory, "id" | "createdAt" | "updatedAt">;
 type ItemForm = Omit<GalleryItem, "id" | "createdAt" | "updatedAt">;
@@ -140,6 +142,9 @@ const GalleryManagement = () => {
       : allItems.filter((i: GalleryItem) => Number(i.categoryId) === Number(activeTab));
     return [...items].sort((a: GalleryItem, b: GalleryItem) => a.displayOrder - b.displayOrder);
   }, [allItems, activeTab]);
+
+  const galleryPagination = usePagination(filteredItems, 12);
+  const pagedItems = galleryPagination.paginatedData;
 
   const generateSlug = (name: string) => {
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -666,8 +671,9 @@ const GalleryManagement = () => {
           <p className="text-slate-400 text-xs">Click "+ Add Photo / Video" above to add items to your gallery.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-          {filteredItems.map((item: GalleryItem) => {
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 p-4">
+            {pagedItems.map((item: GalleryItem) => {
             const catName = sortedCategories.find((c: GalleryCategory) => Number(c.id) === Number(item.categoryId))?.name || "Unknown";
             const isVid = item.mediaType === "VIDEO" || isYouTubeUrl(item.imageUrl);
             const thumb = item.thumbnailUrl || (isVid ? getYouTubeThumbnail(item.imageUrl) : item.imageUrl);
@@ -725,6 +731,8 @@ const GalleryManagement = () => {
               </div>
             );
           })}
+          </div>
+          <PaginationBar {...galleryPagination} itemLabel="media items" />
         </div>
       )}
 

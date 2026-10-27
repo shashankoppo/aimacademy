@@ -3,6 +3,8 @@ import { ArrowLeft, Plus, Megaphone, Calendar, Users, Edit, Trash2, Send, X, Pin
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAdminData, type Announcement } from "@/hooks/useAdminData";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 
 type AnnouncementForm = Omit<Announcement, "id" | "createdAt" | "updatedAt">;
 
@@ -16,6 +18,7 @@ const defaultForm: AnnouncementForm = {
 
 const Announcements = () => {
   const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useAdminData();
+  const pagination = usePagination(announcements, 10);
   const [showForm, setShowForm] = useState(false);
   const [newAnnouncement, setNewAnnouncement] = useState<AnnouncementForm>(defaultForm);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -140,8 +143,9 @@ const Announcements = () => {
           ))}
         </div>
 
-        <div className="space-y-4">
-          {announcements.map((announcement) => (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="space-y-4 p-4">
+          {pagination.paginatedData.map((announcement) => (
             <div key={announcement.id} className={`bg-white rounded-xl border shadow-sm overflow-hidden transition-all hover:shadow-md ${announcement.isPinned ? "border-amber-200 border-l-4 border-l-amber-400" : "border-slate-200"}`}>
               <div className="p-6 md:p-8">
                 <div className="flex flex-col md:flex-row items-start justify-between gap-4 mb-4">
@@ -171,10 +175,12 @@ const Announcements = () => {
             </div>
           ))}
           {announcements.length === 0 && (
-            <div className="bg-white p-12 text-center rounded-xl border border-slate-200">
+            <div className="p-12 text-center">
               <p className="text-slate-400 font-bold">No announcements available.</p>
             </div>
           )}
+          </div>
+          <PaginationBar {...pagination} itemLabel="announcements" />
         </div>
 
         {editingAnnouncement && (

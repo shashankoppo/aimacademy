@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Search, FileSpreadsheet, IndianRupee, Download, CheckCircle2, Eye, TrendingUp, Clock } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 import { useAdminData } from "@/hooks/useAdminData";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -26,6 +28,9 @@ const FeesManagement = () => {
     const matchStatus = statusFilter === "All" || s.feeStatus === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const pagination = usePagination(filtered, 25);
+  const pagedFees = pagination.paginatedData;
 
   const insights = useMemo(() => {
     const collected = students.reduce((sum, s) => sum + s.paidFee, 0);
@@ -174,7 +179,7 @@ const FeesManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filtered.map(student => {
+              {pagedFees.map(student => {
                 const pending = Math.max(0, student.totalFee - student.paidFee);
                 const pct = student.totalFee > 0 ? Math.min(100, (student.paidFee / student.totalFee) * 100) : 0;
                 return (
@@ -231,6 +236,7 @@ const FeesManagement = () => {
             <div className="p-20 text-center"><IndianRupee className="w-12 h-12 text-slate-200 mx-auto mb-4" /><p className="text-slate-400 font-bold">No students found.</p></div>
           )}
         </div>
+        <PaginationBar {...pagination} itemLabel="records" />
       </div>
 
       {/* Record Payment Dialog */}

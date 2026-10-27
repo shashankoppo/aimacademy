@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Search, Mail, Phone, Clock, Filter, Trash2, Edit2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { apiRequest } from "@/lib/admin-api";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 import {
   Dialog,
   DialogContent,
@@ -101,6 +103,9 @@ const LeadManagement = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const leadPagination = usePagination(filteredLeads, 25);
+  const pagedLeads = leadPagination.paginatedData;
+
   if (loading) {
     return <div className="p-8 text-center text-slate-500 font-medium">Loading leads...</div>;
   }
@@ -161,7 +166,7 @@ const LeadManagement = () => {
                   </td>
                 </tr>
               ) : (
-                filteredLeads.map((lead) => (
+                pagedLeads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-slate-900">{lead.name}</div>
@@ -206,6 +211,7 @@ const LeadManagement = () => {
             </tbody>
           </table>
         </div>
+        <PaginationBar {...leadPagination} itemLabel="leads" />
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

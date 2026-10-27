@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Download, Edit, Eye, EyeOff, FileText, Link2, Plus, Trash2 } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 import { toast } from "sonner";
 import { useAdminData, type NoteItem } from "@/hooks/useAdminData";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -26,6 +28,9 @@ const NotesManagement = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const sortedNotes = useMemo(() => [...notes].sort((a, b) => a.displayOrder - b.displayOrder), [notes]);
+  const pagination = usePagination(sortedNotes, 12);
+  const pagedNotes = pagination.paginatedData;
+
 
   const onFileLoad = (field: "thumbnailUrl" | "fileUrl", file?: File | null, isEdit = false) => {
     if (!file) return;
@@ -156,8 +161,9 @@ const NotesManagement = () => {
           <p className="text-slate-400 font-bold">No notes found.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {sortedNotes.map((note) => (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+            {pagedNotes.map((note) => (
             <div key={note.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -185,7 +191,9 @@ const NotesManagement = () => {
               <button onClick={() => void deleteNote(note.id).then(() => toast.success("Note deleted")).catch((err) => toast.error(err instanceof Error ? err.message : "Failed to delete note"))} className="flex-1 p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"><Trash2 className="w-4 h-4 mx-auto" /></button>
             </div>
           </div>
-        ))}
+            ))}
+          </div>
+          <PaginationBar {...pagination} itemLabel="notes" />
         </div>
       )}
 

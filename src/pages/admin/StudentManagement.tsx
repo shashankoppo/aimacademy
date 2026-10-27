@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Search, Plus, Download, Edit, Trash2, Eye, Users, BookOpen, Calendar, BarChart3, X, FileText, IndianRupee, Phone, Mail, Clock } from "lucide-react";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationBar from "@/components/ui/PaginationBar";
 import { useAdminData, type Student, type FeeStatus } from "@/hooks/useAdminData";
 import { uploadFile, API_BASE_URL } from "@/lib/admin-api";
 import { getAttendanceColor } from "@/lib/academic-logic";
@@ -99,6 +101,9 @@ const StudentManagement = () => {
     const matchStatus = statusFilter === "All Status" || s.feeStatus === statusFilter;
     return matchSearch && matchCourse && matchStatus;
   });
+
+  const pagination = usePagination(filteredStudents, 25);
+  const pagedStudents = pagination.paginatedData;
 
   const studentStats = useMemo(() => {
     const avg = students.length ? Math.round(students.reduce((s, st) => s + parseInt(st.attendance, 10), 0) / students.length) : 0;
@@ -251,7 +256,7 @@ const StudentManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredStudents.map(student => (
+              {pagedStudents.map(student => (
                 <tr key={student.id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -310,6 +315,7 @@ const StudentManagement = () => {
             <div className="p-20 text-center"><Users className="w-12 h-12 text-slate-200 mx-auto mb-4" /><p className="text-slate-400 font-bold">No students found.</p></div>
           )}
         </div>
+        <PaginationBar {...pagination} itemLabel="students" />
       </div>
 
       {/* Lightbox */}
