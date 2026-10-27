@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Camera, X, ChevronLeft, ChevronRight, Star, Calendar, ArrowRight, Play, Film } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAdminData, type GalleryCategory, type GalleryItem } from "@/hooks/useAdminData";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const getYouTubeEmbedUrl = (url: string) => {
   const match = url?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
@@ -61,14 +59,10 @@ const Gallery = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
-        <Navbar />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin text-primary">
-             <Camera className="w-12 h-12" />
-          </div>
+      <div className="min-h-[60vh] flex items-center justify-center bg-slate-50">
+        <div className="animate-spin text-primary">
+          <Camera className="w-12 h-12" />
         </div>
-        <Footer />
       </div>
     );
   }
@@ -79,7 +73,6 @@ const Gallery = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative w-full bg-gradient-to-br from-slate-950 via-slate-900 to-primary/30 overflow-hidden py-24 lg:py-32">
@@ -380,7 +373,6 @@ const Gallery = () => {
         )}
       </AnimatePresence>
 
-      <Footer />
     </div>
   );
 };
