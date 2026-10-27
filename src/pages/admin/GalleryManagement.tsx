@@ -60,6 +60,7 @@ const GalleryManagement = () => {
   const [localCategories, setLocalCategories] = useState<GalleryCategory[]>([]);
   const [localItems, setLocalItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<number | "all">("all");
+  const localMutated = React.useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -71,9 +72,10 @@ const GalleryManagement = () => {
     }
   }, [galleryCategories]);
 
-  // Sync external galleryItems when available
+  // Sync external galleryItems when available — but ONLY before any local mutation
+  // After a save, localMutated.current = true prevents overwrite until next loadData()
   useEffect(() => {
-    if (Array.isArray(galleryItems)) {
+    if (Array.isArray(galleryItems) && !localMutated.current) {
       setLocalItems(galleryItems);
     }
   }, [galleryItems]);
@@ -95,6 +97,7 @@ const GalleryManagement = () => {
     try {
       const items = await apiRequest<GalleryItem[]>("/admin/gallery/items");
       if (Array.isArray(items)) {
+        localMutated.current = false;   // reset — server data is now the truth
         setLocalItems(items);
       }
     } catch {}
@@ -274,6 +277,7 @@ const GalleryManagement = () => {
           mediaType,
           thumbnailUrl: thumb,
         });
+        localMutated.current = true;
         setLocalItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
         toast.success("Gallery item updated");
         setEditingItem(null);
@@ -308,6 +312,7 @@ const GalleryManagement = () => {
           if (created) addedItems.push(created);
         }
         if (addedItems.length > 0) {
+          localMutated.current = true;
           setLocalItems((prev) => [...addedItems, ...prev.filter(i => !addedItems.some(a => a.id === i.id))]);
         }
         toast.success(`${urls.length} gallery items added successfully`);
@@ -321,6 +326,7 @@ const GalleryManagement = () => {
           mediaType: itemForm.mediaType || (isYt ? "VIDEO" : "IMAGE") 
         });
         if (created) {
+          localMutated.current = true;
           setLocalItems((prev) => [created, ...prev.filter(i => i.id !== created.id)]);
         }
         toast.success("Gallery item added successfully");
