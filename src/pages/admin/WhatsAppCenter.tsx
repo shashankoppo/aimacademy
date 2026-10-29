@@ -73,7 +73,8 @@ const WhatsAppCenter = () => {
       toast.error("Please write a message first.");
       return;
     }
-    const phone = student.phone.replace(/\D/g, "");
+    const rawDigits = student.phone.replace(/\D/g, "");
+    const phone = rawDigits.length === 10 ? `91${rawDigits}` : rawDigits;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
     toast.success(`WhatsApp opened for ${student.name}`);

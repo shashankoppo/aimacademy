@@ -44,10 +44,8 @@ async function findStudentRecordForUser(userId) {
             });
             return { user, student: created };
         }
-        catch {
-            const fallback = await prisma_1.prisma.adminStudent.findFirst();
-            if (fallback)
-                return { user, student: fallback };
+        catch (e) {
+            console.error("[StudentController] Auto-provision failed for student:", user.id, e);
         }
     }
     return { user, student: null };

@@ -7,6 +7,7 @@ import { useAdminData, type NoteItem } from "@/hooks/useAdminData";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { uploadFile } from "@/lib/admin-api";
 
 type NoteForm = Omit<NoteItem, "id">;
 
@@ -32,18 +33,24 @@ const NotesManagement = () => {
   const pagedNotes = pagination.paginatedData;
 
 
-  const onFileLoad = (field: "thumbnailUrl" | "fileUrl", file?: File | null, isEdit = false) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const onFileLoad = async (field: "thumbnailUrl" | "fileUrl", file?: File | null, isEdit = false) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
+    setIsUploading(true);
+    try {
+      const res = await uploadFile(file);
       if (isEdit && editing) {
-        setEditing({ ...editing, [field]: result });
+        setEditing({ ...editing, [field]: res.url });
       } else {
-        setForm({ ...form, [field]: result });
+        setForm({ ...form, [field]: res.url });
       }
-    };
-    reader.readAsDataURL(file);
+      toast.success(`${field === "thumbnailUrl" ? "Thumbnail" : "File"} uploaded successfully`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload file");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const validate = (note: NoteForm | NoteItem) => {

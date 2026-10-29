@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGalleryItem = exports.updateGalleryItem = exports.addGalleryItemsBulk = exports.addGalleryItem = exports.getGalleryItems = exports.deleteGalleryCategory = exports.updateGalleryCategory = exports.addGalleryCategory = exports.getGalleryCategories = exports.handleFileUpload = exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.updateAdminStaff = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = void 0;
+exports.deleteGalleryItem = exports.updateGalleryItem = exports.addGalleryItemsBulk = exports.addGalleryItem = exports.getGalleryItems = exports.deleteGalleryCategory = exports.updateGalleryCategory = exports.addGalleryCategory = exports.getGalleryCategories = exports.handleFileUpload = exports.deleteAdminVideo = exports.updateAdminVideo = exports.addAdminVideo = exports.getAdminVideos = exports.deleteAdminNote = exports.updateAdminNote = exports.addAdminNote = exports.getAdminNotes = exports.updateWebsiteSettings = exports.getWebsiteSettings = exports.sendFeeReminders = exports.markAttendance = exports.updateAdminStaff = exports.processPayroll = exports.getAdminStaff = exports.deleteAnnouncement = exports.updateAnnouncement = exports.addAnnouncement = exports.getAnnouncements = exports.deleteAdminCourse = exports.updateAdminCourse = exports.addAdminCourse = exports.getAdminCourses = exports.deleteAdminStudent = exports.updateAdminStudent = exports.addAdminStudent = exports.getAdminStudents = exports.getPublicContent = exports.getAdminOverview = exports.seedAdminData = exports.safeJsonParse = void 0;
 const zod_1 = require("zod");
 const prisma_1 = require("../prisma");
 const password_1 = require("../security/password");
@@ -133,6 +133,17 @@ const handleError = (res, error, fallbackMessage) => {
 };
 const parseCurrency = (value) => Number(value.replace(/[^\d]/g, "")) || 0;
 const formatCurrency = (amount) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
+const safeJsonParse = (val, fallback) => {
+    if (typeof val !== "string" || !val.trim())
+        return fallback;
+    try {
+        return JSON.parse(val);
+    }
+    catch {
+        return fallback;
+    }
+};
+exports.safeJsonParse = safeJsonParse;
 const calculateFeeStatus = (paidFee, totalFee) => {
     if (paidFee >= totalFee)
         return "Paid";
@@ -159,59 +170,71 @@ const seedAdminData = async () => {
     seedResult = (async () => {
         try {
             console.log("[Seed] Starting admin data synchronization...");
-            const courseSeeds = [
-                { title: "UPSC 2026-A", students: 3, faculty: "Dr. Sandeep Kumar", status: "Active", duration: "12-18 Months", fee: formatCurrency(120000) },
-                { title: "SSC CGL Fast Track", students: 2, faculty: "Rahul Verma", status: "Active", duration: "6 Months", fee: formatCurrency(45000) },
-                { title: "Banking IBPS", students: 1, faculty: "Suresh Pillai", status: "Upcoming", duration: "4-6 Months", fee: formatCurrency(40000) },
-                { title: "MPPSC Evening", students: 2, faculty: "Meera Nair", status: "Active", duration: "6-12 Months", fee: formatCurrency(75000) },
-            ];
-            for (const data of courseSeeds) {
-                await prisma_1.prisma.adminCourse.upsert({
-                    where: { title: data.title },
-                    update: {},
-                    create: data,
-                });
+            const existingCoursesCount = await prisma_1.prisma.adminCourse.count();
+            if (existingCoursesCount === 0) {
+                const courseSeeds = [
+                    { title: "UPSC 2026-A", students: 3, faculty: "Dr. Sandeep Kumar", status: "Active", duration: "12-18 Months", fee: formatCurrency(120000) },
+                    { title: "SSC CGL Fast Track", students: 2, faculty: "Rahul Verma", status: "Active", duration: "6 Months", fee: formatCurrency(45000) },
+                    { title: "Banking IBPS", students: 1, faculty: "Suresh Pillai", status: "Upcoming", duration: "4-6 Months", fee: formatCurrency(40000) },
+                    { title: "MPPSC Evening", students: 2, faculty: "Meera Nair", status: "Active", duration: "6-12 Months", fee: formatCurrency(75000) },
+                ];
+                for (const data of courseSeeds) {
+                    await prisma_1.prisma.adminCourse.upsert({
+                        where: { title: data.title },
+                        update: {},
+                        create: data,
+                    });
+                }
             }
-            const courses = await prisma_1.prisma.adminCourse.findMany();
-            const courseMap = new Map(courses.map((c) => [c.title, c.id]));
-            const studentSeeds = [
-                { name: "Aarav Mehta", email: "aarav@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Paid", attendance: "88%", phone: "+91 98765 43210", totalFee: 120000, paidFee: 120000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("UPSC 2026-A") },
-                { name: "Deepa Nair", email: "deepa@aim.edu", course: "SSC CGL Fast Track", batch: "Evening", joinDate: "Mar 2025", feeStatus: "Paid", attendance: "96%", phone: "+91 87654 32109", totalFee: 45000, paidFee: 45000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("SSC CGL Fast Track") },
-                { name: "Rahul Kumar", email: "rahul@aim.edu", course: "Banking IBPS", batch: "Morning", joinDate: "Jun 2025", feeStatus: "Overdue", attendance: "72%", phone: "+91 76543 21098", totalFee: 40000, paidFee: 10000, nextInstallmentLabel: "Installment 2", nextInstallmentAmount: 15000, nextDueDate: "2026-04-20", courseId: courseMap.get("Banking IBPS") },
-                { name: "Priya Sharma", email: "priya@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Part Paid", attendance: "80%", phone: "+91 65432 10987", totalFee: 120000, paidFee: 70000, nextInstallmentLabel: "Installment 3", nextInstallmentAmount: 25000, nextDueDate: "2026-04-24", courseId: courseMap.get("UPSC 2026-A") },
-                { name: "Vikram Singh", email: "vikram@aim.edu", course: "MPPSC Evening", batch: "Evening", joinDate: "Sep 2025", feeStatus: "Paid", attendance: "92%", phone: "+91 54321 09876", totalFee: 75000, paidFee: 75000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("MPPSC Evening") },
-                { name: "Ananya Joshi", email: "ananya@aim.edu", course: "SSC CGL Fast Track", batch: "Morning", joinDate: "Feb 2025", feeStatus: "Overdue", attendance: "60%", phone: "+91 43210 98765", totalFee: 45000, paidFee: 0, nextInstallmentLabel: "Installment 1", nextInstallmentAmount: 15000, nextDueDate: "2026-04-18", courseId: courseMap.get("SSC CGL Fast Track") },
-                { name: "Kunal Thakur", email: "kunal@aim.edu", course: "MPPSC Evening", batch: "Weekend", joinDate: "Nov 2025", feeStatus: "Paid", attendance: "85%", phone: "+91 32109 87654", totalFee: 75000, paidFee: 75000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("MPPSC Evening") },
-                { name: "Meghna Rao", email: "meghna@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Part Paid", attendance: "78%", phone: "+91 21098 76543", totalFee: 120000, paidFee: 80000, nextInstallmentLabel: "Installment 3", nextInstallmentAmount: 20000, nextDueDate: "2026-04-27", courseId: courseMap.get("UPSC 2026-A") },
-            ];
-            for (const data of studentSeeds) {
-                if (!data.courseId)
-                    continue;
-                await prisma_1.prisma.adminStudent.upsert({
-                    where: { email: data.email },
-                    update: {},
-                    create: data,
-                });
+            const existingStudentsCount = await prisma_1.prisma.adminStudent.count();
+            if (existingStudentsCount === 0) {
+                const courses = await prisma_1.prisma.adminCourse.findMany();
+                const courseMap = new Map(courses.map((c) => [c.title, c.id]));
+                const studentSeeds = [
+                    { name: "Aarav Mehta", email: "aarav@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Paid", attendance: "88%", phone: "+91 98765 43210", totalFee: 120000, paidFee: 120000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("UPSC 2026-A") },
+                    { name: "Deepa Nair", email: "deepa@aim.edu", course: "SSC CGL Fast Track", batch: "Evening", joinDate: "Mar 2025", feeStatus: "Paid", attendance: "96%", phone: "+91 87654 32109", totalFee: 45000, paidFee: 45000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("SSC CGL Fast Track") },
+                    { name: "Rahul Kumar", email: "rahul@aim.edu", course: "Banking IBPS", batch: "Morning", joinDate: "Jun 2025", feeStatus: "Overdue", attendance: "72%", phone: "+91 76543 21098", totalFee: 40000, paidFee: 10000, nextInstallmentLabel: "Installment 2", nextInstallmentAmount: 15000, nextDueDate: "2026-04-20", courseId: courseMap.get("Banking IBPS") },
+                    { name: "Priya Sharma", email: "priya@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Part Paid", attendance: "80%", phone: "+91 65432 10987", totalFee: 120000, paidFee: 70000, nextInstallmentLabel: "Installment 3", nextInstallmentAmount: 25000, nextDueDate: "2026-04-24", courseId: courseMap.get("UPSC 2026-A") },
+                    { name: "Vikram Singh", email: "vikram@aim.edu", course: "MPPSC Evening", batch: "Evening", joinDate: "Sep 2025", feeStatus: "Paid", attendance: "92%", phone: "+91 54321 09876", totalFee: 75000, paidFee: 75000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("MPPSC Evening") },
+                    { name: "Ananya Joshi", email: "ananya@aim.edu", course: "SSC CGL Fast Track", batch: "Morning", joinDate: "Feb 2025", feeStatus: "Overdue", attendance: "60%", phone: "+91 43210 98765", totalFee: 45000, paidFee: 0, nextInstallmentLabel: "Installment 1", nextInstallmentAmount: 15000, nextDueDate: "2026-04-18", courseId: courseMap.get("SSC CGL Fast Track") },
+                    { name: "Kunal Thakur", email: "kunal@aim.edu", course: "MPPSC Evening", batch: "Weekend", joinDate: "Nov 2025", feeStatus: "Paid", attendance: "85%", phone: "+91 32109 87654", totalFee: 75000, paidFee: 75000, nextInstallmentLabel: "Completed", nextInstallmentAmount: 0, nextDueDate: "-", courseId: courseMap.get("MPPSC Evening") },
+                    { name: "Meghna Rao", email: "meghna@aim.edu", course: "UPSC 2026-A", batch: "Morning", joinDate: "Jan 2025", feeStatus: "Part Paid", attendance: "78%", phone: "+91 21098 76543", totalFee: 120000, paidFee: 80000, nextInstallmentLabel: "Installment 3", nextInstallmentAmount: 20000, nextDueDate: "2026-04-27", courseId: courseMap.get("UPSC 2026-A") },
+                ];
+                for (const data of studentSeeds) {
+                    if (!data.courseId)
+                        continue;
+                    await prisma_1.prisma.adminStudent.upsert({
+                        where: { email: data.email },
+                        update: {},
+                        create: data,
+                    });
+                }
             }
-            const announcementSeeds = [
-                { title: "Weekend Mock Test Schedule", target: "Students Only", content: "Sunday mock tests will begin at 9:00 AM sharp for all active batches.", type: "Academic", isPinned: true },
-                { title: "Fee Counter Update", target: "All Users", content: "Fee counter will remain open until 6:30 PM this week for installment support.", type: "Financial", isPinned: false },
-            ];
-            for (const data of announcementSeeds) {
-                const exists = await prisma_1.prisma.announcement.findFirst({ where: { title: data.title } });
-                if (!exists)
-                    await prisma_1.prisma.announcement.create({ data });
+            const existingAnnouncementsCount = await prisma_1.prisma.announcement.count();
+            if (existingAnnouncementsCount === 0) {
+                const announcementSeeds = [
+                    { title: "Weekend Mock Test Schedule", target: "Students Only", content: "Sunday mock tests will begin at 9:00 AM sharp for all active batches.", type: "Academic", isPinned: true },
+                    { title: "Fee Counter Update", target: "All Users", content: "Fee counter will remain open until 6:30 PM this week for installment support.", type: "Financial", isPinned: false },
+                ];
+                for (const data of announcementSeeds) {
+                    const exists = await prisma_1.prisma.announcement.findFirst({ where: { title: data.title } });
+                    if (!exists)
+                        await prisma_1.prisma.announcement.create({ data });
+                }
             }
-            const videoSeeds = [
-                { title: "UPSC Strategy Session", description: "Preparation roadmap, target-setting, and revision discipline.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", thumbnailUrl: getYouTubeThumbnail("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), isVisible: true, isFeatured: true, displayOrder: 1 },
-                { title: "Student Success Story", description: "How disciplined practice helped secure selection.", youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U", thumbnailUrl: getYouTubeThumbnail("https://www.youtube.com/watch?v=ysz5S6PUM-U"), isVisible: true, isFeatured: true, displayOrder: 2 },
-            ];
-            for (const data of videoSeeds) {
-                await prisma_1.prisma.adminVideo.upsert({
-                    where: { youtubeUrl: data.youtubeUrl },
-                    update: {},
-                    create: data,
-                });
+            const existingVideosCount = await prisma_1.prisma.adminVideo.count();
+            if (existingVideosCount === 0) {
+                const videoSeeds = [
+                    { title: "UPSC Strategy Session", description: "Preparation roadmap, target-setting, and revision discipline.", youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", thumbnailUrl: getYouTubeThumbnail("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), isVisible: true, isFeatured: true, displayOrder: 1 },
+                    { title: "Student Success Story", description: "How disciplined practice helped secure selection.", youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U", thumbnailUrl: getYouTubeThumbnail("https://www.youtube.com/watch?v=ysz5S6PUM-U"), isVisible: true, isFeatured: true, displayOrder: 2 },
+                ];
+                for (const data of videoSeeds) {
+                    await prisma_1.prisma.adminVideo.upsert({
+                        where: { youtubeUrl: data.youtubeUrl },
+                        update: {},
+                        create: data,
+                    });
+                }
             }
             const existingSettings = await prisma_1.prisma.websiteSettings.findFirst();
             if (!existingSettings || existingSettings.facultyJson.includes("Rahul Sir")) {
@@ -350,11 +373,11 @@ const getAdminOverview = async (_req, res) => {
                 ? {
                     id: settings.id,
                     bannerText: settings.bannerText,
-                    slides: settings.slidesJson ? JSON.parse(settings.slidesJson) : [],
-                    faculty: settings.facultyJson ? JSON.parse(settings.facultyJson) : [],
-                    upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
-                    socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
-                    whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+                    slides: (0, exports.safeJsonParse)(settings.slidesJson, []),
+                    faculty: (0, exports.safeJsonParse)(settings.facultyJson, []),
+                    upcomingBatches: (0, exports.safeJsonParse)(settings.upcomingBatchesJson, []),
+                    socialLinks: (0, exports.safeJsonParse)(settings.socialLinksJson, []),
+                    whatsappTemplates: (0, exports.safeJsonParse)(settings.whatsappTemplatesJson, [])
                 }
                 : null,
         });
@@ -366,16 +389,15 @@ const getAdminOverview = async (_req, res) => {
 exports.getAdminOverview = getAdminOverview;
 const getPublicContent = async (_req, res) => {
     try {
-        void (0, exports.seedAdminData)().catch(e => console.warn("[PublicContent] Seeding delayed/failed:", e.message));
         const [settings, notes, videos, galleryCategories, galleryItems] = await Promise.all([
             prisma_1.prisma.websiteSettings.findFirst({ orderBy: { updatedAt: "desc" } }),
             prisma_1.prisma.adminNote.findMany({
                 where: { isVisible: true },
-                orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+                orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
             }),
             prisma_1.prisma.adminVideo.findMany({
                 where: { isVisible: true },
-                orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "asc" }],
+                orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "desc" }],
             }),
             prisma_1.prisma.galleryCategory.findMany({
                 where: { isVisible: true },
@@ -383,7 +405,7 @@ const getPublicContent = async (_req, res) => {
             }),
             prisma_1.prisma.galleryItem.findMany({
                 where: { isVisible: true },
-                orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "asc" }],
+                orderBy: [{ isFeatured: "desc" }, { displayOrder: "asc" }, { createdAt: "desc" }],
             }),
         ]);
         res.json({
@@ -395,11 +417,11 @@ const getPublicContent = async (_req, res) => {
                 ? {
                     id: settings.id,
                     bannerText: settings.bannerText,
-                    slides: JSON.parse(settings.slidesJson),
-                    faculty: JSON.parse(settings.facultyJson),
-                    upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
-                    socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
-                    whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+                    slides: (0, exports.safeJsonParse)(settings.slidesJson, []),
+                    faculty: (0, exports.safeJsonParse)(settings.facultyJson, []),
+                    upcomingBatches: (0, exports.safeJsonParse)(settings.upcomingBatchesJson, []),
+                    socialLinks: (0, exports.safeJsonParse)(settings.socialLinksJson, []),
+                    whatsappTemplates: (0, exports.safeJsonParse)(settings.whatsappTemplatesJson, [])
                 }
                 : null,
         });
@@ -517,6 +539,14 @@ const deleteAdminStudent = async (req, res) => {
         const existing = await prisma_1.prisma.adminStudent.findUnique({ where: { id } });
         if (!existing)
             return res.status(404).json({ error: "Student not found" });
+        // Clean up corresponding user credentials to prevent orphaned logins
+        if (existing.email) {
+            const studentUser = await prisma_1.prisma.user.findUnique({ where: { email: existing.email.toLowerCase() } });
+            if (studentUser && studentUser.role === "STUDENT") {
+                await prisma_1.prisma.studentProfile.deleteMany({ where: { userId: studentUser.id } }).catch(() => { });
+                await prisma_1.prisma.user.delete({ where: { id: studentUser.id } }).catch(() => { });
+            }
+        }
         await prisma_1.prisma.adminStudent.delete({ where: { id } });
         await syncCourseStudentCount(existing.course);
         res.json({ success: true });
@@ -718,11 +748,11 @@ const getWebsiteSettings = async (_req, res) => {
         res.json({
             id: settings.id,
             bannerText: settings.bannerText,
-            slides: JSON.parse(settings.slidesJson),
-            faculty: JSON.parse(settings.facultyJson),
-            upcomingBatches: settings.upcomingBatchesJson ? JSON.parse(settings.upcomingBatchesJson) : [],
-            socialLinks: settings.socialLinksJson ? JSON.parse(settings.socialLinksJson) : [],
-            whatsappTemplates: settings.whatsappTemplatesJson ? JSON.parse(settings.whatsappTemplatesJson) : []
+            slides: (0, exports.safeJsonParse)(settings.slidesJson, []),
+            faculty: (0, exports.safeJsonParse)(settings.facultyJson, []),
+            upcomingBatches: (0, exports.safeJsonParse)(settings.upcomingBatchesJson, []),
+            socialLinks: (0, exports.safeJsonParse)(settings.socialLinksJson, []),
+            whatsappTemplates: (0, exports.safeJsonParse)(settings.whatsappTemplatesJson, [])
         });
     }
     catch (error) {
@@ -746,11 +776,11 @@ const updateWebsiteSettings = async (req, res) => {
         res.json({
             id: updated.id,
             bannerText: updated.bannerText,
-            slides: JSON.parse(updated.slidesJson),
-            faculty: JSON.parse(updated.facultyJson),
-            upcomingBatches: updated.upcomingBatchesJson ? JSON.parse(updated.upcomingBatchesJson) : [],
-            socialLinks: updated.socialLinksJson ? JSON.parse(updated.socialLinksJson) : [],
-            whatsappTemplates: updated.whatsappTemplatesJson ? JSON.parse(updated.whatsappTemplatesJson) : []
+            slides: (0, exports.safeJsonParse)(updated.slidesJson, []),
+            faculty: (0, exports.safeJsonParse)(updated.facultyJson, []),
+            upcomingBatches: (0, exports.safeJsonParse)(updated.upcomingBatchesJson, []),
+            socialLinks: (0, exports.safeJsonParse)(updated.socialLinksJson, []),
+            whatsappTemplates: (0, exports.safeJsonParse)(updated.whatsappTemplatesJson, [])
         });
     }
     catch (error) {
@@ -945,10 +975,13 @@ const deleteGalleryCategory = async (req, res) => {
 };
 exports.deleteGalleryCategory = deleteGalleryCategory;
 // ── Gallery Items ──────────────────────────────
-const getGalleryItems = async (_req, res) => {
+const getGalleryItems = async (req, res) => {
     try {
+        const isPublic = req.baseUrl.includes("/public") || req.path.includes("/public") || !req.authUser;
+        const where = isPublic ? { isVisible: true } : {};
         const items = await prisma_1.prisma.galleryItem.findMany({
-            orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
+            where,
+            orderBy: [{ displayOrder: "asc" }, { createdAt: "desc" }],
         });
         res.json(items);
     }

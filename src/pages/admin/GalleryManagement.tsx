@@ -778,15 +778,23 @@ const GalleryManagement = () => {
               </div>
               <DialogFooter className="flex items-center justify-between">
                 <button 
-                  onClick={() => {
-                    deleteGalleryCategory(editingCategory.id).then(() => {
-                      toast.success("Category deleted");
+                  onClick={async () => {
+                    const ok = window.confirm(`Are you sure you want to delete category "${editingCategory.name}"? All photos and videos in this category will also be permanently removed.`);
+                    if (!ok) return;
+                    try {
+                      await deleteGalleryCategory(editingCategory.id);
+                      setLocalCategories((prev) => prev.filter((c) => c.id !== editingCategory.id));
+                      if (activeTab === String(editingCategory.id)) setActiveTab("all");
                       setEditingCategory(null);
-                    }).catch(() => toast.error("Failed to delete category"));
+                      toast.success("Category deleted");
+                      await loadData();
+                    } catch (err) {
+                      toast.error("Failed to delete category");
+                    }
                   }}
                   className="px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-bold text-sm"
                 >
-                  Delete
+                  Delete Category
                 </button>
                 <button onClick={() => void saveCategory(true)} disabled={isSaving || isUploading} className="bg-primary text-white font-bold px-6 py-2 rounded-lg disabled:opacity-60">
                   {isSaving ? "Saving..." : "Save Changes"}

@@ -224,9 +224,13 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const syncLocalWebsiteSettings = useCallback((settings: WebsiteSettings | null) => {
     if (!settings) return;
-    localStorage.setItem("aim_top_banner", settings.bannerText);
-    localStorage.setItem("aim_hero_slides", JSON.stringify(settings.slides));
-    localStorage.setItem("aim_faculty_data", JSON.stringify(settings.faculty));
+    try {
+      localStorage.setItem("aim_top_banner", settings.bannerText);
+      localStorage.setItem("aim_hero_slides", JSON.stringify(settings.slides));
+      localStorage.setItem("aim_faculty_data", JSON.stringify(settings.faculty));
+    } catch (e) {
+      console.warn("[useAdminData] Could not cache settings in localStorage:", e);
+    }
   }, []);
 
   const refreshData = useCallback(async () => {

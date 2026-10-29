@@ -22,10 +22,46 @@ const storage = multer.diskStorage({
   }
 });
 
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/csv",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/ogg",
+]);
+
+const DANGEROUS_EXTENSIONS = new Set([
+  ".html", ".htm", ".xhtml", ".js", ".mjs", ".ts", ".jsx", ".tsx",
+  ".exe", ".bat", ".cmd", ".sh", ".bash", ".php", ".py", ".rb", ".vbs",
+  ".svg", ".dll", ".so", ".jar", ".war"
+]);
+
 const upload = multer({ 
   storage,
   limits: {
     fileSize: 100 * 1024 * 1024 // 100MB limit
+  },
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (DANGEROUS_EXTENSIONS.has(ext)) {
+      return cb(new Error(`File extension '${ext}' is not permitted for security reasons.`));
+    }
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype.toLowerCase())) {
+      return cb(new Error(`File type '${file.mimetype}' is not permitted.`));
+    }
+    cb(null, true);
   }
 });
 

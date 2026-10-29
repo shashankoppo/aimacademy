@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, Layout } from "lucid
 import { toast } from "sonner";
 import { useAdminData, type FacultyMember, type UpcomingBatch } from "@/hooks/useAdminData";
 import ImageCropperModal from "@/components/ImageCropperModal";
+import { uploadFile } from "@/lib/admin-api";
 
 const AdminWebsiteSettings = () => {
   const { websiteSettings, updateWebsiteSettings } = useAdminData();
@@ -115,18 +116,46 @@ const AdminWebsiteSettings = () => {
     event.target.value = '';
   };
 
-  const handleCropComplete = (croppedImageBase64: string) => {
+  const handleCropComplete = async (croppedImageBase64: string) => {
     if (!cropTarget) return;
-    if (cropTarget.type === 'slide') {
-      updateSlide(cropTarget.index, croppedImageBase64);
-    } else if (cropTarget.type === 'faculty') {
-      updateFaculty(cropTarget.index, 'img', croppedImageBase64);
-    } else if (cropTarget.type === 'batch') {
-      updateBatch(cropTarget.index, 'img', croppedImageBase64);
-    }
+    const target = cropTarget;
     setCropModalOpen(false);
     setCropTarget(null);
     setCropImageSrc("");
+
+    try {
+      // Convert base64 dataURL to File for server upload
+      const arr = croppedImageBase64.split(",");
+      const mime = arr[0].match(/:(.*?);/)?.[1] || "image/jpeg";
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const file = new File([u8arr], `crop-${target.type}-${Date.now()}.jpg`, { type: mime });
+      
+      toast.loading("Uploading cropped image...", { id: "crop-upload" });
+      const res = await uploadFile(file);
+      toast.success("Image uploaded successfully", { id: "crop-upload" });
+
+      if (target.type === 'slide') {
+        updateSlide(target.index, res.url);
+      } else if (target.type === 'faculty') {
+        updateFaculty(target.index, 'img', res.url);
+      } else if (target.type === 'batch') {
+        updateBatch(target.index, 'img', res.url);
+      }
+    } catch (e) {
+      toast.error("Failed to upload cropped image. Using local preview.", { id: "crop-upload" });
+      if (target.type === 'slide') {
+        updateSlide(target.index, croppedImageBase64);
+      } else if (target.type === 'faculty') {
+        updateFaculty(target.index, 'img', croppedImageBase64);
+      } else if (target.type === 'batch') {
+        updateBatch(target.index, 'img', croppedImageBase64);
+      }
+    }
   };
 
   return (

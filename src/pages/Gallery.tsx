@@ -264,6 +264,10 @@ const Gallery = () => {
                     src={item.thumbnailUrl || item.imageUrl}
                     alt={item.title || "Gallery"}
                     loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3EAIM Academy%3C/text%3E%3C/svg%3E";
+                    }}
                     className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -362,21 +366,21 @@ const Gallery = () => {
                   allowFullScreen
                 />
               ) : isCurrentVideo ? (
-                <div className="w-full aspect-video rounded-xl bg-slate-800 flex flex-col items-center justify-center gap-4">
-                  <Film className="w-16 h-16 text-slate-500" />
-                  <a
-                    href={currentLightboxItem.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4 fill-white" /> Open Video
-                  </a>
-                </div>
+                <video
+                  src={currentLightboxItem.imageUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-h-[75vh] w-auto max-w-full rounded-xl shadow-2xl bg-black"
+                />
               ) : (
                 <img
                   src={currentLightboxItem.imageUrl}
                   alt={currentLightboxItem.title || "Gallery"}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect width='600' height='400' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='18' font-family='sans-serif'%3EAIM Academy Jabalpur%3C/text%3E%3C/svg%3E";
+                  }}
                   className="max-h-[75vh] max-w-full object-contain rounded-xl shadow-2xl"
                 />
               )}

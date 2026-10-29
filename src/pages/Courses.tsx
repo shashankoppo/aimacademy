@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Shield, Target, Trophy, Clock, Calendar, CheckCircle2, ArrowRight, ChevronDown, ChevronUp, ChevronRight, Users, Zap } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
+import { useAdminData } from "@/hooks/useAdminData";
 
 const courses = [
   {
@@ -161,9 +162,51 @@ const CourseCard = ({ course, index }: { course: typeof courses[0]; index: numbe
 };
 
 const Courses = () => {
+  const { courses: adminCourses = [] } = useAdminData();
   const [activeCategory, setActiveCategory] = useState("All Exams");
 
-  const filteredCourses = courses.filter(c => {
+  const displayCourses = useMemo(() => {
+    // Start with rich static courses
+    const list = courses.map((staticCourse) => {
+      const match = adminCourses.find((ac) => ac.title.toLowerCase() === staticCourse.title.toLowerCase());
+      if (match) {
+        return {
+          ...staticCourse,
+          duration: match.duration || staticCourse.duration,
+          fee: match.fee || staticCourse.fee,
+          enrolled: match.students ? `${match.students}+ Students` : staticCourse.enrolled,
+        };
+      }
+      return staticCourse;
+    });
+
+    // Add any newly created admin courses not in the static list
+    adminCourses.forEach((ac) => {
+      const exists = list.some((c) => c.title.toLowerCase() === ac.title.toLowerCase());
+      if (!exists && ac.status !== "Archived") {
+        list.push({
+          icon: GraduationCap,
+          title: ac.title,
+          tag: ac.status || "New Program",
+          tagColor: "text-blue-600 bg-blue-50 border-blue-100",
+          overview: `Official coaching and mentorship program for ${ac.title} guided by ${ac.faculty || "senior AIM Academy faculty"}.`,
+          duration: ac.duration || "6-12 Months",
+          batches: "Morning & Evening Batches",
+          fee: ac.fee || "Flexible Installments",
+          enrolled: ac.students ? `${ac.students}+ Students` : "Admissions Open",
+          syllabus: ["Foundation Concept Building", "Comprehensive Syllabus Coverage", "Previous Year Papers", "Regular Mock Tests"],
+          highlights: ["Expert Faculty Guidance", "Detailed Study Notes", "Doubt Clearing Sessions", "Personalized Mentorship"],
+          color: "from-blue-500/6 to-transparent",
+          iconColor: "text-blue-600 bg-blue-50 border-blue-100",
+          accent: "border-blue-500/20",
+        });
+      }
+    });
+
+    return list;
+  }, [adminCourses]);
+
+  const filteredCourses = displayCourses.filter(c => {
     if (activeCategory === "All Exams") return true;
     if (activeCategory === "Core Programs") return c.tag === "Core Program" || c.tag === "Top Choice";
     if (activeCategory === "State Exams") return c.tag === "State Priority" || c.tag === "Mass Hiring";
