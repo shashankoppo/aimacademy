@@ -60,62 +60,61 @@ const GalleryManagement = () => {
   const [localCategories, setLocalCategories] = useState<GalleryCategory[]>([]);
   const [localItems, setLocalItems] = useState<GalleryItem[]>([]);
   const [activeTab, setActiveTab] = useState<number | "all">("all");
-  const localMutated = React.useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Sync external galleryCategories when available
+  // Sync categories from hook when available
   useEffect(() => {
     if (Array.isArray(galleryCategories) && galleryCategories.length > 0) {
       setLocalCategories(galleryCategories);
     }
   }, [galleryCategories]);
 
-  // Sync external galleryItems when available — but ONLY before any local mutation
-  // After a save, localMutated.current = true prevents overwrite until next loadData()
-  useEffect(() => {
-    if (Array.isArray(galleryItems) && !localMutated.current) {
-      setLocalItems(galleryItems);
-    }
-  }, [galleryItems]);
-
-  // Direct fetch categories and items on mount for guaranteed fresh data
+  // Direct fetch categories and items — always gets fresh server data
   const loadData = useCallback(async () => {
+    // Try admin endpoint first (has all items including hidden ones)
+    let itemsLoaded = false;
+    try {
+      const items = await apiRequest<GalleryItem[]>("/admin/gallery/items");
+      if (Array.isArray(items)) {
+        setLocalItems(items);
+        itemsLoaded = true;
+      }
+    } catch {}
+    // Fallback to public endpoint
+    if (!itemsLoaded) {
+      try {
+        const pubItems = await apiRequest<GalleryItem[]>("/public/gallery/items");
+        if (Array.isArray(pubItems)) {
+          setLocalItems(pubItems);
+        }
+      } catch {}
+    }
+
+    // Load categories
+    let catsLoaded = false;
     try {
       const cats = await apiRequest<GalleryCategory[]>("/admin/gallery/categories");
       if (Array.isArray(cats) && cats.length > 0) {
         setLocalCategories(cats);
+        catsLoaded = true;
       }
     } catch {}
-    try {
-      const pubCats = await apiRequest<GalleryCategory[]>("/public/gallery/categories");
-      if (Array.isArray(pubCats) && pubCats.length > 0) {
-        setLocalCategories((prev) => (prev.length > 0 ? prev : pubCats));
-      }
-    } catch {}
-    try {
-      const items = await apiRequest<GalleryItem[]>("/admin/gallery/items");
-      if (Array.isArray(items)) {
-        localMutated.current = false;   // reset — server data is now the truth
-        setLocalItems(items);
-      }
-    } catch {}
-    try {
-      const pubItems = await apiRequest<GalleryItem[]>("/public/gallery/items");
-      if (Array.isArray(pubItems)) {
-        setLocalItems((prev) => (prev.length > 0 ? prev : pubItems));
-      }
-    } catch {}
+    if (!catsLoaded) {
+      try {
+        const pubCats = await apiRequest<GalleryCategory[]>("/public/gallery/categories");
+        if (Array.isArray(pubCats) && pubCats.length > 0) {
+          setLocalCategories(pubCats);
+        }
+      } catch {}
+    }
   }, []);
 
   useEffect(() => {
     void loadData();
-    if (refreshData) {
-      void refreshData();
-    }
-  }, [loadData, refreshData]);
-  
+  }, [loadData]);
+
   // Dialog visibility states
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
@@ -135,9 +134,8 @@ const GalleryManagement = () => {
     return [...list].sort((a, b) => a.displayOrder - b.displayOrder);
   }, [localCategories, galleryCategories]);
   
-  const allItems = useMemo(() => {
-    return localItems.length > 0 ? localItems : (galleryItems || []);
-  }, [localItems, galleryItems]);
+  const allItems = localItems;
+
 
   const filteredItems = useMemo(() => {
     let items = activeTab === "all" 
@@ -271,16 +269,15 @@ const GalleryManagement = () => {
         const isYt = isYouTubeUrl(editingItem.imageUrl);
         const mediaType = editingItem.mediaType || (isYt ? "VIDEO" : "IMAGE");
         const thumb = editingItem.thumbnailUrl || (isYt ? getYouTubeThumbnail(editingItem.imageUrl) : editingItem.imageUrl);
-        const updated = await updateGalleryItem(editingItem.id, {
+        await updateGalleryItem(editingItem.id, {
           ...editingItem,
           categoryId: finalCategoryId,
           mediaType,
           thumbnailUrl: thumb,
         });
-        localMutated.current = true;
-        setLocalItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
         toast.success("Gallery item updated");
         setEditingItem(null);
+        await loadData();  // re-fetch from server
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Failed to update item");
       } finally {
@@ -298,43 +295,34 @@ const GalleryManagement = () => {
     setIsSaving(true);
     try {
       if (urls.length > 0) {
-        const addedItems: GalleryItem[] = [];
         for (const url of urls) {
           const isYt = isYouTubeUrl(url);
           const thumb = isYt ? getYouTubeThumbnail(url) : url;
-          const created = await addGalleryItem({ 
+          await addGalleryItem({ 
             ...itemForm, 
             categoryId: finalCategoryId,
             imageUrl: url, 
             thumbnailUrl: thumb, 
             mediaType: isYt ? "VIDEO" : "IMAGE" 
           });
-          if (created) addedItems.push(created);
-        }
-        if (addedItems.length > 0) {
-          localMutated.current = true;
-          setLocalItems((prev) => [...addedItems, ...prev.filter(i => !addedItems.some(a => a.id === i.id))]);
         }
         toast.success(`${urls.length} gallery items added successfully`);
       } else {
         const isYt = isYouTubeUrl(itemForm.imageUrl);
         const thumb = itemForm.thumbnailUrl || (isYt ? getYouTubeThumbnail(itemForm.imageUrl) : itemForm.imageUrl);
-        const created = await addGalleryItem({ 
+        await addGalleryItem({ 
           ...itemForm, 
           categoryId: finalCategoryId,
           thumbnailUrl: thumb, 
           mediaType: itemForm.mediaType || (isYt ? "VIDEO" : "IMAGE") 
         });
-        if (created) {
-          localMutated.current = true;
-          setLocalItems((prev) => [created, ...prev.filter(i => i.id !== created.id)]);
-        }
         toast.success("Gallery item added successfully");
       }
       setActiveTab("all");
       setItemForm(emptyItem);
       setBulkUrls("");
       setIsAddItemOpen(false);
+      await loadData();  // re-fetch from server — guaranteed to show saved items
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save item");
     } finally {
@@ -343,24 +331,28 @@ const GalleryManagement = () => {
   };
 
   const toggleItemVisibility = async (item: GalleryItem) => {
+    // Optimistic update for instant feedback
+    const nextVisible = !item.isVisible;
+    setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isVisible: nextVisible } : i));
     try {
-      const nextVisible = !item.isVisible;
       await updateGalleryItem(item.id, { isVisible: nextVisible });
-      setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isVisible: nextVisible } : i));
       toast.success(`Item ${item.isVisible ? "hidden" : "shown"}`);
     } catch (err) {
       toast.error("Failed to update visibility");
+      await loadData(); // revert on error
     }
   };
 
   const toggleItemFeatured = async (item: GalleryItem) => {
+    // Optimistic update for instant feedback
+    const nextFeatured = !item.isFeatured;
+    setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isFeatured: nextFeatured } : i));
     try {
-      const nextFeatured = !item.isFeatured;
       await updateGalleryItem(item.id, { isFeatured: nextFeatured });
-      setLocalItems((prev) => prev.map(i => i.id === item.id ? { ...i, isFeatured: nextFeatured } : i));
       toast.success(item.isFeatured ? "Item unfeatured" : "Item featured");
     } catch (err) {
       toast.error("Failed to update featured status");
+      await loadData(); // revert on error
     }
   };
 
@@ -720,12 +712,10 @@ const GalleryManagement = () => {
                     <button onClick={() => void toggleItemFeatured(item)} className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all" title="Toggle Featured"><Star className={`w-4 h-4 mx-auto ${item.isFeatured ? "fill-amber-500 text-amber-500" : ""}`} /></button>
                     <button 
                       onClick={() => {
+                        setLocalItems((prev) => prev.filter(i => i.id !== item.id));
                         void deleteGalleryItem(item.id)
-                          .then(() => {
-                            setLocalItems((prev) => prev.filter(i => i.id !== item.id));
-                            toast.success("Item deleted");
-                          })
-                          .catch(() => toast.error("Failed to delete"));
+                          .then(() => toast.success("Item deleted"))
+                          .catch(() => { toast.error("Failed to delete"); void loadData(); });
                       }} 
                       className="flex-1 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" 
                       title="Delete"
