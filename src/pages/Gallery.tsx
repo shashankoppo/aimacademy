@@ -1,49 +1,102 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, X, ChevronLeft, ChevronRight, Star, Calendar, ArrowRight, Play, Film } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAdminData, type GalleryCategory, type GalleryItem } from "@/hooks/useAdminData";
+import { API_BASE_URL } from "@/lib/admin-api";
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+interface GalleryCategory {
+  id: number;
+  name: string;
+  slug: string;
+  coverUrl: string | null;
+  description: string | null;
+  displayOrder: number;
+  isVisible: boolean;
+}
+
+interface GalleryItem {
+  id: number;
+  title: string | null;
+  imageUrl: string;
+  thumbnailUrl: string | null;
+  categoryId: number;
+  isVisible: boolean;
+  isFeatured: boolean;
+  displayOrder: number;
+  eventDate: string | null;
+  mediaType: string | null;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 const getYouTubeEmbedUrl = (url: string) => {
   const match = url?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
   return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : null;
 };
 
-const isYouTubeUrl = (url: string) => {
-  return /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/i.test(url);
-};
+const isYouTubeUrl = (url: string) =>
+  /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/i.test(url ?? "");
 
+// ─── Component ───────────────────────────────────────────────────────────────
 const Gallery = () => {
   useEffect(() => {
     document.title = "Gallery — AIM Academy Jabalpur";
   }, []);
 
-  const { galleryCategories = [], galleryItems = [], loading } = useAdminData() as any;
-
+  // Own state — no dependency on shared context
+  const [categories, setCategories] = useState<GalleryCategory[]>([]);
+  const [items, setItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Filter out items/categories where isVisible === false
-  const visibleCategories = galleryCategories.filter((c: GalleryCategory) => c.isVisible !== false);
-  const visibleItems = galleryItems.filter((item: GalleryItem) => item.isVisible !== false);
+  // Fetch directly from the public API endpoints
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [catsRes, itemsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/public/gallery/categories`),
+        fetch(`${API_BASE_URL}/public/gallery/items`),
+      ]);
+      if (catsRes.ok) {
+        const cats: GalleryCategory[] = await catsRes.json();
+        setCategories(Array.isArray(cats) ? cats : []);
+      }
+      if (itemsRes.ok) {
+        const its: GalleryItem[] = await itemsRes.json();
+        setItems(Array.isArray(its) ? its : []);
+      }
+    } catch (e) {
+      console.error("[Gallery] Failed to fetch data:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const featuredItems = visibleItems.filter((item: GalleryItem) => item.isFeatured);
-  
-  const displayItems = activeCategory !== null
-    ? visibleItems.filter((item: GalleryItem) => Number(item.categoryId) === Number(activeCategory))
-    : visibleItems;
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
 
-  const handleNext = () => {
-    if (lightboxIndex !== null && displayItems.length > 0) {
+  // ─── Derived values ───────────────────────────────────────────────────────
+  const visibleCategories = categories.filter((c) => c.isVisible !== false);
+  const visibleItems = items.filter((item) => item.isVisible !== false);
+  const featuredItems = visibleItems.filter((item) => item.isFeatured);
+
+  const displayItems =
+    activeCategory !== null
+      ? visibleItems.filter((item) => Number(item.categoryId) === Number(activeCategory))
+      : visibleItems;
+
+  // ─── Lightbox navigation ──────────────────────────────────────────────────
+  const handleNext = useCallback(() => {
+    if (lightboxIndex !== null && displayItems.length > 0)
       setLightboxIndex((lightboxIndex + 1) % displayItems.length);
-    }
-  };
+  }, [lightboxIndex, displayItems.length]);
 
-  const handlePrev = () => {
-    if (lightboxIndex !== null && displayItems.length > 0) {
+  const handlePrev = useCallback(() => {
+    if (lightboxIndex !== null && displayItems.length > 0)
       setLightboxIndex((lightboxIndex - 1 + displayItems.length) % displayItems.length);
-    }
-  };
+  }, [lightboxIndex, displayItems.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -52,11 +105,11 @@ const Gallery = () => {
       if (e.key === "ArrowRight") handleNext();
       if (e.key === "ArrowLeft") handlePrev();
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  });
+  }, [lightboxIndex, handleNext, handlePrev]);
 
+  // ─── Loading state ────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-slate-50">
@@ -68,8 +121,13 @@ const Gallery = () => {
   }
 
   const currentLightboxItem = lightboxIndex !== null ? displayItems[lightboxIndex] : null;
-  const isCurrentVideo = currentLightboxItem ? (currentLightboxItem.mediaType === "VIDEO" || isYouTubeUrl(currentLightboxItem.imageUrl)) : false;
-  const currentEmbedUrl = currentLightboxItem ? getYouTubeEmbedUrl(currentLightboxItem.imageUrl) : null;
+  const isCurrentVideo =
+    currentLightboxItem
+      ? currentLightboxItem.mediaType === "VIDEO" || isYouTubeUrl(currentLightboxItem.imageUrl)
+      : false;
+  const currentEmbedUrl = currentLightboxItem
+    ? getYouTubeEmbedUrl(currentLightboxItem.imageUrl)
+    : null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -78,7 +136,7 @@ const Gallery = () => {
       <section className="relative w-full bg-gradient-to-br from-slate-950 via-slate-900 to-primary/30 overflow-hidden py-24 lg:py-32">
         <div className="absolute inset-0 bg-black/40"></div>
         <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -86,7 +144,7 @@ const Gallery = () => {
           >
             Our Gallery
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -99,7 +157,7 @@ const Gallery = () => {
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 lg:px-8 py-12 md:py-16">
-        
+
         {/* Featured Section */}
         {featuredItems.length > 0 && activeCategory === null && (
           <div className="mb-16">
@@ -108,50 +166,41 @@ const Gallery = () => {
               <h2 className="text-3xl font-black text-slate-900 leading-none">Featured Moments</h2>
             </div>
             <div className="flex overflow-x-auto gap-6 pb-6 snap-x hide-scrollbar">
-              {featuredItems.map((item: GalleryItem) => {
+              {featuredItems.map((item) => {
                 const isVid = item.mediaType === "VIDEO" || isYouTubeUrl(item.imageUrl);
                 return (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    key={item.id} 
+                    key={item.id}
                     className="shrink-0 w-[300px] md:w-[400px] aspect-[4/3] rounded-2xl overflow-hidden relative cursor-pointer group shadow-lg snap-start border border-slate-200 bg-slate-900"
                     onClick={() => {
-                      const dIdx = displayItems.findIndex((i: GalleryItem) => i.id === item.id);
+                      const dIdx = displayItems.findIndex((i) => i.id === item.id);
                       if (dIdx !== -1) setLightboxIndex(dIdx);
                     }}
                   >
-                    <img 
-                      src={item.thumbnailUrl || item.imageUrl} 
-                      alt={item.title || "Featured Item"} 
+                    <img
+                      src={item.thumbnailUrl || item.imageUrl}
+                      alt={item.title || "Featured Item"}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    <div className="absolute top-4 left-4 flex items-center gap-2">
-                      <span className="bg-primary text-slate-900 text-xs font-black px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md uppercase tracking-wider">
-                        <Star className="w-3.5 h-3.5 fill-slate-900" /> Featured
-                      </span>
-                      {isVid && (
-                        <span className="bg-red-600 text-white text-xs font-black px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow-md">
-                          <Play className="w-3 h-3 fill-white" /> Video
-                        </span>
-                      )}
-                    </div>
-
                     {isVid && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="w-14 h-14 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                          <Play className="w-6 h-6 fill-white ml-0.5" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                          <Play className="w-6 h-6 fill-white ml-1" />
                         </div>
                       </div>
                     )}
-
-                    <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-2 group-hover:translate-y-0 transition-transform">
-                      <h3 className="text-white font-extrabold text-lg leading-tight mb-2 drop-shadow-md">{item.title || "AIM Academy Moment"}</h3>
+                    <div className="absolute bottom-0 left-0 right-0 p-5">
+                      <div className="flex items-center gap-2 text-amber-400 mb-2">
+                        <Star className="w-4 h-4 fill-amber-400" />
+                        <span className="text-xs font-black uppercase tracking-widest">Featured</span>
+                      </div>
+                      {item.title && <p className="text-white font-bold text-sm">{item.title}</p>}
                       {item.eventDate && (
-                        <span className="inline-flex items-center gap-1.5 text-slate-300 text-xs font-semibold bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-sm">
+                        <span className="flex items-center gap-1.5 text-slate-300 text-xs mt-1">
                           <Calendar className="w-3.5 h-3.5" />
                           {item.eventDate}
                         </span>
@@ -170,23 +219,23 @@ const Gallery = () => {
             <button
               onClick={() => setActiveCategory(null)}
               className={`shrink-0 px-6 py-2.5 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
-                activeCategory === null 
-                  ? "bg-primary text-slate-900 shadow-md scale-105 font-black" 
+                activeCategory === null
+                  ? "bg-primary text-slate-900 shadow-md scale-105 font-black"
                   : "bg-white text-slate-600 border border-slate-200 hover:border-primary hover:text-slate-900 hover:bg-slate-50"
               }`}
             >
               All Media <span className="ml-2 text-xs opacity-75 bg-black/10 px-2 py-0.5 rounded-full">{visibleItems.length}</span>
             </button>
-            {visibleCategories.map((cat: GalleryCategory) => {
-              const count = visibleItems.filter((i: GalleryItem) => Number(i.categoryId) === Number(cat.id)).length;
+            {visibleCategories.map((cat) => {
+              const count = visibleItems.filter((i) => Number(i.categoryId) === Number(cat.id)).length;
               const isTabActive = activeCategory !== null && Number(activeCategory) === Number(cat.id);
               return (
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={`shrink-0 px-6 py-2.5 rounded-full font-bold text-sm transition-all whitespace-nowrap ${
-                    isTabActive 
-                      ? "bg-primary text-slate-900 shadow-md scale-105 font-black" 
+                    isTabActive
+                      ? "bg-primary text-slate-900 shadow-md scale-105 font-black"
                       : "bg-white text-slate-600 border border-slate-200 hover:border-primary hover:text-slate-900 hover:bg-slate-50"
                   }`}
                 >
@@ -200,7 +249,7 @@ const Gallery = () => {
         {/* Media Masonry Grid */}
         {displayItems.length > 0 ? (
           <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
-            {displayItems.map((item: GalleryItem, idx: number) => {
+            {displayItems.map((item, idx) => {
               const isVid = item.mediaType === "VIDEO" || isYouTubeUrl(item.imageUrl);
               return (
                 <motion.div
@@ -211,9 +260,9 @@ const Gallery = () => {
                   className="break-inside-avoid relative rounded-2xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-xl transition-all border border-slate-200 bg-slate-900"
                   onClick={() => setLightboxIndex(idx)}
                 >
-                  <img 
-                    src={item.thumbnailUrl || item.imageUrl} 
-                    alt={item.title || "Gallery"} 
+                  <img
+                    src={item.thumbnailUrl || item.imageUrl}
+                    alt={item.title || "Gallery"}
                     loading="lazy"
                     className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -232,12 +281,12 @@ const Gallery = () => {
                       </div>
                     </div>
                   )}
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <h3 className="text-white font-extrabold text-sm md:text-base leading-tight mb-1.5 drop-shadow-md">{item.title || "AIM Academy"}</h3>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                    {item.title && <p className="text-white font-bold text-sm">{item.title}</p>}
                     {item.eventDate && (
-                      <span className="inline-flex items-center gap-1.5 text-slate-300 text-[10px] md:text-xs font-semibold bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-sm">
-                        <Calendar className="w-3 h-3" />
+                      <span className="flex items-center gap-1.5 text-slate-300 text-xs mt-1">
+                        <Calendar className="w-3.5 h-3.5" />
                         {item.eventDate}
                       </span>
                     )}
@@ -247,28 +296,28 @@ const Gallery = () => {
             })}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 shadow-sm">
-            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Camera className="w-10 h-10 text-slate-400" />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-28 text-center"
+          >
+            <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6 shadow-inner">
+              <Camera className="w-10 h-10 text-slate-300" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 mb-3">No Media Found</h3>
-            <p className="text-slate-500 font-medium max-w-md mx-auto">
-              Our gallery is being updated with photos and videos. Check back soon for new moments of excellence!
-            </p>
-          </div>
+            <h3 className="text-xl font-black text-slate-400 mb-2">No photos yet</h3>
+            <p className="text-slate-400 text-sm max-w-xs">Our gallery is being updated. Check back soon!</p>
+          </motion.div>
         )}
       </main>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 py-16 lg:py-20 relative overflow-hidden border-t-4 border-primary">
-        <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-6">Want to be part of our story?</h2>
-          <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto font-medium">
-            Join thousands of successful students who have transformed their dreams into reality at AIM Academy.
-          </p>
-          <Link 
-            to="/contact" 
-            className="inline-flex items-center gap-3 bg-primary text-slate-900 font-black text-lg px-8 py-4 rounded-full shadow-[0_0_25px_rgba(251,225,34,0.4)] hover:scale-105 transition-transform uppercase tracking-wider"
+      <section className="bg-gradient-to-r from-slate-900 to-primary/80 py-16">
+        <div className="container mx-auto px-4 lg:px-8 text-center">
+          <h2 className="text-3xl font-black text-white mb-4">Want to be part of our story?</h2>
+          <p className="text-slate-200 mb-8 max-w-xl mx-auto">Join thousands of students who chose AIM Academy and made their mark.</p>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 bg-primary text-slate-900 font-black px-8 py-4 rounded-xl hover:opacity-90 transition-all shadow-lg text-lg"
           >
             Join AIM Academy <ArrowRight className="w-5 h-5" />
           </Link>
@@ -278,101 +327,86 @@ const Gallery = () => {
       {/* Lightbox */}
       <AnimatePresence>
         {lightboxIndex !== null && currentLightboxItem && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/95 flex flex-col items-center justify-center p-4 md:p-8 backdrop-blur-md"
+            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
             onClick={() => setLightboxIndex(null)}
           >
-            <button 
+            {/* Close */}
+            <button
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all"
               onClick={() => setLightboxIndex(null)}
-              className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors z-[210]"
-              title="Close (Esc)"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
 
+            {/* Prev */}
             {displayItems.length > 1 && (
-              <>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                  className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors z-[210]"
-                  title="Previous"
-                >
-                  <ChevronLeft className="w-8 h-8 md:w-10 md:h-10" />
-                </button>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                  className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors z-[210]"
-                  title="Next"
-                >
-                  <ChevronRight className="w-8 h-8 md:w-10 md:h-10" />
-                </button>
-              </>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all"
+                onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
             )}
 
-            <div 
-              className="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {isCurrentVideo ? (
-                currentEmbedUrl ? (
-                  <div className="w-full aspect-video rounded-xl overflow-hidden shadow-2xl bg-black">
-                    <iframe 
-                      src={currentEmbedUrl} 
-                      title={currentLightboxItem.title || "Video"} 
-                      className="w-full h-full border-0" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <video 
-                    controls 
-                    autoPlay 
-                    src={currentLightboxItem.imageUrl} 
-                    className="max-w-full max-h-[70vh] rounded-xl shadow-2xl bg-black"
-                  />
-                )
+            {/* Media */}
+            <div className="max-w-5xl w-full max-h-[85vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+              {isCurrentVideo && currentEmbedUrl ? (
+                <iframe
+                  src={currentEmbedUrl}
+                  className="w-full aspect-video rounded-xl shadow-2xl"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              ) : isCurrentVideo ? (
+                <div className="w-full aspect-video rounded-xl bg-slate-800 flex flex-col items-center justify-center gap-4">
+                  <Film className="w-16 h-16 text-slate-500" />
+                  <a
+                    href={currentLightboxItem.imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4 fill-white" /> Open Video
+                  </a>
+                </div>
               ) : (
-                <motion.img 
-                  key={lightboxIndex}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  src={currentLightboxItem.imageUrl} 
-                  alt={currentLightboxItem.title || "Gallery"} 
-                  className="max-w-full max-h-[72vh] object-contain rounded-lg shadow-2xl"
+                <img
+                  src={currentLightboxItem.imageUrl}
+                  alt={currentLightboxItem.title || "Gallery"}
+                  className="max-h-[75vh] max-w-full object-contain rounded-xl shadow-2xl"
                 />
               )}
-              
-              <motion.div 
-                key={`text-${lightboxIndex}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="mt-6 text-center"
+              {(currentLightboxItem.title || currentLightboxItem.eventDate) && (
+                <div className="mt-4 text-center">
+                  {currentLightboxItem.title && (
+                    <p className="text-white font-bold text-lg">{currentLightboxItem.title}</p>
+                  )}
+                  {currentLightboxItem.eventDate && (
+                    <p className="text-slate-400 text-sm mt-1 flex items-center gap-1 justify-center">
+                      <Calendar className="w-3.5 h-3.5" /> {currentLightboxItem.eventDate}
+                    </p>
+                  )}
+                </div>
+              )}
+              <p className="text-slate-500 text-sm mt-2">{lightboxIndex + 1} / {displayItems.length}</p>
+            </div>
+
+            {/* Next */}
+            {displayItems.length > 1 && (
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all"
+                onClick={(e) => { e.stopPropagation(); handleNext(); }}
               >
-                <h3 className="text-white font-black text-2xl mb-1 drop-shadow-md">
-                  {currentLightboxItem.title || "AIM Academy"}
-                </h3>
-                {currentLightboxItem.eventDate && (
-                  <p className="text-slate-300 font-medium flex items-center justify-center gap-2 mt-2">
-                    <Calendar className="w-4 h-4" />
-                    {currentLightboxItem.eventDate}
-                  </p>
-                )}
-              </motion.div>
-            </div>
-            
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-400 font-semibold text-sm">
-              {lightboxIndex + 1} / {displayItems.length}
-            </div>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 };
