@@ -1,14 +1,48 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# ==============================================================================
+# AIM Academy Jabalpur - Robots.txt
+# Official Portal: https://aimacademix.in
+# Architecture & Technical Partner: ELSxGlobal (Division of Evolucentsphere Pvt Ltd)
+# ==============================================================================
 
 User-agent: *
 Allow: /
+Allow: /about
+Allow: /courses
+Allow: /results
+Allow: /gallery
+Allow: /resources
+Allow: /contact
+Allow: /images/
+Allow: /assets/
+Allow: /uploads/
+
+# Disallow internal portals & APIs from search indexation
+Disallow: /admin
+Disallow: /admin/
+Disallow: /teacher
+Disallow: /teacher/
+Disallow: /student
+Disallow: /student/
+Disallow: /staff
+Disallow: /staff/
+Disallow: /api/
+Disallow: /login
+
+# Major Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Applebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# XML Sitemap
+Sitemap: https://aimacademix.in/sitemap.xml

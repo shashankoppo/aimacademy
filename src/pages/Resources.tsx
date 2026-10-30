@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FileText, ArrowRight, BookOpen, Download, ExternalLink, Search, Bell, Tag, Clock, Eye } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import { useAdminData } from "@/hooks/useAdminData";
+import SEO from "@/components/SEO";
 
 const blogPosts = [
   { title: "UPSC Prelims 2026: Complete Strategy & Key Topics", date: "March 5, 2026", category: "Strategy", readTime: "8 min", summary: "A comprehensive strategy for the remaining months before Prelims 2026 - what to focus on, what to skip, and how to maximize your score." },
@@ -60,6 +61,12 @@ const Resources = () => {
 
   return (
     <div className="pt-[3.75rem] page-enter bg-white">
+      <SEO
+        title="Free Study Material & UPSC Notes PDF"
+        description="Download free UPSC and MPPSC notes, strategy guides, current affairs compilations, and previous year question papers from AIM Academy Jabalpur."
+        canonical="/resources"
+        keywords="Free UPSC Notes, MPPSC Study Material PDF, Current Affairs PDF Jabalpur, Civil Services Study Material"
+      />
       <section className="relative py-28 bg-hero overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] rounded-full bg-gold/5 blur-[100px]" />

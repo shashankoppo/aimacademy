@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Shield, Target, Trophy, Clock, Calendar, CheckCircle2, ArrowRight, ChevronDown, ChevronUp, ChevronRight, Users, Zap } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
 import { useAdminData } from "@/hooks/useAdminData";
+import SEO from "@/components/SEO";
 
 const courses = [
   {
@@ -217,6 +218,12 @@ const Courses = () => {
 
   return (
     <div className="pt-[3.75rem] page-enter bg-background min-h-screen">
+      <SEO
+        title="Civil Services & Govt Exam Courses"
+        description="Comprehensive classroom foundation and test series batches for UPSC, MPPSC, Sub-Inspector (SI), SSC CGL, Police and Banking exams at AIM Academy Jabalpur."
+        canonical="/courses"
+        keywords="UPSC Coaching Jabalpur, MPPSC Classes Jabalpur, Sub Inspector Coaching Jabalpur, SSC CGL Jabalpur, Civil Services Coaching MP"
+      />
       {/* Header */}
       <section className="relative py-16 bg-white border-b border-black/5 shadow-sm">
         <div className="absolute inset-0 dot-grid-sm opacity-30" />

@@ -88,20 +88,36 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium uppercase tracking-wider">
-          <div className="text-center md:text-left space-y-2">
-            <p className="text-slate-900">
+        <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-6 text-[11px] font-medium tracking-wide">
+          <div className="text-center md:text-left space-y-1.5">
+            <p className="text-slate-900 font-bold uppercase tracking-wider">
               © {new Date().getFullYear()}{" "}
-              <span className="lang-en-only">AIM Academy</span>
+              <span className="lang-en-only">AIM Academy Jabalpur</span>
               <span className="lang-hi-only notranslate" translate="no">ए आई एम एकेडमी</span>
               . All Rights Reserved.
             </p>
-            <p className="text-slate-400">Technical Partner: <span className="text-slate-900 font-bold">ELSxGlobal</span> (Division of Evolucentsphere Pvt Ltd)</p>
+            <p className="text-slate-500 normal-case flex flex-wrap items-center justify-center md:justify-start gap-1.5">
+              <span>Technology &amp; Digital Infrastructure Partner:</span>
+              <a
+                href="https://evolucentsphere.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="ELSxGlobal - Digital Architecture & Enterprise Solutions"
+                className="font-bold text-slate-900 hover:text-primary transition-colors underline decoration-slate-300 underline-offset-2"
+              >
+                ELSxGlobal
+              </a>
+              <span className="text-slate-400 font-normal">(Division of Evolucentsphere Pvt Ltd)</span>
+            </p>
           </div>
-          <div className="flex flex-wrap gap-6">
-            <Link to="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
-            <span className="text-slate-200 hidden sm:inline">|</span>
+          <div className="flex flex-wrap items-center gap-6 text-slate-500 font-semibold text-xs">
             <Link to="/about" className="hover:text-primary transition-colors">About Us</Link>
+            <span className="text-slate-200 hidden sm:inline">|</span>
+            <Link to="/courses" className="hover:text-primary transition-colors">Courses</Link>
+            <span className="text-slate-200 hidden sm:inline">|</span>
+            <Link to="/gallery" className="hover:text-primary transition-colors">Gallery</Link>
+            <span className="text-slate-200 hidden sm:inline">|</span>
+            <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
           </div>
         </div>
 

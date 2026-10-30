@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Star, Medal, Award, Zap } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
+import SEO from "@/components/SEO";
 
 const allToppers = [
   { name: "Aarav Mehta",   rank: "AIR 12",  exam: "UPSC CSE 2024", year: "2024", badge: "🥇", quote: "The mock interviews at AIM were indistinguishable from the real board experience.", color: "from-amber-400/20 to-amber-400/3",  border: "border-amber-400/30" },
@@ -46,6 +47,12 @@ const Results = () => {
 
   return (
     <div className="pt-[3.75rem] page-enter bg-background">
+      <SEO
+        title="Selections & Toppers Hall of Fame"
+        description="Over 500+ civil service selections in UPSC CSE, MPPSC, Sub-Inspector, Banking & SSC. Discover AIM Academy Jabalpur's rank holders and success stories."
+        canonical="/results"
+        keywords="AIM Academy Results, UPSC Toppers Jabalpur, MPPSC Selections, Civil Services Rankers MP"
+      />
       {/* Hero */}
       <section className="relative py-22 md:py-28 bg-transparent overflow-hidden border-b border-black/5">
         <div className="absolute inset-0 dot-grid-sm opacity-60" />

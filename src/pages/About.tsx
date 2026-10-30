@@ -49,6 +49,7 @@ const fadeUp = {
 
 import { useEffect } from "react";
 import { useAdminData } from "@/hooks/useAdminData";
+import SEO from "@/components/SEO";
 
 const About = () => {
   const { websiteSettings } = useAdminData();
@@ -57,6 +58,12 @@ const About = () => {
 
   return (
     <div className="pt-[3.75rem] page-enter bg-background">
+      <SEO
+        title="About Us – Faculty & Mentorship Excellence"
+        description="Learn about AIM Academy Jabalpur, founded by Dr. Imran Khan. Discover our mission, proven methodology, experienced civil servant faculty, and 14+ years legacy."
+        canonical="/about"
+        keywords="About AIM Academy, Dr Imran Khan Jabalpur, Best Civil Services Faculty MP, UPSC Mentorship Jabalpur"
+      />
       {/* ══ HERO ══════════════════════════════════════════════ */}
       <section className="relative py-24 md:py-32 bg-transparent overflow-hidden border-b border-black/5">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />

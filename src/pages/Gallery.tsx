@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Camera, X, ChevronLeft, ChevronRight, Star, Calendar, ArrowRight, Play, Film } from "lucide-react";
 import { Link } from "react-router-dom";
 import { API_BASE_URL } from "@/lib/admin-api";
+import SEO from "@/components/SEO";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface GalleryCategory {
@@ -131,6 +132,12 @@ const Gallery = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <SEO
+        title="Photo & Video Gallery – Campus Life & Events"
+        description="Explore the campus life, classroom sessions, toppers felicitation ceremonies, and seminars at AIM Academy Jabalpur."
+        canonical="/gallery"
+        keywords="AIM Academy Gallery, Classroom photos Jabalpur, AIM Academy videos, Coaching institute photos Jabalpur"
+      />
 
       {/* Hero Section */}
       <section className="relative w-full bg-gradient-to-br from-slate-950 via-slate-900 to-primary/30 overflow-hidden py-24 lg:py-32">

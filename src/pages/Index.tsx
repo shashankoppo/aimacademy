@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { MapPin, Clock, Youtube, ShieldCheck, GraduationCap, Video, ArrowRight, ChevronRight, ChevronLeft, PhoneCall, Handshake, Users, Award, X, Play, Download, CheckCircle2 } from "lucide-react";
 import { useAdminData, type VideoItem } from "@/hooks/useAdminData";
+import SEO from "@/components/SEO";
 
 const getYouTubeVideoId = (url: string) => {
    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
@@ -94,28 +95,13 @@ const Index = () => {
 
    return (
       <div className="min-h-screen bg-[#FFFF00] font-sans text-slate-800">
+         <SEO
+            title="Best UPSC, MPPSC, SI, Police & SSC Coaching in Jabalpur"
+            description="AIM Academy Jabalpur is Central India's premier coaching institute for UPSC, MPPSC, Sub-Inspector, Police Constable, SSC CGL & Vyapam. 500+ selections under Dr. Imran Khan."
+            canonical="/"
+            keywords="AIM Academy Jabalpur, UPSC Coaching Jabalpur, MPPSC Coaching Jabalpur, Sub Inspector Coaching, Best MPPSC Coaching, Vyapam Coaching"
+         />
          <h1 className="sr-only">AIM Academy Jabalpur - Best MPPSC & UPSC Coaching in Central India</h1>
-         
-         {/* JSON-LD Structured Data for Local SEO */}
-         <script type="application/ld+json">
-            {JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "EducationalOrganization",
-              "name": "AIM Academy",
-              "url": "https://aimacademix.in",
-              "logo": "https://aimacademix.in/images/logo_main.png",
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "3rd Floor, Manas Bhawan Extension, Wright Town",
-                "addressLocality": "Jabalpur",
-                "addressRegion": "Madhya Pradesh",
-                "postalCode": "482002",
-                "addressCountry": "IN"
-              },
-              "description": "Best MPPSC, UPSC, SSC and Banking coaching institute in Jabalpur with 14+ years of legacy.",
-              "telephone": "+91-7067231189"
-            })}
-         </script>
 
          {/* ── KGS-STYLE HERO (FULL WIDTH SLIDER) ── */}
          <section className="w-full relative group bg-transparent border-b border-black/5">

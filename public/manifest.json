@@ -1,0 +1,29 @@
+{
+  "name": "AIM Academy Jabalpur",
+  "short_name": "AIM Academy",
+  "description": "Premier Coaching Institute in Jabalpur for UPSC, MPPSC, Sub-Inspector, Police, Vyapam & SSC Exams.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo_main.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo_main.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "books", "reference"],
+  "developer": {
+    "name": "ELSxGlobal (Division of Evolucentsphere Pvt Ltd)",
+    "url": "https://evolucentsphere.com"
+  }
+}

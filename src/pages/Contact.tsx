@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle2, MessageCircle, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import SEO from "@/components/SEO";
 
 const courseOptions = [
   "UPSC Civil Services (CSE)",
@@ -59,6 +60,12 @@ const Contact = () => {
 
   return (
     <div className="pt-[3.75rem] page-enter bg-background">
+      <SEO
+        title="Contact Us & Campus Locations – Ranjhi & Adhartal"
+        description="Visit AIM Academy Jabalpur at Ranjhi or Adhartal campuses. Call +91 70672 31189 or +91 62320 51184 for personalized civil service admissions counseling."
+        canonical="/contact"
+        keywords="AIM Academy Jabalpur address, AIM Academy contact number, Ranjhi coaching center, Adhartal coaching institute"
+      />
       {/* Hero */}
       <section className="relative py-28 bg-transparent overflow-hidden">
         <div className="absolute inset-0 dot-grid-sm opacity-40" />
